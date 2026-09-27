@@ -379,7 +379,7 @@ el.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return
   if(press&&!press.moved&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>8)press.moved=true;
   if(ptrs.size===1){
     if(panMode||plan2d)pan(dx,dy);
-    else{const da=-dx*.35,dp=dy*.28;userAz+=da;userPol=clampPol(userPol+dp);vAz=vAz*.4+da*.6;vPol=vPol*.4+dp*.6;lastMove=performance.now();}
+    else{const da=-dx*.35,dp=-dy*.28;userAz+=da;userPol=clampPol(userPol+dp);vAz=vAz*.4+da*.6;vPol=vPol*.4+dp*.6;lastMove=performance.now();}
   }else if(ptrs.size===2&&g2){const n=two();
     pan(n.mx-g2.mx,n.my-g2.my);
     if(n.d>0)zoomAt(g2.d/n.d,anchor);
