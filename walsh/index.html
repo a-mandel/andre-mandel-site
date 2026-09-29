@@ -681,7 +681,7 @@
   const ldBar = $('#ldBar'), ldMsg = $('#ldMsg');
   const MSGS = ['Sharpening the pencils', 'Leveling the grade', 'Setting the beam at 6012', 'Framing the gable ends', 'Squaring the windows', 'Planting the pines', 'Checking 30 ft over grade'];
   const LD_T = 5.8, LD_HOLD = 0.9;               // seconds of motion, then a beat at rest before diving in
-  const LD = { built: 0, done: false, err: false, t0: 0, end: 0 };
+  const LD = { built: 0, done: false, err: false, a: 0 };      // a: motion progress 0..1, advanced only by drawn frames
   function step(i) { LD.built = (i + 1) / MSGS.length; if (i >= MSGS.length - 1) LD.done = true; }
   const clampL = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const eOutL = (t, p = 3) => 1 - Math.pow(1 - t, p);
@@ -760,16 +760,18 @@
         ldMsg.textContent = MSGS[Math.min(MSGS.length - 1, Math.floor(k * MSGS.length * 0.999))];
       }
     };
-    LD.t0 = performance.now(); LD.end = LD.t0 + (REDUCE ? 0 : LD_T * 1000);
-    if (REDUCE) { paint(1); return; }
+    // the clock moves only while frames are drawn, at most 34 ms a frame: a long stall (the model build on a phone)
+    // pauses the spin instead of skipping it, so the whole motion always plays (André 9/29 12:27 pm)
+    if (REDUCE) { LD.a = 1; paint(1); return; }
+    let last = 0;
     const tick = now => {
-      const t = clampL((now - LD.t0) / 1000 / LD_T);
-      paint(t);
-      if (t < 1 || (!LD.done && !LD.err)) requestAnimationFrame(tick);
+      if (last) LD.a = clampL(LD.a + Math.min(now - last, 34) / 1000 / LD_T);
+      last = now; paint(LD.a);
+      if (LD.a < 1 || (!LD.done && !LD.err)) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }
-  window.__ld = { freeze: t => { LD.t0 = performance.now() - t * LD_T * 1000; } };
+  window.__ld = { freeze: t => { LD.a = t; } };
 
   // ------------------------------------------------------------------ boot
   async function boot() {
@@ -783,8 +785,8 @@
     const W3 = build(DATA, step);
     await W3.ready;
     step(6);
-    const wait = REDUCE ? 600 - (performance.now() - tStart) : LD.end + LD_HOLD * 1000 - performance.now();
-    if (wait > 0) await sleep(wait);
+    if (REDUCE) { const wait = 600 - (performance.now() - tStart); if (wait > 0) await sleep(wait); }
+    else { while (LD.a < 1) await nextFrame(); await sleep(LD_HOLD * 1000); }      // the full motion, then a beat at rest
     if (!REDUCE) { $('#ld').classList.add('dive'); await sleep(380); }
     $('#loader').classList.add('gone');
     setTimeout(() => { $('#loader').hidden = true; }, 1000);
