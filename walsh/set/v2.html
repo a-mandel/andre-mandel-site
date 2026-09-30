@@ -100,7 +100,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .zl.hot{opacity:1;color:var(--accent)}
 
 /* drawing field */
-.field{position:absolute;left:calc(var(--u)*1.25);top:calc(var(--u)*.5);width:calc(var(--u)*30.75);height:calc(var(--u)*23)}
+.field{position:absolute;left:calc(var(--u)*1.25);top:calc(var(--u)*.5);width:calc(var(--u)*31.25);height:calc(var(--u)*23)}
 .view{position:absolute}
 .view .box{position:absolute;inset:0;border:1px dashed rgba(27,26,24,.42);border-radius:calc(var(--u)*.24)}
 .vt{position:absolute;left:0;top:calc(100% + var(--u)*.2);display:flex;align-items:center;gap:calc(var(--u)*.16);white-space:nowrap}
@@ -148,6 +148,25 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .qr path{fill:var(--ink)}
 .qr rect{fill:var(--paper)}
 
+
+/* curved footer lines (André 9/30): every horizontal rule swoops like the ribbon roof, level and sagging, then lifting at the right */
+:root{--swoop:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'%3E%3Cpath d='M0 7.6 C22 9.4 58 9.6 80 6.4 S96 1.6 100 0.8' fill='none' stroke='%231b1a18' stroke-opacity='.34' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")}
+.rdata li{border-top:0 !important;background:var(--swoop) no-repeat 0 0 / 100% calc(var(--u)*.16);padding-top:calc(var(--u)*.2) !important}
+.iss li{border-top:0 !important;background:var(--swoop) no-repeat 0 0 / 100% calc(var(--u)*.1)}
+.tbc .sec + .sec::after{content:"";position:absolute;left:calc(var(--u)*-.3);right:0;top:calc(var(--u)*-.2);height:calc(var(--u)*.14);background:var(--swoop) no-repeat 0 0 / 100% 100%;pointer-events:none}
+.tbc .sec.tlive + .sec.colo::after{display:none}
+
+/* the 3 in sidebar (9/30): type trimmed so every line holds */
+.tb{--t-name:max(calc(15px * var(--fl)),calc(var(--u) * .33));--t-val:max(calc(9px * var(--fl)),calc(var(--u) * .135));--t-iss:max(calc(9.5px * var(--fl)),calc(var(--u) * .15));
+  --t-sheet:max(calc(13px * var(--fl)),calc(var(--u) * .27));--t-num:max(calc(32px * var(--fl)),calc(var(--u) * 1.0));--t-lab:max(calc(7.5px * var(--fl)),calc(var(--u) * .105));--t-sm:max(calc(8px * var(--fl)),calc(var(--u) * .118))}
+.tb .iss li{grid-template-columns:1em 3.7em 1fr}
+.tb .stamp .seal{width:max(calc(46px * var(--fl)),calc(var(--u)*1.02));height:max(calc(46px * var(--fl)),calc(var(--u)*1.02))}
+.tb .stamp .val{white-space:normal}
+.tb .tlive{gap:calc(var(--u)*.1)}
+.tb .tlive .qr{width:calc(var(--u)*.66);height:calc(var(--u)*.66);flex:none}
+.tb .tlive .url{white-space:normal;word-break:break-all}
+.tb .status{letter-spacing:.14em}
+.tb .tlive .url{font-size:max(calc(7.5px * var(--fl)),calc(var(--u)*.105))}
 /* cover: the pocket model reel drives the footer; the model's own controls take over the field when it's entered */
 .ticks i.run b{animation:rtick var(--dur,10s) linear forwards}
 @keyframes rtick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -183,9 +202,9 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .legend-p{font-style:italic;color:var(--muted);font-size:max(calc(var(--fl)*11px),calc(var(--u)*.24));line-height:1.35;margin:0}
 
 /* title block, option 2: one vertical rule, datum dots, hierarchy from type */
-.tb{position:absolute;left:calc(var(--u)*32);top:calc(var(--u)*.5);width:calc(var(--u)*3.5);height:calc(var(--u)*23)}
+.tb{position:absolute;left:calc(var(--u)*32.5);top:calc(var(--u)*.5);width:calc(var(--u)*3);height:calc(var(--u)*23)}
 .tb .lock{position:absolute;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.tbc{position:absolute;left:calc(var(--u)*.3);right:calc(var(--u)*.26);bottom:calc(var(--u)*.26);display:flex;flex-direction:column;justify-content:space-between}
+.tbc{position:absolute;left:calc(var(--u)*.3);right:calc(var(--u)*.22);bottom:calc(var(--u)*.26);display:flex;flex-direction:column;justify-content:space-between}
 .sec{position:relative;flex:none}
 .sec + .sec{margin-top:calc(var(--u)*.22)}
 .sec.dat::before{content:"";position:absolute;left:calc(var(--u)*-.3 - var(--dot) / 2);top:calc(var(--t-lab) * .65 - var(--dot) / 2);width:var(--dot);height:var(--dot);border-radius:50%;background:var(--accent)}
@@ -538,18 +557,36 @@ const pad2 = n => String(n).padStart(2, '0');
 /* border geometry: a 1 in binding, the border clears it at x 1.25; the upper right corner is cut on the roof stroke angle */
 const BL = 1.25;                     // border left
 const K = 0.738;                     // dx/dy of the roof stroke (53.6 degrees from horizontal)
-const LOCK = { x: 32.86, y: 0.84, w: 2.14 };          // lockup in sheet inches
-const LK = LOCK.w / 357;                               // inches per lockup px
-const GAP = 0.34;                                      // horizontal gap from stroke envelope to cut
-const aCut = LOCK.x + 23 * LK - K * LOCK.y + GAP;      // cut line X = aCut + K * Y
-const V1 = [aCut + K * 0.5, 0.5], V2 = [35.5, (35.5 - aCut) / K];
-const LOCK_BOTTOM = LOCK.y + LOCK.w * 520 / 357;
-
+const TBX = 32.5;                                       // sidebar from the 32 1/2 line, 3 in wide (André 9/30)
+const TXL = TBX + 0.3, TXR = 35.5 - 0.22;               // the sidebar's text margins
+/* the lockup fills the sidebar: the mark (lockup px 6 to 352) spans the text margins exactly */
+const LK = (TXR - TXL) / 346;                           // inches per lockup px
+const LOCK = { x: TXL - 6 * LK, y: 0.74, w: 357 * LK };
+const LOCK_BOTTOM = LOCK.y + 520 * LK;
+/* the corner follows the roof stroke's concave sweep: its right edge, measured off the lockup, is
+   x = 53.38 + 0.0741 y + 0.001358 y^2 (lockup px, good to about 4 px), offset outward by GAP */
+const GAP = 0.3;
+const ENV = py => 53.38 + 0.0741 * py + 0.001358 * py * py;
+const CUT = py => [LOCK.x + ENV(py) * LK + GAP, LOCK.y + py * LK];
+function cutSpan() {
+  let a = (0.5 - LOCK.y) / LK, b = a;                     // top of the border
+  while (CUT(b)[0] < 35.5 && b < 700) b += 0.25;          // down to the right border
+  return [a, b];
+}
+const [PY0, PY1] = cutSpan();
+const V1 = CUT(PY0), V2 = [35.5, CUT(PY1)[1]];
 function borderPath() {
-  const R = 0.3, r = 0.38, dx = K / Math.hypot(K, 1), dy = 1 / Math.hypot(K, 1);
-  const f = n => +n.toFixed(4);
-  return `M${f(BL + R)} 0.5 H${f(V1[0] - r)} Q${f(V1[0])} 0.5 ${f(V1[0] + r * dx)} ${f(0.5 + r * dy)} ` +
-    `L${f(V2[0] - r * dx)} ${f(V2[1] - r * dy)} Q35.5 ${f(V2[1])} 35.5 ${f(V2[1] + r)} ` +
+  const R = 0.3, r = 0.34, f = n => +n.toFixed(4);
+  // sample the curve, easing off a fillet at each end
+  const pts = [];
+  const lenAt = [];
+  for (let py = PY0; py <= PY1; py += 2) pts.push(CUT(py));
+  pts.push(CUT(PY1));
+  const sIn = pts.findIndex(p => Math.hypot(p[0] - V1[0], p[1] - V1[1]) >= r);
+  let sOut = pts.length - 1; while (sOut > 0 && Math.hypot(pts[sOut][0] - V2[0], pts[sOut][1] - V2[1]) < r) sOut--;
+  const body = pts.slice(sIn, sOut + 1).map(p => `L${f(p[0])} ${f(p[1])}`).join(' ');
+  return `M${f(BL + R)} 0.5 H${f(V1[0] - r)} Q${f(V1[0])} 0.5 ${f(pts[sIn][0])} ${f(pts[sIn][1])} ${body} ` +
+    `Q35.5 ${f(V2[1])} 35.5 ${f(V2[1] + r)} ` +
     `V${23.5 - R} Q35.5 23.5 ${35.5 - R} 23.5 H${BL + R} Q${BL} 23.5 ${BL} ${23.5 - R} V${0.5 + R} Q${BL} 0.5 ${BL + R} 0.5 Z`;
 }
 
@@ -576,7 +613,7 @@ function frameSVG() {
   }
   return `<svg class="frame" viewBox="0 0 36 24" preserveAspectRatio="none" aria-hidden="true">
     <path class="bd" d="${borderPath()}"/>
-    <line class="vr" x1="32" y1="0.5" x2="32" y2="23.5"/>
+    <line class="vr" x1="${TBX}" y1="0.5" x2="${TBX}" y2="23.5"/>
     ${t}</svg>`;
 }
 
@@ -654,7 +691,7 @@ function fieldCartoon(sh) {
 function sheetNotesFree(sh) {
   const notes = (sh.notes || []).filter(n => n.v === undefined);
   if (!notes.length) return '';
-  const W = 30.75, H = 23;
+  const W = 31.25, H = 23;
   let d = 0;
   return `<div class="vfree">${notes.map(n => {
     const m = { ...n, t: [FX(n.t[0]) / W, FY(n.t[1]) / H], p: [FX(n.p[0]) / W, FY(n.p[1]) / H] };
@@ -725,7 +762,7 @@ function titleBlock(sh, i) {
     return `<li class="${k === 0 ? 'new' : ''}" style="--d:${d}">${k === 0 ? '<svg class="tick" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5.5 L4 8.5 L9 1.5"/></svg>' : ''}<span class="n">${r.no}</span><span class="d">${esc(r.date)}</span><span>${esc(r.for)}</span></li>`;
   }).join('');
   // no sheet index here (André 9/30): it lives on A0.1 and behind the Sheet index button
-  const lw = LOCK.w, lx = LOCK.x - 32, ly = LOCK.y - 0.5;
+  const lw = LOCK.w, lx = LOCK.x - TBX, ly = LOCK.y - 0.5;
   const colo = `<b>${esc(F.name)}</b> · <i>${esc(F.line)}</i>. ${F.addr.map(esc).join(', ')} · ${esc(F.phone)} · ${esc(F.email)}. ${esc(SET.copy)}`;
   return `<aside class="tb" aria-label="Title block">
     <img class="lock" src="${esc(SET.marks.lockup)}" alt="André Mandel" width="357" height="520" style="left:${U(lx)};top:${U(ly)};width:${U(lw)}">
@@ -1061,7 +1098,7 @@ function showThumb(row) {
     if (!RM.matches) requestAnimationFrame(() => wrap.classList.add('play'));
   }
   const sr = stage.getBoundingClientRect(), rr = row.getBoundingClientRect();
-  const x = 31.75 * u - tw;
+  const x = (TBX - 0.25) * u - tw;
   let y = rr.top + rr.height / 2 - sr.top - th / 2;
   y = Math.max(0.6 * u, Math.min(23.4 * u - th, y));
   thumb.style.cssText = `left:${x}px;top:${y}px;width:${tw}px;height:${th}px`;
