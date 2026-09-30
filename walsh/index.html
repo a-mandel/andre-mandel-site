@@ -413,6 +413,10 @@
   }
 </style>
 
+<style>
+  html.in-sheet header.top, html.in-sheet #rtitle, html.in-sheet #rb, html.in-sheet #fontPop { display: none !important; }
+</style>
+<script>if (new URLSearchParams(location.search).has('sheet')) document.documentElement.classList.add('in-sheet');</script>
 <div id="app" data-mode="loading" data-style="annot">
   <canvas id="cv" aria-label="Live 3D model of the Walsh Residence on Lahontan Lot 235"></canvas>
   <canvas id="deco" aria-hidden="true"></canvas>
