@@ -115,6 +115,60 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .note.r{transform:translate(-100%,-58%)}
 .dot{position:absolute;width:max(calc(var(--fl)*6px),calc(var(--u)*.13));height:max(calc(var(--fl)*6px),calc(var(--u)*.13));border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);pointer-events:none}
 
+/* real drawings (9/30): true scale views, labels in the sheet's type, tables on curved rules */
+.dv{--l-b:max(calc(7.5px * var(--fl)),calc(var(--u) * .105));--l-i:max(calc(8.5px * var(--fl)),calc(var(--u) * .125))}
+.dv .dsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dv .dimg{position:absolute;left:0;top:0;max-width:none}
+.dv .dov{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;text-align:center;white-space:nowrap;line-height:1.12;pointer-events:none;
+  padding:.1em .3em;border-radius:3px;background:rgba(246,245,241,.72)}
+.lbl b{font:400 var(--l-b)/1.2 var(--ft);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.lbl i{font:italic 400 var(--l-i)/1.2 var(--fs);color:var(--muted)}
+.lbl.tag b{font-size:max(calc(8.5px * var(--fl)),calc(var(--u) * .135))}
+.lbl.tag i{font-size:max(calc(9.5px * var(--fl)),calc(var(--u) * .15));color:var(--ink)}
+.lbl.room{background:rgba(246,245,241,.6)}
+.lbl.dim{background:none;padding:0}
+.lbl.dim b{font:italic 400 max(calc(10px * var(--fl)),calc(var(--u) * .17))/1 var(--fs);letter-spacing:.02em;text-transform:none}
+.lbl.spot{transform:translate(calc(var(--u) * .12),-108%);align-items:flex-start;text-align:left;background:rgba(246,245,241,.82);padding:.05em .25em}
+.lbl.spot.hot b{color:var(--accent)}
+.lbl.spot.r{transform:translate(calc(-100% - var(--u) * .12),-108%);align-items:flex-end;text-align:right}
+.lbl.dat{transform:translate(0,-50%);flex-direction:row;align-items:baseline;gap:.45em;background:none;padding:0}
+.lbl.dat i{color:var(--ink)}
+.lbl.lim{background:none;padding:0}
+.lbl.lim b{color:var(--accent);font-size:max(calc(7px * var(--fl)),calc(var(--u) * .1))}
+.lbl.road{transform:translate(-50%,-50%) rotate(-86deg);background:none}
+.lbl.road b{font-size:max(calc(8.5px * var(--fl)),calc(var(--u) * .15));letter-spacing:.3em}
+.lbl.bub{width:max(calc(20px * var(--fl)),calc(var(--u) * .5));height:max(calc(20px * var(--fl)),calc(var(--u) * .5));padding:0;border:1px solid var(--ink);border-radius:50%;background:var(--paper);justify-content:center;gap:0;
+  background-image:linear-gradient(var(--ink),var(--ink));background-size:100% 1px;background-position:0 50%;background-repeat:no-repeat}
+.lbl.bub b{font-size:max(calc(7px * var(--fl)),calc(var(--u) * .12));line-height:1;letter-spacing:0;margin-bottom:.15em}
+.lbl.bub i{font:400 max(calc(5.5px * var(--fl)),calc(var(--u) * .075))/1 var(--ft);letter-spacing:.04em;color:var(--ink);margin-top:.2em}
+.dvt{position:absolute;display:flex;align-items:center;gap:calc(var(--u) * .5)}
+.dvt .vt{position:static}
+.gbar{position:relative;display:block;height:calc(var(--u) * .11);margin-top:calc(var(--u) * -.1)}
+.gbar svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.gbar rect{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.gbar rect.on{fill:var(--ink)}
+.gbar span{position:absolute;top:calc(100% + var(--u) * .05);transform:translateX(-50%);font:400 max(calc(7px * var(--fl)),calc(var(--u) * .1))/1 var(--ft);letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+.dnorth{position:absolute;pointer-events:none}
+.dnorth svg{width:100%;height:100%;overflow:visible}
+.dnorth circle{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.dnorth .nd{fill:var(--accent)}
+.dnorth .nl{stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.dnorth span{position:absolute;transform:translate(-50%,-50%);font:400 max(calc(9px * var(--fl)),calc(var(--u) * .16))/1 var(--ft);letter-spacing:.06em}
+.dkey{position:absolute}
+.dkey .kp{position:relative}
+.dkey .kp .dsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dkey .kc{display:flex;flex-direction:column;margin-top:calc(var(--u) * .12);line-height:1.2}
+.dkey .kc b{font:400 max(calc(8px * var(--fl)),calc(var(--u) * .12))/1.2 var(--ft);letter-spacing:.16em;text-transform:uppercase}
+.dkey .kc i{font:italic 400 max(calc(9px * var(--fl)),calc(var(--u) * .14))/1.2 var(--fs);color:var(--muted)}
+.dtab{position:absolute}
+.dtab h3{margin:0 0 calc(var(--u) * .12);font:400 max(calc(10px * var(--fl)),calc(var(--u) * .2))/1.1 var(--ft);letter-spacing:.18em;text-transform:uppercase}
+.dtab ul{list-style:none;margin:0;padding:0}
+.dtab li{display:flex;justify-content:space-between;align-items:baseline;gap:.8em;padding:calc(var(--u) * .14) 0 calc(var(--u) * .03);background:var(--swoop) no-repeat 0 0 / 100% calc(var(--u) * .1)}
+.dtab .k{font:400 max(calc(7.5px * var(--fl)),calc(var(--u) * .11))/1.2 var(--ft);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.dtab .v{font:italic 400 max(calc(10px * var(--fl)),calc(var(--u) * .18))/1.2 var(--fs);white-space:nowrap;font-variant-numeric:lining-nums}
+.dtab p{margin:calc(var(--u) * .16) 0 0;font:italic 400 max(calc(8.5px * var(--fl)),calc(var(--u) * .13))/1.3 var(--fs);color:var(--muted)}
+
 /* the site's own title, upper left of the field */
 .rt{position:absolute;z-index:3;left:calc(var(--u)*.6);top:calc(var(--u)*.26);pointer-events:none}
 .rt h1{margin:0;font:400 var(--s-h1)/1.2 var(--ft);letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
@@ -187,7 +241,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .trow{display:grid;align-items:center;height:max(calc(var(--fl)*19px),calc(var(--u)*.44));font-size:max(calc(var(--fl)*11px),calc(var(--u)*.24));line-height:1.1}
 .trow.hd{font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-size:max(calc(var(--fl)*9px),calc(var(--u)*.15))}
 .trow.gp{font-family:var(--ft);text-transform:uppercase;letter-spacing:.16em;color:var(--accent);font-size:max(calc(var(--fl)*9.5px),calc(var(--u)*.17));height:max(calc(var(--fl)*22px),calc(var(--u)*.62));align-items:end;padding-bottom:calc(var(--u)*.08)}
-.si-t{grid-template-columns:calc(var(--u)*1.4) 1fr calc(var(--u)*3) calc(var(--u)*.8) calc(var(--u)*.8)}
+.si-t{grid-template-columns:calc(var(--u)*1.4) 1fr calc(var(--u)*3) repeat(var(--ni,2),calc(var(--u)*.7))}
 .si-t .n{font-family:var(--ft);letter-spacing:.06em}
 .si-t .c{text-align:center}
 .si-t.link{cursor:pointer}
@@ -331,11 +385,20 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   .note{white-space:normal;font-size:15px;width:max-content;max-width:calc(100% - var(--nx) * 1% - 10px)}
   .note.r{max-width:calc(var(--nx) * 1% - 10px);text-align:right}
   .blk{position:relative !important;left:auto !important;top:auto !important;width:auto !important;margin-bottom:34px}
-  .si-t{grid-template-columns:44px 1fr 92px 16px 16px}
+  .si-t{grid-template-columns:44px 1fr 92px repeat(var(--ni,2),16px)}
   .pd-t{grid-template-columns:118px 1fr}
   .is-t{grid-template-columns:30px 64px 1fr 44px}
   .trow{height:auto;min-height:26px;padding:3px 0}
   .legend-demo{position:relative !important;width:100% !important;height:150px !important}
+  .dv{max-height:none;margin-bottom:12px}
+  .dv .lbl{display:none}
+  .sheet[data-kind="draw"] .vfree{margin:0 0 22px}
+  .sheet[data-kind="draw"] .vfree .note{display:block;margin:0 0 6px}
+  .dvt,.dtab,.dkey,.dnorth{position:relative !important;left:auto !important;top:auto !important;margin:0 0 26px}
+  .dvt{flex-wrap:wrap;gap:12px 18px}
+  .dtab,.dkey{width:auto !important;max-width:420px}
+  .dkey .kp{height:auto !important;aspect-ratio:1.216;max-width:170px}
+  .dnorth{width:44px !important;height:44px !important}
   .sheet[data-kind="model"] .field{padding:0;overflow:hidden}
   .sheet[data-kind="model"] .rt{position:absolute;left:16px;top:14px;margin:0}
   .sheet[data-kind="model"] .rb{display:none}
@@ -408,6 +471,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Sheet index"></div>
 
+<script src="draw/drawings.js"></script>
 <script>
 /* ================================================================
    THE CORNER IN THE BREEZE. Named so the email GIF can match it.
@@ -447,7 +511,7 @@ const SET = {
   permits: [ { k: 'Lahontan design review (LCC)', tb: 'Design review (LCC)', v: 'no. pending' }, { k: 'Placer County building permit', tb: 'Building permit', v: 'no. pending' } ],
   fire: 'Very High FHSZ · Chapter 7A',
   // oldest first here; the title block shows newest first
-  issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
+  issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' }, { no: 3, date: '9/30/26', for: 'Living set, drawings' } ],
   date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
   copy: '© 2026 André Mandel. Drawings are instruments of service.',
   live: { url: 'https://mango-mushroom.github.io/andre-mandel-site/walsh/set/v2.html', show: ['mango-mushroom.github.io', '/andre-mandel-site', '/walsh/set/v2.html'], label: 'The living set' },
@@ -455,12 +519,12 @@ const SET = {
   marks: { lockup: '../marks/am10_lockup.webp', mark: '../marks/am10_mark.webp' },
   groups: ['General', 'Feasibility', 'Architectural', 'Landscape'],
   sheets: [
-    { id: 'A0.0', group: 'General', title: 'Cover · the site', short: 'Cover · the site', foot: 'The site', scale: 'Live model', kind: 'model', issued: [2],
+    { id: 'A0.0', group: 'General', title: 'Cover · the site', short: 'Cover · the site', foot: 'The site', scale: 'Live model', kind: 'model', issued: [2, 3],
       cap: 'Lot 235 on Lahontan Drive. The house wraps the signature tree, inside the setbacks and under the 30 ft line.',
       data: ['Very High FHSZ · Chapter 7A', 'Every roof under the 30 ft line', 'Approach from the west', 'Live model · drag to orbit'] },
-    { id: 'A0.1', group: 'General', title: 'Sheet index and project data', short: 'Index and project data', foot: 'Sheet index', scale: 'None', kind: 'index', issued: [2],
-      cap: 'Seventeen sheets in four parts, with the issuances and the project data kept current as the set grows.',
-      data: ['17 sheets · 2 issuances', 'APN 108 160 012 000', 'RS PD 1.7 · Placer County', 'Owner · Dustin Walsh'],
+    { id: 'A0.1', group: 'General', title: 'Sheet index and project data', short: 'Index and project data', foot: 'Sheet index', scale: 'None', kind: 'index', issued: [2, 3],
+      cap: 'Nineteen sheets in four parts, with the issuances and the project data kept current as the set grows.',
+      data: ['19 sheets · 3 issuances', 'APN 108 160 012 000', 'RS PD 1.7 · Placer County', 'Owner · Dustin Walsh'],
       notes: [ { text: 'LCC meets the 2nd Wednesday', t: [26.3, 11.35], p: [25.3, 8.7], a: 'l' } ] },
     { id: 'F1.0', group: 'Feasibility', title: 'Regulatory report', scale: 'As noted', issued: [2],
       cap: 'What Lahontan and Placer County ask of Lot 235, and the path from design review to permit.',
@@ -482,41 +546,35 @@ const SET = {
       data: ['Cedar, dark steel, board form concrete', 'Chapter 7A assemblies throughout', 'Clear glass only', 'Square panes, 4 by 8 ft max'],
       views: [ { t: 'Structure', s: 'Outline', x: 1.9, y: 3.8, w: 14.2, h: 6.9 }, { t: 'Envelope', s: 'Outline', x: 17.2, y: 3.8, w: 14.2, h: 6.9 }, { t: 'Interiors', s: 'Outline', x: 1.9, y: 12.1, w: 14.2, h: 6.9 }, { t: 'Systems', s: 'Outline', x: 17.2, y: 12.1, w: 14.2, h: 6.9 } ],
       notes: [ { v: 1, text: 'cedar, dark steel, board form concrete', t: [.22, .34], p: [.12, .62], a: 'l' } ] },
-    { id: 'A1.0', group: 'Architectural', title: 'Site plan', scale: '1/8 in = 1 ft', issued: [2],
-      cap: 'The house wraps the signature tree, approached from the west, every wing inside the setbacks.',
-      data: ['Keep the signature tree', 'Approach from the west', 'FA grade, not survey', 'Inside the setbacks'],
-      views: [ { t: 'Site plan', s: '1/8 in = 1 ft', x: 1.9, y: 3.8, w: 21.3, h: 15.2 }, { t: 'Vicinity', s: 'Not to scale', x: 24.4, y: 3.8, w: 7.0, h: 4.1 }, { t: 'Site data', s: 'Schedule', x: 24.4, y: 9.4, w: 7.0, h: 9.6 } ],
-      notes: [ { v: 0, text: 'keep the signature tree', t: [.6, .26], p: [.47, .46], a: 'l' }, { v: 0, text: 'approach from the west', t: [.3, .8], p: [.08, .6], a: 'l' } ] },
-    { id: 'A2.1', group: 'Architectural', title: 'Level 1 plan', short: 'Level 1 plan', foot: 'Level 1 plan', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'Living, kitchen, bridge and suites on one main floor, wrapped around the front court tree.',
-      data: ['One main floor, one elevation', 'Living room double height', 'Dining on the bridge, about 20 ft wide', 'Granny suite at the main level'],
-      views: [ { t: 'Level 1 plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
-      notes: [ { v: 0, text: 'the court wraps the tree', t: [.6, .2], p: [.48, .42], a: 'l' }, { v: 0, text: 'living room tip, all glass', t: [.6, .86], p: [.8, .64], a: 'r' } ] },
-    { id: 'A2.2', group: 'Architectural', title: 'Level 2 plan', short: 'Level 2 plan', foot: 'Level 2 plan', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'The south wing steps down one level with the land. The flex room sits slightly buried, open to the east.',
-      data: ['One 5 to 6 ft step with the land', 'Flex room, east side above grade', 'Primary suite and terrace above', 'Stairs inside the bridge only'],
-      views: [ { t: 'Level 2 plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
-      notes: [ { v: 0, text: 'flex room, slightly buried', t: [.44, .8], p: [.64, .6], a: 'r' }, { v: 0, text: 'one step down with the land', t: [.58, .2], p: [.72, .38], a: 'r' } ] },
-    { id: 'A2.3', group: 'Architectural', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'One level beam, straight joists, and a roof that lifts like a sheet of paper toward the court.',
-      data: ['Tip 6023.0 · 29.4 ft over grade', 'Beam 6012.0 · dead level', 'Joists cantilever about 3 ft', 'Every roof under 30 ft'],
-      views: [ { t: 'Roof plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Roof heights', s: 'Schedule', x: 26.1, y: 3.8, w: 5.3, h: 15.2 } ],
-      notes: [ { v: 0, text: 'every roof under 30 ft', t: [.58, .2], p: [.45, .4], a: 'l' }, { v: 0, text: 'the ribbon lifts to the court', t: [.4, .84], p: [.58, .62], a: 'r' } ] },
-    { id: 'A3.1', group: 'Architectural', title: 'Elevations west and north', short: 'Elevations west, north', foot: 'West and north', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'The arrival faces. The whole north wing greets the approach from the west.',
-      data: ['Approach from the west', 'Glowing glass at the bridge', 'Two garage doors', 'Under the 30 ft line'],
-      views: [ { t: 'West elevation', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 29.5, h: 6.9 }, { t: 'North elevation', s: '3/16 in = 1 ft', x: 1.9, y: 12.1, w: 29.5, h: 6.9 } ],
-      notes: [ { v: 0, text: 'approach from the west', t: [.62, .26], p: [.5, .56], a: 'l' }, { v: 1, text: 'every roof under 30 ft', t: [.7, .24], p: [.58, .52], a: 'l' } ] },
-    { id: 'A3.2', group: 'Architectural', title: 'Elevations east and south', short: 'Elevations east, south', foot: 'East and south', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'The court faces, open to late light and the long view east.',
-      data: ['Living room tip, all glass', 'Clerestory at the fold', 'Late light on the terrace', 'Under the 30 ft line'],
-      views: [ { t: 'East elevation', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 29.5, h: 6.9 }, { t: 'South elevation', s: '3/16 in = 1 ft', x: 1.9, y: 12.1, w: 29.5, h: 6.9 } ],
-      notes: [ { v: 0, text: 'late light on the terrace', t: [.34, .28], p: [.46, .56], a: 'r' } ] },
-    { id: 'A4.1', group: 'Architectural', title: 'Building sections', scale: '3/16 in = 1 ft', issued: [2],
-      cap: 'Cut through living, bridge and suites to show the fold, the clerestory and the step with the land.',
-      data: ['Clerestory at the fold', 'Living room double height', 'South wing steps 5 to 6 ft', 'Beam dead level at 6012'],
-      views: [ { t: 'Section through living', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 29.5, h: 4.0 }, { t: 'Section through bridge', s: '3/16 in = 1 ft', x: 1.9, y: 9.4, w: 29.5, h: 4.0 }, { t: 'Section through suites', s: '3/16 in = 1 ft', x: 1.9, y: 15.0, w: 29.5, h: 4.0 } ],
-      notes: [ { v: 0, text: 'clerestory at the fold', t: [.6, .3], p: [.5, .62], a: 'l' }, { v: 2, text: 'one step down with the land', t: [.3, .3], p: [.42, .62], a: 'r' } ] },
+    /* real drawings (9/30): cut from the pocket model by draw/build_drawings.py; geometry, labels, tables and notes live
+       in draw/drawings.js (window.DRAWINGS), these entries hold the sheet's words */
+    { id: 'A1.2', group: 'Architectural', title: 'Site plan', scale: '1 in = 10 ft', kind: 'draw', issued: [3],
+      cap: 'Lot 235 from Lahontan Drive. The house wraps the signature tree, the drive comes in from the west.',
+      data: ['Roof footprint about 5,369 sf', 'Coverage about 19.6% of the lot', 'Impervious about 28.2%', 'Lot area about, confirm on survey'] },
+    { id: 'A2.1', group: 'Architectural', title: 'Level 1 plan', short: 'Level 1 plan', foot: 'Level 1 plan', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'Main level at 5997.5, the garage a step up, the lower level five feet down in the south wing.',
+      data: ['Level 1 conditioned about 3,169 sf', 'Garage and gear bay about 1,006 sf', 'Open plan, rooms to come'] },
+    { id: 'A2.2', group: 'Architectural', title: 'Level 2 plan', short: 'Level 2 plan', foot: 'Level 2 plan', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'The primary suite at 6004.0 over the lower level, its terrace open to the east.',
+      data: ['Primary suite about 610 sf', 'Total conditioned about 3,779 sf', 'Primary terrace about 187 sf'] },
+    { id: 'A2.3', group: 'Architectural', title: 'Roof plan', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'One level beam, joists square to it, and the tip lifting to the court at 6023.0.',
+      data: ['Tip 6023.0, 29.4 ft over grade', 'Coverage about 19.6%', 'Impervious about 7,725 sf'] },
+    { id: 'A3.0', group: 'Architectural', title: 'Sections', short: 'Sections', foot: 'Sections', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'Through the bridge looking east, and through the garage and living room looking north.',
+      data: ['Main 5997.5 · lower 5992.5', 'Primary 6004.0 · beam 6012.0', 'Tip 6023.0, under the 30 ft line'] },
+    { id: 'A4.0', group: 'Architectural', title: 'North elevation', short: 'North elevation', foot: 'North elevation', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'The long north wall, quiet and closed, the ribbon lifting at the far corner.',
+      data: ['Tip 6023.0, 29.4 ft over grade', 'Garage roof 6016.5', 'Every roof under 30 ft'] },
+    { id: 'A4.1', group: 'Architectural', title: 'East elevation', short: 'East elevation', foot: 'East elevation', scale: '1/4 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'The court face. Glass at the living room tip and the bridge, the south wing stepping down.',
+      data: ['Tip 6023.0 at the court', 'Lower level 5992.5', 'Every roof under 30 ft'] },
+    { id: 'A4.2', group: 'Architectural', title: 'South elevation', short: 'South elevation', foot: 'South elevation', scale: '3/16 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'The garage doors to the drive, the south wing and its chimney, the terraces beyond.',
+      data: ['Two garage doors to the drive', 'Primary 6004.0 over the lower level', 'Every roof under 30 ft'] },
+    { id: 'A4.3', group: 'Architectural', title: 'West elevation', short: 'West elevation', foot: 'West elevation', scale: '1/4 in = 1 ft', kind: 'draw', issued: [3],
+      cap: 'The arrival face, from the drive. Garage, entry and the south wing in one long view.',
+      data: ['Approach from the west', 'Garage 6000.0 · main 5997.5', 'Every roof under 30 ft'] },
     { id: 'A5.1', group: 'Architectural', title: 'Exterior materials and colors', short: 'Materials and colors', foot: 'Materials and colors', scale: 'None', issued: [2],
       cap: 'Cedar, dark steel and board form concrete, warm plaster and stone. The glass kept clear.',
       data: ['Silvered cedar vertical boards', 'Dark steel fascia and columns', 'Board form concrete chimneys', 'Clear glass only'],
@@ -707,7 +765,7 @@ function fieldModel() {
 
 function fieldIndex(sh) {
   const P = SET.project, iss = SET.issuances, last = iss[iss.length - 1].no;
-  const B = (x, y, w, inner, cls = '') => `<div class="blk ${cls}" style="left:${U(FX(x))};top:${U(FY(y))};width:${U(w)}">${inner}</div>`;
+  const B = (x, y, w, inner, cls = '', st = '') => `<div class="blk ${cls}" style="left:${U(FX(x))};top:${U(FY(y))};width:${U(w)};${st}">${inner}</div>`;
   let rows = `<div class="trow si-t hd"><span>No.</span><span>Sheet</span><span>Scale</span>${iss.map(i => `<span class="c">${i.no}</span>`).join('')}</div>`;
   SET.groups.forEach(g => {
     const gs = SHEETS.filter(s => s.group === g);
@@ -726,12 +784,51 @@ function fieldIndex(sh) {
     iss.slice().reverse().map(i => `<div class="trow is-t"><span class="n">${i.no}</span><span>${esc(i.date)}</span><span>${esc(i.for)}</span><span>${SHEETS.filter(s => (s.issued || []).includes(i.no)).length || ''}</span></div>`).join('');
   const legendNote = { text: 'a note in hand', t: [.6, .3], p: [.44, .62], a: 'l' };
   const legend = `<div class="legend-demo view" style="position:relative;width:${U(5.6)};height:${U(2.9)};--ar:1.93;margin-bottom:${U(1.2)}"><div class="box"></div>${noteHTML(legendNote, 5.6, 2.9, 400)}${viewTitle(1, 'View title', 'Scale')}</div>
-    <p class="legend-p">A cartoon set. Each dashed box holds a view to come; handwritten notes carry design intent. The title block keeps the set, the issuances and the index in one place.</p>`;
-  return B(1.9, 3.8, 14.4, `<h2 class="h2">Sheet index</h2>${rows}`) +
+    <p class="legend-p">A living set. The drawings are cut from the pocket model at true scale; dashed boxes hold views to come; handwritten notes carry design intent.</p>`;
+  return B(1.9, 3.8, 14.4, `<h2 class="h2">Sheet index</h2>${rows}`, '', `--ni:${iss.length}`) +
     B(17.6, 3.8, 13.8, `<h2 class="h2">Project data</h2>${pd}`) +
     B(17.6, 12.7, 6.4, `<h2 class="h2">Issuances</h2>${isr}`) +
     B(25.2, 12.7, 6.2, `<h2 class="h2">Conventions</h2>${legend}`) +
     sheetNotesFree(sh);
+}
+
+/* ================================================================ real drawings (9/30)
+   Plans are vector (the model's own plan paths), elevations and sections are print resolution renders of the model.
+   Everything sits at true scale: a view w inches wide on the sheet is w inches wide in print. */
+const DRW = window.DRAWINGS || { sheets: {}, keys: {} };
+const PC = v => +(v * 100).toFixed(3);
+function lblHTML(l) {
+  const k = l.k || 'room', cls = `lbl ${k}${l.hot ? ' hot' : ''}`;
+  return `<span class="${cls}" style="left:${PC(l.p[0])}%;top:${PC(l.p[1])}%"><b>${esc(l.t)}</b>${l.s ? `<i>${esc(l.s)}</i>` : ''}</span>`;
+}
+function scaleBar(b) {
+  const L = b.ft[b.ft.length - 1], w = L * b.sc;
+  let r = '';
+  for (let k = 1; k < b.ft.length; k++) r += `<rect x="${b.ft[k - 1] / L}" y="0" width="${(b.ft[k] - b.ft[k - 1]) / L}" height="1" class="${k % 2 ? 'on' : ''}"/>`;
+  const labs = b.ft.map(v => `<span style="left:${PC(v / L)}%">${v}${v === L ? ' ft' : ''}</span>`).join('');
+  return `<span class="gbar" style="width:${U(w)}"><svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">${r}</svg>${labs}</span>`;
+}
+function northArrow(n) {
+  const a = DRW.north || 0;
+  return `<div class="dnorth" style="left:${U(FX(n.x) - n.s / 2)};top:${U(FY(n.y) - n.s / 2)};width:${U(n.s)};height:${U(n.s)}" aria-label="North">
+    <svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r=".78"/><g transform="rotate(${a})"><path class="nd" d="M0 -.98 L.2 .18 L0 .02 L-.2 .18 Z"/><path class="nl" d="M0 .02 V.78"/></g></svg>
+    <span style="left:${PC(.5 + .62 * Math.sin(a * Math.PI / 180))}%;top:${PC(.5 - .62 * Math.cos(a * Math.PI / 180))}%">N</span></div>`;
+}
+function fieldDraw(sh) {
+  const D = DRW.sheets[sh.id];
+  let h = '';
+  D.views.forEach(v => {
+    const art = v.svg ? v.svg : `<img class="dimg" src="${esc(v.img)}" alt="${esc(sh.title)}" width="${v.px}" height="${v.py}" style="width:${PC(v.iw / v.w)}%;height:100%" decoding="async">`;
+    const ov = v.ov ? `<svg class="dov" viewBox="0 0 ${v.w} ${v.h}" preserveAspectRatio="none" aria-hidden="true">${v.ov}</svg>` : '';
+    h += `<div class="view dv" style="left:${U(FX(v.x))};top:${U(FY(v.y))};width:${U(v.w)};height:${U(v.h)};--ar:${(v.w / v.h).toFixed(4)}">${art}${ov}${(v.labels || []).map(lblHTML).join('')}</div>`;
+  });
+  (D.vt || []).forEach(t => { h += `<div class="dvt" style="left:${U(FX(t.x))};top:${U(FY(t.y))}">${viewTitle(t.n, t.t, t.s)}${t.bar ? scaleBar(t.bar) : ''}</div>`; });
+  (D.keys || []).forEach(k => { h += `<div class="dkey" style="left:${U(FX(k.x))};top:${U(FY(k.y))};width:${U(k.w)}"><div class="kp" style="height:${U(k.w / (DRW.keyAr || 1.2))}">${DRW.keys[k.k] || ''}</div><span class="kc"><b>${esc(k.t)}</b><i>${esc(k.s)} · not to scale</i></span></div>`; });
+  (D.tables || []).forEach(t => {
+    h += `<div class="dtab" style="left:${U(FX(t.x))};top:${U(FY(t.y))};width:${U(t.w)}"><h3>${esc(t.title)}</h3><ul>${t.rows.map(([k, v]) => `<li><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></li>`).join('')}</ul>${t.foot ? `<p>${esc(t.foot)}</p>` : ''}</div>`;
+  });
+  if (D.north) h += northArrow(D.north);
+  return h + sheetNotesFree({ notes: D.notes || [] });
 }
 
 /* the live site's header and footer, carried onto the sheet */
@@ -781,7 +878,7 @@ const cells = s => [...s].map(c => `<span class="fc${c === '.' ? ' pt' : ''}">${
 
 function buildSheet(sh, i) {
   const kind = sh.kind || 'cartoon';
-  const field = kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
+  const field = kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : kind === 'draw' && DRW.sheets[sh.id] ? fieldDraw(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
   const el = document.createElement('section');
   el.className = 'sheet';
   el.dataset.id = sh.id; el.dataset.kind = kind;
@@ -909,7 +1006,7 @@ function reelBridge(sheet, f) {
     const plansOpen = !!(plans && !plans.hidden && getComputedStyle(plans).display !== 'none');
     const live = app.dataset.mode === 'model' || (info && !info.hidden) || plansOpen;
     if (live !== lastLive) { sheet.classList.toggle('live-model', live); lastLive = live; }
-    // the plans follow the title block: Site A1.0, Level 1 A2.1, Level 2 A2.2, Roof A2.3; closing them restores A0.0
+    // the plans follow the title block: Site A1.2, Level 1 A2.1, Level 2 A2.2, Roof A2.3; closing them restores A0.0
     const lv = plansOpen ? ((doc.querySelector('#plSheets button[aria-pressed="true"]') || {}).dataset || {}).sh : null;
     coverAs(sheet, lv ? PLAN_SHEETS[lv] || null : null);
     if (app.dataset.mode !== 'reel') return;
@@ -930,15 +1027,16 @@ function reelBridge(sheet, f) {
 }
 /* the cover borrows a plan sheet's number, title and scale while the model's plans are open on it */
 const sid = k => k === 0 && coverAlias ? coverAlias : SHEETS[k].id;
-const PLAN_SHEETS = { site: 'A1.0', l1: 'A2.1', l2: 'A2.2', roof: 'A2.3' };
+const PLAN_SHEETS = { site: 'A1.2', l1: 'A2.1', l2: 'A2.2', roof: 'A2.3' };
 let coverAlias = null;
 function coverAs(sheet, id) {
   if (id === coverAlias) return;
   const was = coverAlias || SHEETS[0].id;
   coverAlias = id;
   const k = id ? idxOf(id) : 0, s = SHEETS[k], tb = sheet.querySelector('.tb');
-  tb.querySelector('.stitle').textContent = s.title;
-  tb.querySelector('.meta .sc').textContent = s.scale;
+  const st = tb.querySelector('.stitle'), sc = tb.querySelector('.meta .sc');
+  if (st) st.textContent = s.title;
+  if (sc) sc.textContent = s.scale;
   tb.querySelector('.snum .lab').textContent = `Sheet ${k + 1} of ${N}`;
   const sn = tb.querySelector('.sn'); sn.dataset.sn = s.id; sn.setAttribute('aria-label', `Sheet ${s.id}`);
   flap(sn, was, s.id);
