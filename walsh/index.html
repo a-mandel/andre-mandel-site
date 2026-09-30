@@ -1323,6 +1323,9 @@
     function eyeCam(v) { const dx = v.eye[0] - v.at[0], dy = v.eye[1] - v.at[1], dz = v.eye[2] - v.at[2], dist = Math.hypot(dx, dy, dz); return { yaw: Math.atan2(dx, dz), el: Math.asin(dy / dist), dist, t: v.at, fp: 1 }; }
     const cam = { yaw: 1.15, el: 0.42, dist: 215, t: new THREE.Vector3(...VIEWS.house.t), fp: 0 };
     const S = { scheme: 'rib', pitch: '12', inside: false, roof: false, panels: true, lens: 'wide', trees: true, notes: true, room: false };   // wide angle lens by default (André 9/28 9:57 am)
+    const IN_SHEET = document.documentElement.classList.contains('in-sheet');
+    if (IN_SHEET) S.lens = 'ultra';   // inside the living set the model opens on the widest lens; the quick toggle reads pressed (André 9/30)
+    const REEL_SHEET_K = 1.4;          // inside a sheet the reel stands this much further back
     let reelScheme = { scheme: 'rib', pitch: '12', see: true, room: false };
 
     function apply() {
@@ -1403,7 +1406,8 @@
       const LENS = { normal: [44, 38], wide: [62, 52], ultra: [88, 78] }, EYE = { wide: [92, 64], ultra: [108, 88] };
       const ph = CW < 520 ? 0 : 1, fp = Math.max(0, Math.min(1, cam.fp || 0));
       const lens = MODE === 'reel' ? 'wide' : S.lens;
-      const fovO = MODE === 'reel' ? (CW < 520 ? 62 : 54) : LENS[lens][ph];
+      const reelSheet = MODE === 'reel' && IN_SHEET;
+      const fovO = MODE === 'reel' ? (CW < 520 ? 62 : reelSheet ? 64 : 54) : LENS[lens][ph];
       const fovE = EYE[lens === 'ultra' ? 'ultra' : 'wide'][ph];
       camera.fov = fovO + (fovE - fovO) * fp; camera.aspect = CW / CH;
       const vw = Math.max(80, vis.r - vis.l), vh = Math.max(80, vis.b - vis.t);
@@ -1412,6 +1416,7 @@
       const wf = CW < 520 ? (MODE === 'model' ? 0.94 : 0.96) : (MODE === 'reel' ? 1.2 : 1.36);
       let k = Math.max(CH / vh, wf * CH / vw) * Math.tan(17 * Math.PI / 180) / Math.tan(fovFit / 2 * Math.PI / 180);
       if (CW >= 900 && MODE === 'reel') k *= 1.05;
+      if (reelSheet) k *= REEL_SHEET_K;                   // inside a sheet: stand well back, the whole house and some site
       if (wideM) k *= lens === 'ultra' ? 0.56 : 0.84;
       k = Math.max(0.5, Math.min(3.2, k));
       k = k + (1 - k) * fp;                                   // eye level views stand exactly where they say
@@ -1651,6 +1656,8 @@
       }
     ];
     SHOTS.forEach(s => { if (s.from.eye) { s.from = eyeCam(s.from); s.to = eyeCam(s.to); } });
+    // inside a living set sheet the reel reads as a wide view: each shot aims nearer the middle of the house (André 9/30)
+    if (IN_SHEET) SHOTS.forEach(s => [s.from, s.to].forEach(c => { if (c.fp) return; const w = c.el > 0.7 ? 0.3 : 0.7; c.t = [c.t[0] + (CEN[0] - c.t[0]) * w, c.t[1] + (CEN[1] - 4 - c.t[1]) * w, c.t[2] + (CEN[2] - c.t[2]) * w]; }));
     const MODEL_ANN = {
       rib: () => [
         { k: 'note', key: true, p: A.beam, text: 'beam dead level, 6012', dx: -60, dy: -90 },
@@ -1759,12 +1766,15 @@
       const to = v.eye ? eyeCam(v) : Object.assign({ fp: 0 }, v);
       const from = { yaw: cam.yaw, el: cam.el, dist: cam.dist, fp: cam.fp || 0 }, t0v = cam.t.clone(), t1v = V3(to.t);
       let dy = to.yaw - from.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
-      const t0 = performance.now(), D = REDUCE ? 400 : (T || (v.eye || from.fp > 0.5 ? 1400 : 900));
+      // gentle moves (André 9/30: the view changes were too fast): 1.8 to 2.4 s by distance, ease in and out on a sine
+      const tv = Math.hypot(t1v.x - t0v.x, t1v.y - t0v.y, t1v.z - t0v.z);
+      const reach = Math.min(1, Math.abs(dy) / Math.PI * 0.8 + Math.abs(to.el - from.el) * 0.6 + Math.abs(Math.log(to.dist / Math.max(1, from.dist))) * 0.9 + tv / 90 + Math.abs(to.fp - from.fp) * 0.5);
+      const t0 = performance.now(), D = REDUCE ? 400 : Math.max(T || 0, 1800 + 600 * reach);
       cancelAnimationFrame(anim);
       $$('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === name));
       S.room = !!v.room; window.__notesHold = true; apply();
       const stepA = now => {
-        const t = Math.min(1, (now - t0) / D), e = ease(t);
+        const t = Math.min(1, (now - t0) / D), e = 0.5 - 0.5 * Math.cos(Math.PI * t);
         cam.yaw = from.yaw + dy * e; cam.el = from.el + (to.el - from.el) * e; cam.dist = from.dist + (to.dist - from.dist) * e;
         cam.fp = from.fp + (to.fp - from.fp) * e;
         cam.t.lerpVectors(t0v, t1v, e); dirty = true;

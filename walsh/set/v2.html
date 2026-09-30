@@ -27,8 +27,9 @@
   --t-lab:max(calc(8.5px * var(--fl)),calc(var(--u) * .115));
   --t-val:max(calc(10px * var(--fl)),calc(var(--u) * .15));
   --t-sm:max(calc(9px * var(--fl)),calc(var(--u) * .13));
-  --t-name:max(calc(16px * var(--fl)),calc(var(--u) * .32));
-  --t-sheet:max(calc(14px * var(--fl)),calc(var(--u) * .27));
+  --t-name:max(calc(19px * var(--fl)),calc(var(--u) * .41));
+  --t-iss:max(calc(10.5px * var(--fl)),calc(var(--u) * .175));
+  --t-sheet:max(calc(15px * var(--fl)),calc(var(--u) * .31));
   --t-num:max(calc(38px * var(--fl)),calc(var(--u) * 1.18));
   --dot:max(calc(5px * var(--fl)),calc(var(--u) * .1));
   /* site type, the live Walsh page at 46 px per inch */
@@ -59,6 +60,11 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   box-shadow:0 1px 2px rgba(27,26,24,.07),0 calc(var(--u)*.25) calc(var(--u)*.9) rgba(27,26,24,.11)}
 .shade{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(90deg,rgba(27,26,24,.02),rgba(27,26,24,.16));border-radius:inherit}
 
+/* weathered paper (André 9/30): faint fibers, soft mottling and foxing, a whisper of old graphite and long construction
+   lines. Baked once at startup into one full sheet bitmap (see bakePaper), so page turns only composite a cached
+   image. Nothing here animates. Print stays clean. */
+.tex{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:var(--paper-tex,none) 0 0/100% 100% no-repeat}
+
 /* binding: black book cloth, one inch, the paper runs under it to the left edge */
 .bindg{position:absolute;left:0;top:0;bottom:0;width:var(--u);z-index:4;pointer-events:none;
   border-radius:calc(var(--u)*.05) 0 0 calc(var(--u)*.05);
@@ -79,14 +85,17 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .curl{position:absolute;right:0;top:0;width:calc(var(--u)*3);height:calc(var(--u)*3);overflow:visible;pointer-events:none;z-index:5}
 .curl .flap{stroke:rgba(27,26,24,.2);stroke-width:.8;vector-effect:non-scaling-stroke}
 .curl .hl{fill:none;stroke:rgba(255,255,255,.75);stroke-width:1;vector-effect:non-scaling-stroke}
+.curl .crest{fill:none;stroke:#fbfaf7;stroke-width:2.2;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:blur(.6px)}
 
 /* frame */
 .frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .frame .bd{fill:none;stroke:var(--ink);stroke-width:1.1;vector-effect:non-scaling-stroke}
 .frame .vr{stroke:var(--ink);stroke-width:.9;vector-effect:non-scaling-stroke}
 .frame .tk{stroke:var(--ink);stroke-opacity:.42;stroke-width:1;vector-effect:non-scaling-stroke;transition:stroke-opacity .18s,stroke .18s}
+.frame .tk.lg{stroke-opacity:.55}
 .frame .tk.hot{stroke:var(--accent);stroke-opacity:1}
-.zl{position:absolute;transform:translate(-50%,-50%);font-family:var(--ft);font-size:max(calc(var(--fl)*7.5px),calc(var(--u)*.13));color:var(--muted);opacity:.62;letter-spacing:.06em;line-height:1;pointer-events:none;transition:color .18s,opacity .18s}
+.zl{position:absolute;transform:translate(-50%,-50%);font-family:var(--ft);font-size:max(calc(var(--fl)*7px),calc(var(--u)*.12));color:var(--muted);opacity:.5;font-variant-numeric:tabular-nums;letter-spacing:.06em;line-height:1;pointer-events:none;transition:color .18s,opacity .18s}
+.zl.lg{opacity:.78}
 .zl.warm{opacity:.95;color:var(--ink)}
 .zl.hot{opacity:1;color:var(--accent)}
 
@@ -176,40 +185,31 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 /* title block, option 2: one vertical rule, datum dots, hierarchy from type */
 .tb{position:absolute;left:calc(var(--u)*32);top:calc(var(--u)*.5);width:calc(var(--u)*3.5);height:calc(var(--u)*23)}
 .tb .lock{position:absolute;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.tbc{position:absolute;left:calc(var(--u)*.3);right:calc(var(--u)*.26);bottom:calc(var(--u)*.26);display:flex;flex-direction:column}
+.tbc{position:absolute;left:calc(var(--u)*.3);right:calc(var(--u)*.26);bottom:calc(var(--u)*.26);display:flex;flex-direction:column;justify-content:space-between}
 .sec{position:relative;flex:none}
-.sec + .sec{margin-top:calc(var(--u)*.16)}
+.sec + .sec{margin-top:calc(var(--u)*.22)}
 .sec.dat::before{content:"";position:absolute;left:calc(var(--u)*-.3 - var(--dot) / 2);top:calc(var(--t-lab) * .65 - var(--dot) / 2);width:var(--dot);height:var(--dot);border-radius:50%;background:var(--accent)}
 .lab{display:block;font:400 var(--t-lab)/1.3 var(--ft);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .val{font:italic 400 var(--t-val)/1.3 var(--fs)}
 .line{display:block}
 .il{font:400 var(--t-lab)/1 var(--ft);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-right:.45em;font-style:normal}
-.pname{font:400 var(--t-name)/1.05 var(--fs);margin:.12em 0 .1em}
+.pname{font:400 var(--t-name)/1.05 var(--fs);margin:.12em 0 .14em;white-space:nowrap}
 .pend{color:var(--muted)}
 .iss{list-style:none;margin:0;padding:0}
-.iss li{position:relative;display:grid;grid-template-columns:1.3em 4.3em 1fr;align-items:baseline;font:italic 400 var(--t-val)/1.3 var(--fs);color:var(--muted)}
+.iss{margin-top:.2em}
+.iss li{position:relative;display:grid;grid-template-columns:1.2em 4.1em 1fr;align-items:baseline;font:italic 400 var(--t-iss)/1.3 var(--fs);color:var(--muted);padding:.22em 0;border-top:1px solid var(--rule)}
+.iss li:last-child{border-bottom:1px solid var(--rule)}
 .iss li:first-child{color:var(--ink)}
 .iss .n,.iss .d{font:400 var(--t-lab)/1 var(--ft);letter-spacing:.08em;font-style:normal}
 .iss .tick{position:absolute;left:calc(var(--u)*-.3 - var(--dot));top:50%;width:calc(var(--dot) * 1.8);height:calc(var(--dot) * 1.8);transform:translateY(-50%);opacity:0;overflow:visible}
 .iss .tick path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.idx{flex:1 1 auto;min-height:0;margin-top:calc(var(--u)*.3) !important}
-.toc{list-style:none;margin:0;padding:0}
-.toc .gh{font:400 var(--t-lab)/1.3 var(--ft);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-top:.55em}
-.toc .gh:first-child{margin-top:.15em}
-.ix{position:relative;display:grid;grid-template-columns:1fr auto;column-gap:.6em;align-items:baseline;width:100%;text-align:left;font:italic 400 var(--t-val)/1.22 var(--fs);color:var(--muted);padding:.02em 0}
-.ix .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ix .n{font:400 var(--t-lab)/1 var(--ft);letter-spacing:.1em;font-style:normal;color:var(--faint)}
-.ix:hover,.ix:hover .n{color:var(--ink)}
-.ix.cur{color:var(--ink);font-style:normal}
-.ix.cur .n{color:var(--accent)}
-.ix.cur::before{content:"";position:absolute;left:calc(var(--u)*-.3 - max(calc(9px * var(--fl)),calc(var(--u)*.19)) / 2);top:50%;margin-top:calc(max(calc(9px * var(--fl)),calc(var(--u)*.19)) / -2);
-  width:max(calc(9px * var(--fl)),calc(var(--u)*.19));height:max(calc(9px * var(--fl)),calc(var(--u)*.19));border-radius:50%;border:1.5px solid var(--accent);background:var(--paper)}
 .stamp{display:grid;grid-template-columns:1fr auto;column-gap:calc(var(--u)*.12);align-items:start}
 .stamp .lab{grid-column:1 / -1}
 .stamp .seal{grid-column:2;grid-row:2 / span 2}
 .sm{font:400 var(--t-sm)/1.32 var(--fs);color:var(--muted)}
-.seal{width:max(calc(40px * var(--fl)),calc(var(--u)*.86));height:max(calc(40px * var(--fl)),calc(var(--u)*.86));border-radius:50%;border:1.2px dotted rgba(27,26,24,.38);display:grid;place-items:center;text-align:center;
-  font:400 max(calc(7px * var(--fl)),calc(var(--u)*.085))/1.25 var(--ft);letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.seal{width:max(calc(60px * var(--fl)),calc(var(--u)*1.34));height:max(calc(60px * var(--fl)),calc(var(--u)*1.34));border-radius:50%;border:1.2px dotted rgba(27,26,24,.38);display:grid;place-items:center;text-align:center;
+  font:400 max(calc(7.5px * var(--fl)),calc(var(--u)*.1))/1.25 var(--ft);letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.stamp{min-height:max(calc(96px * var(--fl)),calc(var(--u)*2.1))}
 .stitle{font:400 var(--t-sheet)/1.12 var(--fs);margin:.1em 0 .25em}
 .meta{display:flex;flex-wrap:wrap;column-gap:.9em}
 .meta > span{font:italic 400 var(--t-val)/1.3 var(--fs);white-space:nowrap}
@@ -234,7 +234,6 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .play .dot{animation:land .55s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--d) * 1ms + 1700ms)}
 .play .iss li{animation:rowIn .5s ease both;animation-delay:calc(var(--d) * 1ms)}
 .play .iss li.new .tick{animation:tick 1.8s ease both;animation-delay:calc(var(--d) * 1ms + 380ms)}
-.play .ix.cur::before{animation:slide .75s var(--ease) both;animation-delay:.2s}
 .play .ticks i.now b{animation:fill .9s var(--ease) both;animation-delay:.35s}
 .play .shot,.play .shotline{animation:rin .6s ease both}
 .play .shotline{animation-delay:.12s}
@@ -355,7 +354,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   .sheet .bindg{visibility:visible !important}
   .paper{box-shadow:none;border-radius:0}
   .bindg{border-radius:0}
-  .ctrl,.strip,.drawer,.scrim,.thumb,.caret,.shade,.curl,.btn{display:none !important}
+  .ctrl,.strip,.drawer,.scrim,.thumb,.caret,.shade,.curl,.btn,.tex{display:none !important}
   .model iframe{display:none !important}
   .model .still{display:block !important;opacity:1}
   .zl{opacity:.62 !important;color:var(--muted) !important}
@@ -374,7 +373,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   <span class="cn" id="cn">A0.0</span>
   <button id="next" aria-label="Next sheet">&#8250;</button>
   <span class="sep"></span>
-  <span class="rd" id="rd" aria-hidden="true">Zone <b>&#183;</b></span>
+  <span class="rd" id="rd" aria-hidden="true">Inch <b>&#183;</b></span>
   <span class="sep"></span>
   <button id="print">Print</button>
 </nav>
@@ -397,15 +396,21 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
    the logo's roof angle and lifts on an irregular loop.
    ================================================================ */
 const FLUTTER = {
-  period: 5.2,        // seconds, one breath of the breeze (4 to 6)
+  period: 5.2,        // seconds, the base breath of the breeze; slower layers ride at 2.6x and 4.2x, a quicker one at 0.62x
   lift: 0.95,         // inches, largest fold distance along the top edge
   rest: 0.12,         // inches, fold distance when the air is still
-  curl: 0.16,         // bow of the flap edges and the hinge, as a fraction of their length
+  curl: 0.16,         // bow of the flap edges and the hinge, as a fraction of their length (grows a little with lift)
+  roll: 0.22,         // how far the flap rolls over near its tip as it lifts, 0 = flat flap
   turnRest: 152,      // degrees the flap has turned over at rest (90 = on edge, 180 = folded flat)
-  turnPeak: 126,      // degrees at the height of a gust (stands up more, shows more underside)
+  turnPeak: 124,      // degrees at the height of a gust (stands up more, shows more underside)
   skew: 1.355,        // right edge fold / top edge fold, 1.355 = parallel to the corner cut (53.6 degrees)
-  gust: 0.38,         // 0 = a pure sine loop, 1 = very gusty from breath to breath
-  shadow: 0.24        // opacity of the flap's soft shadow on the page
+  gust: 0.38,         // 0 = an even breeze, 1 = very gusty from breath to breath
+  calm: 0.44,         // wind below this (0 to 1) is a still spell: the corner settles and rests
+  rise: 0.26,         // seconds, time constant of the lift when a gust arrives (quick)
+  settle: 1.35,       // seconds, time constant of the settle when it passes (slow)
+  flutter: 0.06,      // small quick tremble of the flap at the top of a gust
+  shadow: 0.24,       // opacity of the flap's soft shadow on the page at rest
+  blur: [0.035, 0.16] // shadow softness in inches, at rest and at full lift
 };
 
 /* ================================================================
@@ -464,15 +469,15 @@ const SET = {
       data: ['Keep the signature tree', 'Approach from the west', 'FA grade, not survey', 'Inside the setbacks'],
       views: [ { t: 'Site plan', s: '1/8 in = 1 ft', x: 1.9, y: 3.8, w: 21.3, h: 15.2 }, { t: 'Vicinity', s: 'Not to scale', x: 24.4, y: 3.8, w: 7.0, h: 4.1 }, { t: 'Site data', s: 'Schedule', x: 24.4, y: 9.4, w: 7.0, h: 9.6 } ],
       notes: [ { v: 0, text: 'keep the signature tree', t: [.6, .26], p: [.47, .46], a: 'l' }, { v: 0, text: 'approach from the west', t: [.3, .8], p: [.08, .6], a: 'l' } ] },
-    { id: 'A2.1', group: 'Architectural', title: 'Main level plan', scale: '3/16 in = 1 ft', issued: [2],
+    { id: 'A2.1', group: 'Architectural', title: 'Level 1 plan', short: 'Level 1 plan', foot: 'Level 1 plan', scale: '3/16 in = 1 ft', issued: [2],
       cap: 'Living, kitchen, bridge and suites on one main floor, wrapped around the front court tree.',
       data: ['One main floor, one elevation', 'Living room double height', 'Dining on the bridge, about 20 ft wide', 'Granny suite at the main level'],
-      views: [ { t: 'Main level plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
+      views: [ { t: 'Level 1 plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
       notes: [ { v: 0, text: 'the court wraps the tree', t: [.6, .2], p: [.48, .42], a: 'l' }, { v: 0, text: 'living room tip, all glass', t: [.6, .86], p: [.8, .64], a: 'r' } ] },
-    { id: 'A2.2', group: 'Architectural', title: 'Lower level plan', scale: '3/16 in = 1 ft', issued: [2],
+    { id: 'A2.2', group: 'Architectural', title: 'Level 2 plan', short: 'Level 2 plan', foot: 'Level 2 plan', scale: '3/16 in = 1 ft', issued: [2],
       cap: 'The south wing steps down one level with the land. The flex room sits slightly buried, open to the east.',
       data: ['One 5 to 6 ft step with the land', 'Flex room, east side above grade', 'Primary suite and terrace above', 'Stairs inside the bridge only'],
-      views: [ { t: 'Lower level plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
+      views: [ { t: 'Level 2 plan', s: '3/16 in = 1 ft', x: 1.9, y: 3.8, w: 22.9, h: 15.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.1, y: 3.8, w: 5.3, h: 3.2 }, { t: 'Plan notes', s: 'General', x: 26.1, y: 8.5, w: 5.3, h: 10.5 } ],
       notes: [ { v: 0, text: 'flex room, slightly buried', t: [.44, .8], p: [.64, .6], a: 'r' }, { v: 0, text: 'one step down with the land', t: [.58, .2], p: [.72, .38], a: 'r' } ] },
     { id: 'A2.3', group: 'Architectural', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2],
       cap: 'One level beam, straight joists, and a roof that lifts like a sheet of paper toward the court.',
@@ -528,7 +533,6 @@ const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const MQ = matchMedia('screen and (max-width:760px), screen and (max-aspect-ratio:1/1) and (max-width:1100px)');
 const SHEETS = SET.sheets;
 const N = SHEETS.length;
-const ZL = 'ABCDEFGHJKLMNPQRSTUVWX'; // zone letters, I and O skipped
 const pad2 = n => String(n).padStart(2, '0');
 
 /* border geometry: a 1 in binding, the border clears it at x 1.25; the upper right corner is cut on the roof stroke angle */
@@ -549,17 +553,26 @@ function borderPath() {
     `V${23.5 - R} Q35.5 23.5 ${35.5 - R} 23.5 H${BL + R} Q${BL} 23.5 ${BL} ${23.5 - R} V${0.5 + R} Q${BL} 0.5 ${BL + R} 0.5 Z`;
 }
 
+/* the ruler: a mark at every inch measured from the paper's edges (x 0 at the left edge, y 0 at the top), numbered by
+   the inch, every 6th mark longer. Nothing lands in the binding (x 1 and less), on a rounded corner or in the corner cut. */
+const RULER = {
+  top: x => x >= 2 && x <= 35 && x < V1[0] - 0.4,
+  bottom: x => x >= 2 && x <= 35,
+  left: y => y >= 1 && y <= 23,
+  right: y => y >= 1 && y <= 23 && y > V2[1] + 0.4,
+  len: n => n % 6 === 0 ? 0.24 : 0.12,     // top, bottom and right margins
+  lenL: n => n % 6 === 0 ? 0.13 : 0.07     // the left margin is a quarter inch between binding and border
+};
 function frameSVG() {
   let t = '';
-  for (let x = 2; x <= 35; x++) {
-    const L = x % 6 === 0 ? 0.3 : 0.13;
-    if (x < V1[0] - 0.4) t += `<line class="tk" data-ax="x" data-v="${x}" x1="${x}" y1="${0.5 - L}" x2="${x}" y2="0.5"/>`;
-    t += `<line class="tk" data-ax="x" data-v="${x}" x1="${x}" y1="23.5" x2="${x}" y2="${23.5 + L}"/>`;
+  for (let x = 1; x <= 35; x++) {
+    const L = RULER.len(x);
+    if (RULER.top(x)) t += `<line class="tk${x % 6 ? '' : ' lg'}" data-ax="x" data-v="${x}" x1="${x}" y1="${0.5 - L}" x2="${x}" y2="0.5"/>`;
+    if (RULER.bottom(x)) t += `<line class="tk${x % 6 ? '' : ' lg'}" data-ax="x" data-v="${x}" x1="${x}" y1="23.5" x2="${x}" y2="${23.5 + L}"/>`;
   }
   for (let y = 1; y <= 23; y++) {
-    const L = y % 6 === 0 ? 0.19 : 0.1;             // the left margin is a quarter inch between binding and border
-    t += `<line class="tk" data-ax="y" data-v="${y}" x1="${BL - L}" y1="${y}" x2="${BL}" y2="${y}"/>`;
-    if (y > V2[1] + 0.4) t += `<line class="tk" data-ax="y" data-v="${y}" x1="35.5" y1="${y}" x2="${35.5 + (y % 6 === 0 ? 0.3 : 0.13)}" y2="${y}"/>`;
+    if (RULER.left(y)) t += `<line class="tk${y % 6 ? '' : ' lg'}" data-ax="y" data-v="${y}" x1="${BL - RULER.lenL(y)}" y1="${y}" x2="${BL}" y2="${y}"/>`;
+    if (RULER.right(y)) t += `<line class="tk${y % 6 ? '' : ' lg'}" data-ax="y" data-v="${y}" x1="35.5" y1="${y}" x2="${35.5 + RULER.len(y)}" y2="${y}"/>`;
   }
   return `<svg class="frame" viewBox="0 0 36 24" preserveAspectRatio="none" aria-hidden="true">
     <path class="bd" d="${borderPath()}"/>
@@ -567,18 +580,22 @@ function frameSVG() {
     ${t}</svg>`;
 }
 
-function zoneLabels() {
+// ruler numbers: centered past the mark on the top and bottom, just below the mark down the sides
+function rulerLabels() {
   let h = '';
-  for (let n = 1; n <= 34; n++) {
-    if (n + 1 < V1[0] - 0.4) h += `<span class="zl" data-ax="x" data-v="${n}" style="left:${U(n + 0.5)};top:${U(0.27)}">${n}</span>`;
-    h += `<span class="zl" data-ax="x" data-v="${n}" style="left:${U(n + 0.5)};top:${U(23.75)}">${n}</span>`;
+  const lab = (ax, v, x, y) => `<span class="zl${v % 6 ? '' : ' lg'}" data-ax="${ax}" data-v="${v}" style="left:${U(x)};top:${U(y)}">${v}</span>`;
+  for (let x = 1; x <= 35; x++) {
+    if (RULER.top(x)) h += lab('x', x, x, 0.16);
+    if (RULER.bottom(x)) h += lab('x', x, x, 23.84);
   }
-  for (let k = 1; k <= 22; k++) {
-    h += `<span class="zl" data-ax="y" data-v="${k}" style="left:${U(1.115)};top:${U(k + 0.5)}">${ZL[k - 1]}</span>`;
-    if (k > V2[1] + 0.4) h += `<span class="zl" data-ax="y" data-v="${k}" style="left:${U(35.76)};top:${U(k + 0.5)}">${ZL[k - 1]}</span>`;
+  for (let y = 1; y <= 23; y++) {
+    if (RULER.left(y)) h += lab('y', y, 1.125, y + 0.14);
+    if (RULER.right(y)) h += lab('y', y, 35.74, y + 0.14);
   }
   return h;
 }
+
+function paperTexture() { return '<div class="tex" aria-hidden="true"></div>'; }
 
 function bindingHTML() {
   return `<div class="bindg" aria-hidden="true">${[4, 12, 20].map(y => `<i class="rv" style="top:${U(y)}"></i>`).join('')}</div>`;
@@ -591,11 +608,12 @@ function curlSVG(k) {
         <stop offset="0" stop-color="#d6d2c8"/><stop offset=".5" stop-color="#e6e3dc"/><stop offset="1" stop-color="#f4f2ed"/></linearGradient>
       <linearGradient id="cr${k}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="#e2dfd7"/><stop offset="1" stop-color="#f1efe9"/></linearGradient>
-      <filter id="cb${k}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".05"/></filter>
+      <filter id="cb${k}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation=".05"/></filter>
     </defs>
     <path class="rev" fill="url(#cr${k})" d=""/>
     <path class="csh" fill="#1b1a18" filter="url(#cb${k})" d=""/>
     <path class="flap" fill="url(#cg${k})" d=""/>
+    <path class="crest" d=""/>
     <path class="hl" d=""/>
   </svg>`;
 }
@@ -706,14 +724,7 @@ function titleBlock(sh, i) {
     const d = (arr.length - 1 - k) * 170 + 260;     // oldest (bottom) first, newest (top) last
     return `<li class="${k === 0 ? 'new' : ''}" style="--d:${d}">${k === 0 ? '<svg class="tick" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5.5 L4 8.5 L9 1.5"/></svg>' : ''}<span class="n">${r.no}</span><span class="d">${esc(r.date)}</span><span>${esc(r.for)}</span></li>`;
   }).join('');
-  let toc = '';
-  SET.groups.forEach(g => {
-    toc += `<li class="gh">${esc(g)}</li>`;
-    SHEETS.forEach((s, k) => {
-      if (s.group !== g) return;
-      toc += `<li><button class="ix${k === i ? ' cur' : ''}" data-go="${s.id}"${k === i ? ' aria-current="page"' : ''}><span class="t">${esc(s.short || s.title)}</span><span class="n">${s.id}</span></button></li>`;
-    });
-  });
+  // no sheet index here (André 9/30): it lives on A0.1 and behind the Sheet index button
   const lw = LOCK.w, lx = LOCK.x - 32, ly = LOCK.y - 0.5;
   const colo = `<b>${esc(F.name)}</b> · <i>${esc(F.line)}</i>. ${F.addr.map(esc).join(', ')} · ${esc(F.phone)} · ${esc(F.email)}. ${esc(SET.copy)}`;
   return `<aside class="tb" aria-label="Title block">
@@ -725,10 +736,9 @@ function titleBlock(sh, i) {
         <span class="val line"><span class="il">Owner</span>${esc(P.owner)}</span><span class="val line">${esc(P.ownerCo)}</span></div>
       <div class="sec dat"><span class="lab">Issued</span><ol class="iss">${issRows}</ol></div>
       <div class="sec dat"><span class="lab">Agency and permits</span>${SET.permits.map(p => `<span class="val line">${esc(p.tb || p.k)} <span class="pend">${esc(p.v)}</span></span>`).join('')}<span class="val line">${esc(SET.fire)}</span></div>
-      <div class="sec dat idx"><span class="lab">Sheets</span><ol class="toc">${toc}</ol></div>
       <div class="sec dat stamp"><span class="lab">${esc(SET.aor.label)}</span><span class="val line">${esc(SET.aor.name)}</span><div class="seal" aria-label="Stamp area">Stamp</div><span class="sm line">${esc(SET.aor.note)}</span></div>
       <div class="sec dat"><span class="lab">Sheet title</span><div class="stitle">${esc(sh.title)}</div>
-        <div class="meta"><span><span class="il">Scale</span>${esc(sh.scale)}</span><span><span class="il">Date</span>${esc(SET.date)}</span><span><span class="il">Drawn</span>${esc(SET.drawnBy)}</span></div>
+        <div class="meta"><span><span class="il">Scale</span><span class="sc">${esc(sh.scale)}</span></span><span><span class="il">Date</span>${esc(SET.date)}</span><span><span class="il">Drawn</span>${esc(SET.drawnBy)}</span></div>
         <div class="status">${esc(SET.status)}</div></div>
       <div class="sec dat snum"><span class="lab">Sheet ${i + 1} of ${N}</span><div class="sn" data-sn="${sh.id}" aria-label="Sheet ${sh.id}">${cells(sh.id)}</div></div>
       <div class="sec tlive">${qrSVG()}${liveText()}</div>
@@ -744,7 +754,7 @@ function buildSheet(sh, i) {
   el.className = 'sheet';
   el.dataset.id = sh.id; el.dataset.kind = kind;
   el.setAttribute('aria-label', `${sh.id} ${sh.title}`);
-  el.innerHTML = `<div class="paper">${frameSVG()}${zoneLabels()}<div class="field">${siteHeader()}${field}${siteFooter(sh, i)}</div>${titleBlock(sh, i)}${bindingHTML()}${curlSVG(i)}<div class="shade"></div></div>`;
+  el.innerHTML = `<div class="paper">${paperTexture()}${frameSVG()}${rulerLabels()}<div class="field">${siteHeader()}${field}${siteFooter(sh, i)}</div>${titleBlock(sh, i)}${bindingHTML()}${curlSVG(i)}<div class="shade"></div></div>`;
   return el;
 }
 
@@ -799,12 +809,12 @@ function hairlines(scope) {
     sv.querySelector('path').style.strokeWidth = (1.05 * vb.width / r.width).toFixed(4) + 'px';
   });
 }
-// too tall for this window: ease the px floors down until the index fits
+// too tall for this window: ease the px floors down until the title block fits
 function fitTitleBlock(el) {
-  const idx = el.querySelector('.tb .idx'); if (!idx) return;
+  const tbc = el.querySelector('.tb .tbc'); if (!tbc) return;
   el.style.removeProperty('--fl');
   let fl = 1;
-  while (idx.scrollHeight > idx.clientHeight + 1 && fl > .5) { fl -= .05; el.style.setProperty('--fl', fl.toFixed(2)); }
+  while (tbc.scrollHeight > tbc.clientHeight + 1 && fl > .5) { fl -= .05; el.style.setProperty('--fl', fl.toFixed(2)); }
 }
 addEventListener('resize', layout);
 MQ.addEventListener ? MQ.addEventListener('change', layout) : MQ.addListener(layout);
@@ -836,8 +846,8 @@ function flap(el, from, to) {
 function finishFlaps() {
   flapTimers.forEach(ts => ts.forEach(clearTimeout));
   flapTimers.clear();
-  els.forEach((e, i) => setCells(e.querySelector('.tb .sn'), SHEETS[i].id));
-  if (cur >= 0) setCells($('#ssn'), SHEETS[cur].id);
+  els.forEach((e, i) => setCells(e.querySelector('.tb .sn'), sid(i)));
+  if (cur >= 0) setCells($('#ssn'), sid(cur));
 }
 
 /* ================================================================ turning */
@@ -864,8 +874,12 @@ function reelBridge(sheet, f) {
     if (!app) return;
     const plans = doc.querySelector('.plansheet');
     const info = q('info');
-    const live = app.dataset.mode === 'model' || (info && !info.hidden) || (plans && !plans.hidden && getComputedStyle(plans).display !== 'none');
+    const plansOpen = !!(plans && !plans.hidden && getComputedStyle(plans).display !== 'none');
+    const live = app.dataset.mode === 'model' || (info && !info.hidden) || plansOpen;
     if (live !== lastLive) { sheet.classList.toggle('live-model', live); lastLive = live; }
+    // the plans follow the title block: Site A1.0, Level 1 A2.1, Level 2 A2.2, Roof A2.3; closing them restores A0.0
+    const lv = plansOpen ? ((doc.querySelector('#plSheets button[aria-pressed="true"]') || {}).dataset || {}).sh : null;
+    coverAs(sheet, lv ? PLAN_SHEETS[lv] || null : null);
     if (app.dataset.mode !== 'reel') return;
     const t = (q('shotTitle') || {}).textContent || '';
     const l = (q('shotLine') || {}).textContent || '';
@@ -882,6 +896,22 @@ function reelBridge(sheet, f) {
   setInterval(tick, 250);
   tick();
 }
+/* the cover borrows a plan sheet's number, title and scale while the model's plans are open on it */
+const sid = k => k === 0 && coverAlias ? coverAlias : SHEETS[k].id;
+const PLAN_SHEETS = { site: 'A1.0', l1: 'A2.1', l2: 'A2.2', roof: 'A2.3' };
+let coverAlias = null;
+function coverAs(sheet, id) {
+  if (id === coverAlias) return;
+  const was = coverAlias || SHEETS[0].id;
+  coverAlias = id;
+  const k = id ? idxOf(id) : 0, s = SHEETS[k], tb = sheet.querySelector('.tb');
+  tb.querySelector('.stitle').textContent = s.title;
+  tb.querySelector('.meta .sc').textContent = s.scale;
+  tb.querySelector('.snum .lab').textContent = `Sheet ${k + 1} of ${N}`;
+  const sn = tb.querySelector('.sn'); sn.dataset.sn = s.id; sn.setAttribute('aria-label', `Sheet ${s.id}`);
+  flap(sn, was, s.id);
+  if (cur === 0) { $('#cn').textContent = s.id; flap($('#ssn'), was, s.id); $('#stt').textContent = s.foot || s.short || s.title; }
+}
 function arrive(el, prevIdx) {
   el.classList.remove('play');
   const rows = el.querySelectorAll('.tb .ix');
@@ -893,15 +923,15 @@ function arrive(el, prevIdx) {
   el.classList.add('play');
 }
 function updateChrome(i, prev) {
-  const s = SHEETS[i];
+  const s = i === 0 && coverAlias ? SHEETS[idxOf(coverAlias)] : SHEETS[i];
   $('#cn').textContent = s.id;
   $('#stt').textContent = s.foot || s.short || s.title;
   $('#stl').textContent = s.cap || '';
   $('#scount').textContent = `${pad2(i + 1)} / ${pad2(N)}`;
-  flap($('#ssn'), prev >= 0 ? SHEETS[prev].id : '    ', s.id);
+  flap($('#ssn'), prev >= 0 ? $('#ssn').textContent || SHEETS[prev].id : '    ', s.id);
   $('#drawer').querySelectorAll('.dr').forEach(b => b.classList.toggle('cur', b.dataset.go === s.id));
   document.title = `${s.id} ${s.title} · Walsh Living Set`;
-  const h = '#' + s.id;
+  const h = '#' + SHEETS[i].id;
   if (location.hash !== h) history.replaceState(null, '', h);
 }
 function go(i, dir) {
@@ -918,7 +948,7 @@ function go(i, dir) {
   if (!old || RM.matches) {
     els.forEach(e => e.classList.remove('on', 'top', 'turning'));
     next.classList.add('on');
-    flap(sn, old ? SHEETS[prev].id : '    ', SHEETS[i].id);
+    flap(sn, old ? SHEETS[prev].id : '    ', sid(i));
     arrive(next, prev);
     return;
   }
@@ -930,7 +960,7 @@ function go(i, dir) {
     const a1 = old.animate([{ transform: 'rotateY(0deg)', opacity: 1 }, { transform: 'rotateY(-84deg)', opacity: 1, offset: .78 }, { transform: 'rotateY(-104deg)', opacity: 0 }], opts);
     const a2 = old.querySelector('.shade').animate(shadeK, opts);
     anim = [a1, a2];
-    setTimeout(() => { flap(sn, SHEETS[prev].id, SHEETS[i].id); arrive(next, prev); }, 230);
+    setTimeout(() => { flap(sn, SHEETS[prev].id, sid(i)); arrive(next, prev); }, 230);
     a1.onfinish = () => { old.classList.remove('on', 'top', 'turning'); anim = null; };
   } else {
     // the previous leaf swings back down onto the set
@@ -938,7 +968,7 @@ function go(i, dir) {
     const a1 = next.animate([{ transform: 'rotateY(-104deg)', opacity: 0 }, { transform: 'rotateY(-84deg)', opacity: 1, offset: .22 }, { transform: 'rotateY(0deg)', opacity: 1 }], opts);
     const a2 = next.querySelector('.shade').animate(shadeK.slice().reverse(), opts);
     anim = [a1, a2];
-    setTimeout(() => { flap(sn, SHEETS[prev].id, SHEETS[i].id); arrive(next, prev); }, 520);
+    setTimeout(() => { flap(sn, SHEETS[prev].id, sid(i)); arrive(next, prev); }, 520);
     a1.onfinish = () => { old.classList.remove('on'); next.classList.remove('top', 'turning'); anim = null; };
   }
 }
@@ -966,14 +996,37 @@ document.addEventListener('keydown', e => {
 $('#prev').onclick = () => go(cur - 1, -1);
 $('#next').onclick = () => go(cur + 1, 1);
 $('#print').onclick = () => window.print();
+/* swipes turn sheets: touch, and two finger horizontal swipes on a trackpad (wheel events with deltaX dominant).
+   One gesture turns one sheet: deltas add up to a threshold, then the gesture is spent until the wheel goes quiet
+   (the trackpad's momentum tail included). Nothing fires over the live model, which uses drags of its own. */
+const SWIPE = { wheel: 70, quiet: 420, cooldown: 1000, touch: 50 };
+const inModel = el => !!(el && el.closest && el.closest('.model'));
+const blocked = () => $('#drawer').classList.contains('show');
 let sw = null;
-addEventListener('touchstart', e => { if (e.touches.length === 1) sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
+addEventListener('touchstart', e => { sw = e.touches.length === 1 && !inModel(e.target) ? { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() } : null; }, { passive: true });
 addEventListener('touchend', e => {
   if (!sw) return;
   const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y;
-  if (Math.abs(dx) > 50 && Math.abs(dx) > 1.6 * Math.abs(dy) && Date.now() - sw.t < 700 && !$('#drawer').classList.contains('show')) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  if (Math.abs(dx) > SWIPE.touch && Math.abs(dx) > 1.6 * Math.abs(dy) && Date.now() - sw.t < 700 && !blocked()) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
   sw = null;
 }, { passive: true });
+const wh = { acc: 0, last: 0, spent: false, until: 0 };
+addEventListener('wheel', e => {
+  if (inModel(e.target) || blocked() || e.ctrlKey) return;
+  const now = performance.now();
+  const gap = now - wh.last; wh.last = now;
+  if (gap > SWIPE.quiet) { wh.acc = 0; if (now > wh.until) wh.spent = false; }
+  const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX, dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+  if (Math.abs(dx) <= 1.2 * Math.abs(dy)) return;          // a vertical scroll: leave it to the page
+  e.preventDefault();                                      // no browser back or forward on a sideways swipe
+  if (wh.spent) return;
+  wh.acc += dx;
+  if (Math.abs(wh.acc) >= SWIPE.wheel) {
+    const d = wh.acc > 0 ? 1 : -1;                         // fingers move left: the next sheet
+    wh.spent = true; wh.acc = 0; wh.until = now + SWIPE.cooldown;
+    go(cur + d, d);
+  }
+}, { passive: false });
 let lastFocus = null;
 function openDrawer() { lastFocus = document.activeElement; $('#drawer').classList.add('show'); $('#scrim').classList.add('show'); $('#ib').setAttribute('aria-expanded', 'true'); const c = $('#drawer .dr.cur') || $('#dclose'); c && c.focus({ preventScroll: false }); }
 function closeDrawer() { if (!$('#drawer').classList.contains('show')) return; $('#drawer').classList.remove('show'); $('#scrim').classList.remove('show'); $('#ib').setAttribute('aria-expanded', 'false'); if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); }
@@ -1035,12 +1088,12 @@ function readout() {
   if (hotSheet && hotSheet !== sheet) clearHot(hotSheet);
   hotSheet = sheet;
   const cx = $('#cx'), cy = $('#cy'), rd = $('#rd');
-  const off = () => { clearHot(sheet); cx.classList.remove('show'); cy.classList.remove('show'); rd.innerHTML = 'Zone <b>&#183;</b>'; };
+  const off = () => { clearHot(sheet); cx.classList.remove('show'); cy.classList.remove('show'); rd.innerHTML = 'Inch <b>&#183;</b>'; };
   if (!mx || mob) return off();
   const sr = stage.getBoundingClientRect();
   const ix = (mx.x - sr.left) / u, iy = (mx.y - sr.top) / u;
   if (!(ix >= BL && ix <= 35.5 && iy >= 0.5 && iy <= 23.5)) return off();
-  const zx = Math.min(34, Math.max(1, Math.floor(ix))), zy = Math.min(22, Math.max(1, Math.floor(iy)));
+  const rx = Math.min(35, Math.max(2, Math.round(ix))), ry = Math.min(23, Math.max(1, Math.round(iy)));   // nearest inch marks
   sheet.querySelectorAll('.tk').forEach(t => {
     const v = +t.dataset.v, d = Math.abs(v - (t.dataset.ax === 'x' ? ix : iy));
     const k = Math.max(0, 1 - d / 3.2);
@@ -1048,14 +1101,14 @@ function readout() {
     t.classList.toggle('hot', d < 0.5);
   });
   sheet.querySelectorAll('.zl').forEach(z => {
-    const v = +z.dataset.v, c = z.dataset.ax === 'x' ? zx : zy;
+    const v = +z.dataset.v, c = z.dataset.ax === 'x' ? rx : ry;
     z.classList.toggle('hot', v === c);
     z.classList.toggle('warm', Math.abs(v - c) === 1);
   });
   cx.style.left = (ix * u) + 'px'; cx.style.top = (0.5 * u - 7) + 'px';
   cy.style.left = (BL * u - 7) + 'px'; cy.style.top = (iy * u) + 'px';
   cx.classList.add('show'); cy.classList.add('show');
-  rd.innerHTML = `Zone <b>${ZL[zy - 1]}${zx}</b>`;
+  rd.innerHTML = `<b>${rx} · ${ry}</b>`;
 }
 addEventListener('mousemove', e => { mx = { x: e.clientX, y: e.clientY }; if (!raf) raf = requestAnimationFrame(readout); }, { passive: true });
 document.addEventListener('mouseleave', () => { mx = null; if (!raf) raf = requestAnimationFrame(readout); });
@@ -1065,25 +1118,35 @@ document.addEventListener('mouseleave', () => { mx = null; if (!raf) raf = reque
    The fold runs from P on the top edge to Q on the right edge. The flap turns over the fold by
    an angle; seen from above, its tip lands at F + (C - F) cos(angle), F the foot of the corner on
    the fold. Past 90 degrees we see the flap's underside, a touch darker, with a soft shadow. */
-const breeze = { t0: performance.now(), raf: 0 };
-function lift(t) {
-  const P = FLUTTER.period, g = FLUTTER.gust, TAU = Math.PI * 2;
-  const breath = 0.5 - 0.5 * Math.cos(TAU * t / P);                     // one slow breath per period
-  const swell = 1 - g * 0.5 * (1 + Math.sin(TAU * t / (P * 2.618) + 1.7)); // each breath a different size
-  const flick = g * 0.14 * Math.sin(TAU * t / (P * 0.29) + 0.6) * breath; // a little flutter at the top
-  return Math.max(0, Math.min(1, Math.pow(breath, 1.5) * swell + flick));
+const TAU = Math.PI * 2;
+// the wind: layered sines at unrelated periods, so no two gusts are alike; below FLUTTER.calm it is a still spell
+function wind(t) {
+  const P = FLUTTER.period, g = FLUTTER.gust;
+  const n = 0.46 * Math.sin(TAU * t / P + 0.3) + 0.26 * Math.sin(TAU * t / (P * 2.618) + 1.7)
+          + 0.17 * Math.sin(TAU * t / (P * 0.618) + 4.1) + 0.11 * Math.sin(TAU * t / (P * 4.236) + 0.9);
+  const w = 0.5 + 0.5 * n;                                           // 0 to 1
+  const x = Math.max(0, Math.min(1, (w - FLUTTER.calm) / (1 - FLUTTER.calm)));
+  const size = 1 - g * 0.5 * (1 + Math.sin(TAU * t / (P * 3.7) + 2.2));   // each gust a different size
+  const puff = Math.pow(Math.max(0, Math.sin(TAU * t / (P * 0.37) + 0.8)), 8) * 0.35 * (x > 0 ? 1 : 0.25);
+  return Math.min(1, x * x * (3 - 2 * x) * size + puff);
 }
-function curlShape(t) {
-  const L = lift(t), TAU = Math.PI * 2;
-  const a = FLUTTER.rest + (FLUTTER.lift - FLUTTER.rest) * L;
-  const b = a * (FLUTTER.skew + 0.07 * Math.sin(TAU * t / (FLUTTER.period * 0.71) + 2.1));
-  const turn = (FLUTTER.turnRest + (FLUTTER.turnPeak - FLUTTER.turnRest) * L + 4 * Math.sin(TAU * t / (FLUTTER.period * 0.53))) * Math.PI / 180;
+// the paper answers the wind: a quick lift, a slow settle
+function stepLift(L, t, dt) {
+  const target = wind(t), tau = target > L ? FLUTTER.rise : FLUTTER.settle;
+  return L + (target - L) * (1 - Math.exp(-dt / tau));
+}
+function curlShape(t, L) {
+  const tr = FLUTTER.flutter * L * (Math.sin(TAU * t * 2.3) + 0.6 * Math.sin(TAU * t * 3.7 + 1.3) + 0.3 * Math.sin(TAU * t * 5.9 + 0.4)) / 1.9;
+  const l = Math.max(0, Math.min(1, L + tr));
+  const a = FLUTTER.rest + (FLUTTER.lift - FLUTTER.rest) * l;
+  const b = a * (FLUTTER.skew + 0.06 * Math.sin(TAU * t / (FLUTTER.period * 0.71) + 2.1) * (0.3 + l));
+  const turn = (FLUTTER.turnRest + (FLUTTER.turnPeak - FLUTTER.turnRest) * l + 5 * tr / Math.max(.01, FLUTTER.flutter) * l + 1.5 * Math.sin(TAU * t / (FLUTTER.period * 0.53))) * Math.PI / 180;
   const P = [-a, 0], Q = [0, b], dd = a * a + b * b;
   const F = [-a + a * a * a / dd, a * a * b / dd];                        // foot of the corner on the fold
   const n = [-F[0], -F[1]];                                              // fold to corner
   const c = Math.cos(turn);
   const T = [F[0] + n[0] * c, F[1] + n[1] * c];                          // the tip, seen from above
-  return { P, Q, F, T, n, L };
+  return { P, Q, F, T, n, L: l };
 }
 function bow(A, B, away, k) {
   // control point for a gentle bow from A to B, pushed away from point 'away'
@@ -1094,41 +1157,61 @@ function bow(A, B, away, k) {
 }
 const f4 = v => v.toFixed(4);
 const pt = p => `${f4(p[0])} ${f4(p[1])}`;
+const lerp2 = (A, B, k) => [A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k];
 function drawCurl(sv, S, k) {
   if (!sv) return;
-  const { P, Q, F, T, n } = S, cu = FLUTTER.curl;
+  const { P, Q, F, T, n, L } = S, cu = FLUTTER.curl * (0.8 + 0.6 * L), ro = FLUTTER.roll * L;
   const hinge = bow(Q, P, T, cu * 0.5);          // the hinge bows toward the corner: a curl, not a crease
-  const e1 = bow(P, T, Q, cu), e2 = bow(T, Q, P, cu);
-  const flap = `M${pt(P)} Q${pt(e1)} ${pt(T)} Q${pt(e2)} ${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
-  const rev = `M${pt(P)} L0 0 L${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
+  // the free edges are cubic: they leave the hinge nearly straight, then roll over toward the tip
   const sz = Math.hypot(n[0], n[1]);
-  const sh = [-0.06 * sz - 0.01, 0.1 * sz + 0.012];
-  const mv = p => [p[0] + sh[0], p[1] + sh[1]];
-  const shadow = `M${pt(P)} Q${pt(mv(e1))} ${pt(mv(T))} Q${pt(mv(e2))} ${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
-  const q = sv.querySelectorAll('path');
-  q[0].setAttribute('d', rev);
-  q[1].setAttribute('d', shadow);
-  q[1].setAttribute('opacity', (FLUTTER.shadow * Math.min(1, sz / 0.25)).toFixed(3));
-  q[2].setAttribute('d', flap);
-  q[3].setAttribute('d', `M${pt(Q)} Q${pt(hinge)} ${pt(P)}`);
-  const g = sv.querySelector('#cg' + k), r = sv.querySelector('#cr' + k);
-  const H = [(hinge[0] + (P[0] + Q[0]) / 2) / 2, (hinge[1] + (P[1] + Q[1]) / 2) / 2];
-  g.setAttribute('x1', f4(H[0])); g.setAttribute('y1', f4(H[1])); g.setAttribute('x2', f4(T[0])); g.setAttribute('y2', f4(T[1]));
+  const M = lerp2(P, Q, 0.5), tipIn = lerp2(T, M, ro);                  // the tip rolls back over the flap as it lifts
+  const e1a = bow(P, lerp2(P, T, 0.7), Q, cu * 0.5), e1b = bow(lerp2(P, tipIn, 0.45), tipIn, Q, cu * (1 + 1.5 * ro));
+  const e2a = bow(tipIn, lerp2(Q, tipIn, 0.45), P, cu * (1 + 1.5 * ro)), e2b = bow(lerp2(Q, T, 0.7), Q, P, cu * 0.5);
+  const edge = (m = x => x) => `M${pt(P)} C${pt(m(e1a))} ${pt(m(e1b))} ${pt(m(tipIn))} C${pt(m(e2a))} ${pt(m(e2b))} ${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
+  const flap = edge();
+  const rev = `M${pt(P)} L0 0 L${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
+  // the shadow drifts further and softens as the flap stands up off the page
+  const off = [-(0.05 + 0.1 * L) * sz - 0.01, (0.08 + 0.16 * L) * sz + 0.012];
+  const shadow = edge(p => [p[0] + off[0], p[1] + off[1]]);
+  // the roll's crest: a soft highlight across the flap where it turns over
+  const c0 = lerp2(P, tipIn, 0.55 + 0.2 * (1 - L)), c1 = lerp2(Q, tipIn, 0.55 + 0.2 * (1 - L));
+  const crest = `M${pt(c0)} Q${pt(bow(c0, c1, T, cu * 0.6))} ${pt(c1)}`;
+  const q = n => sv.querySelector(n);
+  q('.rev').setAttribute('d', rev);
+  q('.csh').setAttribute('d', shadow);
+  q('.csh').setAttribute('opacity', (FLUTTER.shadow * (1 - 0.4 * L) * Math.min(1, sz / 0.25)).toFixed(3));
+  q('#cb' + k + ' feGaussianBlur').setAttribute('stdDeviation', f4(FLUTTER.blur[0] + (FLUTTER.blur[1] - FLUTTER.blur[0]) * L));
+  q('.flap').setAttribute('d', flap);
+  q('.crest').setAttribute('d', crest);
+  q('.crest').setAttribute('stroke-opacity', (0.15 + 0.5 * L).toFixed(3));
+  q('.hl').setAttribute('d', `M${pt(Q)} Q${pt(hinge)} ${pt(P)}`);
+  const g = q('#cg' + k), r = q('#cr' + k);
+  const H = [(hinge[0] + M[0]) / 2, (hinge[1] + M[1]) / 2];
+  g.setAttribute('x1', f4(H[0])); g.setAttribute('y1', f4(H[1])); g.setAttribute('x2', f4(tipIn[0])); g.setAttribute('y2', f4(tipIn[1]));
   r.setAttribute('x1', f4(H[0])); r.setAttribute('y1', f4(H[1])); r.setAttribute('x2', '0'); r.setAttribute('y2', '0');
 }
+const breeze = { t0: performance.now(), last: 0, raf: 0, L: 0 };
 function breezeFrame(now) {
   breeze.raf = 0;
-  if (cur < 0 || document.hidden || RM.matches) return;
-  const t = (now - breeze.t0) / 1000;
-  drawCurl(els[cur].querySelector('.curl'), curlShape(t), cur);
+  if (cur < 0 || document.hidden || RM.matches) { breeze.last = 0; return; }
+  const t = (now - breeze.t0) / 1000, dt = breeze.last ? Math.min(0.1, (now - breeze.last) / 1000) : 1 / 60;
+  breeze.last = now;
+  breeze.L = stepLift(breeze.L, t, dt);
+  drawCurl(els[cur].querySelector('.curl'), curlShape(t, breeze.L), cur);
   breeze.raf = requestAnimationFrame(breezeFrame);
 }
 function startBreeze() { if (!breeze.raf && !RM.matches) breeze.raf = requestAnimationFrame(breezeFrame); }
-els.forEach((e, k) => drawCurl(e.querySelector('.curl'), curlShape(0), k));   // every sheet starts at rest
+els.forEach((e, k) => drawCurl(e.querySelector('.curl'), curlShape(0, 0), k));   // every sheet starts at rest
 document.addEventListener('visibilitychange', startBreeze);
 RM.addEventListener && RM.addEventListener('change', startBreeze);
-// a still frame for tests and captures: window.__breeze(seconds) draws that instant and stops the loop
-window.__breeze = s => { cancelAnimationFrame(breeze.raf); breeze.raf = 0; drawCurl(els[cur].querySelector('.curl'), curlShape(s), cur); };
+// a still frame for tests and captures: window.__breeze(seconds) replays the wind to that instant, draws it and stops the loop
+window.__breeze = s => {
+  cancelAnimationFrame(breeze.raf); breeze.raf = 0;
+  let L = 0; for (let t = 0; t < s; t += 1 / 60) L = stepLift(L, t, 1 / 60);
+  drawCurl(els[cur].querySelector('.curl'), curlShape(s, L), cur);
+  return +L.toFixed(3);
+};
+window.__wind = wind;
 
 /* ================================================================ print: everything in its final still state */
 function toStill() {
@@ -1140,8 +1223,54 @@ function toStill() {
 addEventListener('beforeprint', toStill);
 matchMedia('print').addEventListener && matchMedia('print').addEventListener('change', e => { if (e.matches) toStill(); });
 
+/* ================================================================ weathered paper, baked once
+   SVG turbulence (fibers, grain, mottling, mist) and canvas gradients (foxing, graphite smudges, long construction
+   lines, weathered edges) are drawn one time into a 36 x 24 in bitmap at 60 px per inch. Every sheet shows that one
+   cached image, so page turns and the breeze never re-run filters or gradients. */
+const PAPER = { ppi: 60, W: 2160, H: 1440 };
+const PAPER_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='${PAPER.W}' height='${PAPER.H}'>` +
+  "<filter id='a' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.014 .15' numOctaves='3' seed='11'/><feColorMatrix values='0 0 0 0 .40 0 0 0 0 .36 0 0 0 0 .30 5 0 0 0 -3.1'/></filter>" +
+  "<filter id='c' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.038 .07' numOctaves='2' seed='31'/><feColorMatrix values='0 0 0 0 .98 0 0 0 0 .97 0 0 0 0 .94 5 0 0 0 -3.2'/></filter>" +
+  "<filter id='g' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='2' seed='2'/><feColorMatrix values='0 0 0 0 .30 0 0 0 0 .28 0 0 0 0 .25 1.6 0 0 0 -.62'/></filter>" +
+  "<filter id='m' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.0016 .0021' numOctaves='4' seed='23'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .47 0 0 0 0 .36 2.2 0 0 0 -1.0'/></filter>" +
+  "<filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.0012' numOctaves='3' seed='5'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 .99 2.4 0 0 0 -1.15'/></filter>" +
+  "<rect width='100%' height='100%' filter='url(#m)' opacity='.09'/><rect width='100%' height='100%' filter='url(#w)' opacity='.35'/>" +
+  "<rect width='100%' height='100%' filter='url(#a)' opacity='.05'/><rect width='100%' height='100%' filter='url(#c)' opacity='.3'/><rect width='100%' height='100%' filter='url(#g)' opacity='.06'/></svg>";
+// [x, y] in sheet fractions, radii in inches, rgb, alpha at the center
+const FOX = [
+  [.084, .91, .16, .16, '150,108,58', .11], [.096, .885, .09, .09, '150,108,58', .09], [.47, .065, .22, .22, '150,108,58', .05],
+  [.83, .94, .12, .12, '150,108,58', .09], [.58, .52, .3, .3, '150,108,58', .04], [.34, .71, .07, .07, '150,108,58', .1],
+  [.22, .84, 4.6, 1.3, '70,66,60', .035], [.71, .12, 3.2, .9, '70,66,60', .03],
+  [.86, .8, 9, 6, '160,130,90', .05], [.12, .18, 11, 7, '160,130,90', .04]
+];
+// long faint construction lines: [x1, y1, x2, y2] in sheet fractions, alpha
+const GRAPHITE = [[0, .375, 1, .375, .05], [.618, 0, .618, 1, .04], [0, .70, 1, .722, .035], [.172, 0, .188, 1, .03]];
+function bakePaper() {
+  const { W, H, ppi } = PAPER, img = new Image();
+  img.onload = () => {
+    try {
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const x = c.getContext('2d');
+      x.drawImage(img, 0, 0);
+      FOX.forEach(([fx, fy, rx, ry, rgb, a]) => {
+        x.save(); x.translate(fx * W, fy * H); x.scale(1, ry / rx);
+        const g = x.createRadialGradient(0, 0, 0, 0, 0, rx * ppi);
+        g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`);
+        x.fillStyle = g; x.fillRect(-rx * ppi, -rx * ppi, 2 * rx * ppi, 2 * rx * ppi); x.restore();
+      });
+      x.lineWidth = 1.3;
+      GRAPHITE.forEach(([x1, y1, x2, y2, a]) => { x.strokeStyle = `rgba(27,26,24,${a})`; x.beginPath(); x.moveTo(x1 * W, y1 * H); x.lineTo(x2 * W, y2 * H); x.stroke(); });
+      // weathered edges: a soft warm darkening that fades in from the paper's edges
+      const e = 1.1 * ppi, edge = (x0, y0, x1, y1, rx, ry, rw, rh) => { const g = x.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(130,105,70,.075)'); g.addColorStop(1, 'rgba(130,105,70,0)'); x.fillStyle = g; x.fillRect(rx, ry, rw, rh); };
+      edge(0, 0, 0, e, 0, 0, W, e); edge(0, H, 0, H - e, 0, H - e, W, e); edge(0, 0, e, 0, 0, 0, e, H); edge(W, 0, W - e, 0, W - e, 0, e, H);
+      c.toBlob(b => { if (b) root.style.setProperty('--paper-tex', `url(${URL.createObjectURL(b)})`); }, 'image/png');
+    } catch (err) { /* no grain: the paper stays plain */ }
+  };
+  img.src = 'data:image/svg+xml,' + encodeURIComponent(PAPER_SVG);
+}
+
 /* ================================================================ start */
-const start = () => { go(fromHash()); startBreeze(); };
+const start = () => { go(fromHash()); startBreeze(); (window.requestIdleCallback || (f => setTimeout(f, 600)))(bakePaper, { timeout: 1500 }); };
 (document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]) : Promise.resolve()).then(() => { layout(); start(); });
 </script>
 </body>
