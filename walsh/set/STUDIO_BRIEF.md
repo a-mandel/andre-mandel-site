@@ -20,3 +20,9 @@ Common thread: rendered architecture dissolving into hairline drafting, handwrit
 - No dashes in visible text: no em dash, no en dash, no hyphen used as punctuation.
 - Dates M/D/YY. Three fonts only: Tenor Sans, EB Garamond, Nothing You Could Do (Google Fonts).
 - Do not git commit or push.
+
+## Update 9/30/26, 5:45 am (overrides the above where they differ)
+- No architect of record anywhere. No AOR label, name, stamp box or seal on any sheet.
+- Sidebar geometry, from v2.html (read its TBX, TXL, TXR, LK, LOCK, ENV, CUT, borderPath and the "3 in sidebar" CSS): the sidebar runs from the 32 1/2 line, 3 in wide. The lockup fills the sidebar, its mark spanning the text margins exactly. The upper right corner is not a straight cut: it follows the concave curve of the logo's roof stroke, offset about 0.3 in.
+- Curved footer lines: every horizontal rule swoops like the ribbon roof, level and sagging slightly, then lifting at the right (v2's --swoop). Straight rules are out.
+- Fonts: explore different typefaces across the 40, but each variation uses 2 or 3 fonts max: one hand sketch face, one sans serif, one serif. Google Fonts only. Name the three on each deck card.

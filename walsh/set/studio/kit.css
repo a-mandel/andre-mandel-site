@@ -195,3 +195,6 @@ button:focus-visible,a:focus-visible{outline:1px solid var(--accent);outline-off
   .curl,.btn,.vtag{display:none !important}
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
+
+/* architect of record removed from all project documentation (9/30/26) */
+[class*="stamp"],.seal{display:none !important}

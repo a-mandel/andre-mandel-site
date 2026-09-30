@@ -13,7 +13,7 @@ const SET = {
   permits: [ { k: 'Lahontan design review (LCC)', tb: 'Design review (LCC)', v: 'no. pending' }, { k: 'Placer County building permit', tb: 'Building permit', v: 'no. pending' } ],
   fire: 'Very High FHSZ · Chapter 7A',
   issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
-  aor: { label: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
+  aor: { label: '', name: '', note: '' },   // architect of record removed from all project documentation (9/30/26)
   date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
   copy: '© 2026 André Mandel. Drawings are instruments of service.',
   live: { url: 'https://mango-mushroom.github.io/andre-mandel-site/walsh/set/v2.html', show: ['mango-mushroom.github.io', '/andre-mandel-site', '/walsh/set/v2.html'], label: 'The living set' },
@@ -286,7 +286,7 @@ function frags(c) {
       <span class="val line"><span class="il">Owner</span>${e(P.owner)}</span><span class="val line">${e(P.ownerCo)}</span></div>`,
     issued: o => `<div class="sec s-iss">${L(o, 'Issued')}<ol class="iss">${c.iss.map((r, k) => `<li class="${k === 0 ? 'new' : ''}"><span class="n">${r.no}</span><span class="d">${e(r.date)}</span><span class="w">${e(r.for)}</span></li>`).join('')}</ol></div>`,
     permits: o => `<div class="sec s-perm">${L(o, 'Agency and permits')}${S.permits.map(p => `<span class="val line">${e(p.tb)} <span class="pend">${e(p.v)}</span></span>`).join('')}<span class="val line">${e(S.fire)}</span></div>`,
-    stamp: o => `<div class="sec s-stamp stamp">${L(o, S.aor.label)}<span class="val line">${e(S.aor.name)}</span><div class="seal" aria-label="Stamp area">Stamp</div><span class="sm line">${e(S.aor.note)}</span></div>`,
+    stamp: o => '',
     title: o => `<div class="sec s-title">${L(o, 'Sheet title')}<div class="stitle">${e(sh.title)}</div>
       <div class="meta"><span><span class="il">Scale</span>${e(sh.scale)}</span><span><span class="il">Date</span>${e(S.date)}</span><span><span class="il">Drawn</span>${e(S.drawnBy)}</span></div>
       <div class="status">${e(S.status)}</div></div>`,

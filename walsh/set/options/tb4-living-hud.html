@@ -238,6 +238,9 @@ img{display:block}
   .frame .tk{stroke:var(--ink) !important;stroke-opacity:.42 !important}
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
+
+/* architect of record removed from all project documentation (9/30/26) */
+[class*="stamp"],.seal{display:none !important}
 </style>
 </head>
 <body>
@@ -276,7 +279,7 @@ const SET = {
   fire: 'Very High FHSZ · Chapter 7A',
   // oldest first here; the title block shows newest first
   issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
-  aor: { label: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
+  aor: { label: 'Architect of record', name: '', note: 'Stamp at design review submittal' },
   date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
   copy: '© 2026 André Mandel. Drawings are instruments of service.',
   model: { src: '../../?sheet', still: '../../preview-house.jpg' },
@@ -455,7 +458,7 @@ function fieldIndex(sh) {
   });
   const pd = [
     ['Project', P.name], ['Site', P.site], ['Address', P.address], ['APN', P.apn], ['Zoning', P.zoning], ['Jurisdiction', P.county],
-    ['Owner', `${P.owner}, ${P.ownerCo}`], ['Designer', 'André Mandel'], ['Architect of record', SET.aor.name],
+    ['Owner', `${P.owner}, ${P.ownerCo}`], ['Designer', 'André Mandel'],
     ['Design review', `Lahontan (LCC) · no. pending`], ['Building permit', `Placer County · no. pending`], ['Fire zone', SET.fire], ['Status', SET.status]
   ].map(([k, v]) => `<div class="trow pd-t"><span class="k">${esc(k)}</span><span>${esc(v)}</span></div>`).join('');
   const isr = `<div class="trow is-t hd"><span>No.</span><span>Date</span><span>Issued for</span><span>Sheets</span></div>` +
@@ -526,7 +529,7 @@ $('#smark').src = SET.marks.mark;
     h += `<div class="lbl dg">${esc(g)}</div>`;
     SHEETS.filter(s => s.group === g).forEach(s => { h += `<button class="dr" data-go="${s.id}"><span class="n">${s.id}</span><span class="t">${esc(s.title)}</span></button>`; });
   });
-  h += `<div class="dp"><div class="lbl">Project</div>${esc(P.name)} · ${esc(P.site)}<br>${esc(P.address)}<br>APN ${esc(P.apn)} · ${esc(P.zoning)}<div class="lbl">Issuances</div>${SET.issuances.slice().reverse().map(r => `${r.no} · ${esc(r.date)} · ${esc(r.for)}`).join('<br>')}<div class="lbl">Status</div>${esc(SET.status)}<div class="lbl">Architect of record</div>${esc(SET.aor.name)}</div>`;
+  h += `<div class="dp"><div class="lbl">Project</div>${esc(P.name)} · ${esc(P.site)}<br>${esc(P.address)}<br>APN ${esc(P.apn)} · ${esc(P.zoning)}<div class="lbl">Issuances</div>${SET.issuances.slice().reverse().map(r => `${r.no} · ${esc(r.date)} · ${esc(r.for)}`).join('<br>')}<div class="lbl">Status</div>${esc(SET.status)}</div>`;
   $('#drawer').innerHTML = h;
 })();
 

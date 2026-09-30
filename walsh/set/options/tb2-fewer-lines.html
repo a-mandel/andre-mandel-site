@@ -335,6 +335,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outlin
   .model .still { display: block; }
   #ctl, #strip, #panel, #scrim { display: none !important; }
 }
+
+/* architect of record removed from all project documentation (9/30/26) */
+[class*="stamp"],.seal{display:none !important}
 </style>
 </head>
 <body>
@@ -390,7 +393,7 @@ const SET = {
     { k: 'Placer County building permit', tb: 'Building permit', v: 'no.', p: 'pending' },
     { k: 'Very High FHSZ · Chapter 7A' }
   ],
-  architect: { name: 'Joseph Benveniste, AIA', role: 'Architect of record', note: 'Stamp at design review submittal' },
+  architect: { name: '', role: 'Architect of record', note: 'Stamp at design review submittal' },
   drawnBy: 'AM',
   status: 'Feasibility · not for construction',
   statusShort: 'Not for construction',
@@ -690,8 +693,7 @@ function indexSheetHTML(s) {
     ['Design review', `<dd>Lahontan design review (LCC), no. pending</dd>`],
     ['Building permit', `<dd>Placer County, no. pending</dd>`],
     ['Wildfire', `<dd>Very High FHSZ · Chapter 7A</dd>`],
-    ['Designer', `<dd>${esc(SET.firm.name)}, ${esc(SET.firm.kind.toLowerCase())}</dd>`],
-    ['Architect of record', `<dd>${esc(a.name)}</dd>`]
+    ['Designer', `<dd>${esc(SET.firm.name)}, ${esc(SET.firm.kind.toLowerCase())}</dd>`]
   ].map(([k, v]) => `<dt>${k}</dt>${v}`).join('');
   const issList = issuedSorted().map(i => `<dt>No. ${i.no}</dt><dd>${esc(i.date)} · ${esc(i.for)}</dd>`).join('');
   const V = [[1.6, 1.3, 17.2, 19.2], [20.4, 1.3, 10.8, 12.4], [20.4, 15.6, 10.8, 4.9]];

@@ -45,7 +45,6 @@ A living plan set. The web page IS the drawing sheet. On a big screen you see a 
 - Agency and permits: Lahontan design review (LCC) no. pending. Placer County building permit no. pending. Very High FHSZ · Chapter 7A.
 - Issuances table directly under the project, dynamic from data, newest first: no., date, issued for. Current data: 1 · 9/28/26 · Feasibility FA2. 2 · 9/30/26 · Living set, cartoon.
 - Sheet index (table of contents) always visible and clickable, current sheet highlighted.
-- Stamp area: Architect of record, Joseph Benveniste, AIA. Stamp at design review submittal.
 - Sheet title, scale, date, drawn by (AM), and a "Feasibility · not for construction" status line.
 - Sheet number, large.
 - Small line: © 2026 André Mandel. Drawings are instruments of service.

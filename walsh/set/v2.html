@@ -448,7 +448,6 @@ const SET = {
   fire: 'Very High FHSZ · Chapter 7A',
   // oldest first here; the title block shows newest first
   issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
-  aor: { label: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
   date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
   copy: '© 2026 André Mandel. Drawings are instruments of service.',
   live: { url: 'https://mango-mushroom.github.io/andre-mandel-site/walsh/set/v2.html', show: ['mango-mushroom.github.io', '/andre-mandel-site', '/walsh/set/v2.html'], label: 'The living set' },
@@ -465,7 +464,7 @@ const SET = {
       notes: [ { text: 'LCC meets the 2nd Wednesday', t: [26.3, 11.35], p: [25.3, 8.7], a: 'l' } ] },
     { id: 'F1.0', group: 'Feasibility', title: 'Regulatory report', scale: 'As noted', issued: [2],
       cap: 'What Lahontan and Placer County ask of Lot 235, and the path from design review to permit.',
-      data: ['RS PD 1.7 · Placer County', 'Every roof under 30 ft over grade', 'Gables and sheds, flat roofs by variance', 'Architect of record through every stage'],
+      data: ['RS PD 1.7 · Placer County', 'Every roof under 30 ft over grade', 'Gables and sheds, flat roofs by variance', 'Licensed architect through every stage'],
       views: [ { t: 'Zoning and setbacks', s: 'Diagram', x: 1.9, y: 3.8, w: 14.2, h: 7.06 }, { t: 'Height envelope', s: 'Diagram', x: 17.2, y: 3.8, w: 14.2, h: 7.06 }, { t: 'Approvals path', s: 'Not to scale', x: 1.9, y: 12.18, w: 29.5, h: 6.82 } ],
       notes: [ { v: 1, text: 'every roof under 30 ft', t: [.52, .3], p: [.36, .56], a: 'l' }, { v: 2, text: 'LCC meets the 2nd Wednesday', t: [.62, .32], p: [.5, .6], a: 'l' } ] },
     { id: 'F2.0', group: 'Feasibility', title: 'Budget framework', scale: 'As noted', issued: [2],
@@ -720,7 +719,7 @@ function fieldIndex(sh) {
   });
   const pd = [
     ['Project', P.name], ['Site', P.site], ['Address', P.address], ['APN', P.apn], ['Zoning', P.zoning], ['Jurisdiction', P.county],
-    ['Owner', `${P.owner}, ${P.ownerCo}`], ['Designer', 'André Mandel'], ['Architect of record', SET.aor.name],
+    ['Owner', `${P.owner}, ${P.ownerCo}`], ['Designer', 'André Mandel'],
     ['Design review', 'Lahontan (LCC) · no. pending'], ['Building permit', 'Placer County · no. pending'], ['Fire zone', SET.fire], ['Status', SET.status]
   ].map(([k, v]) => `<div class="trow pd-t"><span class="k">${esc(k)}</span><span>${esc(v)}</span></div>`).join('');
   const isr = `<div class="trow is-t hd"><span>No.</span><span>Date</span><span>Issued for</span><span>Sheets</span></div>` +
@@ -773,10 +772,6 @@ function titleBlock(sh, i) {
         <span class="val line"><span class="il">Owner</span>${esc(P.owner)}</span><span class="val line">${esc(P.ownerCo)}</span></div>
       <div class="sec dat"><span class="lab">Issued</span><ol class="iss">${issRows}</ol></div>
       <div class="sec dat"><span class="lab">Agency and permits</span>${SET.permits.map(p => `<span class="val line">${esc(p.tb || p.k)} <span class="pend">${esc(p.v)}</span></span>`).join('')}<span class="val line">${esc(SET.fire)}</span></div>
-      <div class="sec dat stamp"><span class="lab">${esc(SET.aor.label)}</span><span class="val line">${esc(SET.aor.name)}</span><div class="seal" aria-label="Stamp area">Stamp</div><span class="sm line">${esc(SET.aor.note)}</span></div>
-      <div class="sec dat"><span class="lab">Sheet title</span><div class="stitle">${esc(sh.title)}</div>
-        <div class="meta"><span><span class="il">Scale</span><span class="sc">${esc(sh.scale)}</span></span><span><span class="il">Date</span>${esc(SET.date)}</span><span><span class="il">Drawn</span>${esc(SET.drawnBy)}</span></div>
-        <div class="status">${esc(SET.status)}</div></div>
       <div class="sec dat snum"><span class="lab">Sheet ${i + 1} of ${N}</span><div class="sn" data-sn="${sh.id}" aria-label="Sheet ${sh.id}">${cells(sh.id)}</div></div>
       <div class="sec tlive">${qrSVG()}${liveText()}</div>
       <div class="sec colo">${colo}</div>
@@ -810,7 +805,7 @@ $('#smark').src = SET.marks.mark;
     h += `<div class="dg">${esc(g)}</div>`;
     SHEETS.filter(s => s.group === g).forEach(s => { h += `<button class="dr" data-go="${s.id}"><span class="n">${s.id}</span><span class="t">${esc(s.title)}</span><span class="c">${esc(s.cap || '')}</span></button>`; });
   });
-  h += `<div class="dp"><div class="lab">Project</div>${esc(P.name)} · ${esc(P.site)}<br>${esc(P.address)}<br>APN ${esc(P.apn)} · ${esc(P.zoning)}<div class="lab">Issuances</div>${SET.issuances.slice().reverse().map(r => `${r.no} · ${esc(r.date)} · ${esc(r.for)}`).join('<br>')}<div class="lab">Status</div>${esc(SET.status)}<div class="lab">Architect of record</div>${esc(SET.aor.name)}</div>`;
+  h += `<div class="dp"><div class="lab">Project</div>${esc(P.name)} · ${esc(P.site)}<br>${esc(P.address)}<br>APN ${esc(P.apn)} · ${esc(P.zoning)}<div class="lab">Issuances</div>${SET.issuances.slice().reverse().map(r => `${r.no} · ${esc(r.date)} · ${esc(r.for)}`).join('<br>')}<div class="lab">Status</div>${esc(SET.status)}</div>`;
   $('#drawer').innerHTML = h;
 })();
 

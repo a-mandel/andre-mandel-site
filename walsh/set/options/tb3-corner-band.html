@@ -222,6 +222,9 @@
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
   @media (prefers-reduced-motion: reduce) { .sheet { transition: none !important; } }
+
+/* architect of record removed from all project documentation (9/30/26) */
+[class*="stamp"],.seal{display:none !important}
 </style>
 </head>
 <body>
@@ -266,7 +269,7 @@ const SET = {
     { no: 1, date: '9/28/26', for: 'Feasibility FA2' },
     { no: 2, date: '9/30/26', for: 'Living set, cartoon' }
   ],
-  stamp: { role: 'Architect of record', name: 'Joseph Benveniste, AIA', when: 'Stamp at design review submittal' },
+  stamp: { role: 'Architect of record', name: '', when: 'Stamp at design review submittal' },
   status: 'Feasibility · not for construction',
   drawn: 'AM',
   copyright: '© 2026 André Mandel. Drawings are instruments of service.',
@@ -544,7 +547,7 @@ function projectTable() {
   const P = SET.project, rows = [
     ['Address', P.address.join(', ')], ...P.data,
     ...SET.agency.map(a => [a[0], a[1]]),
-    ['Designer', 'André Mandel'], ['Architect of record', SET.stamp.name]
+    ['Designer', 'André Mandel']
   ];
   return '<table class="dat t-data"><tbody>' + rows.map(r => `<tr><td class="k">${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('') + '</tbody></table>';
 }

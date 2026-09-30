@@ -245,6 +245,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .ir.on{background:none}
   .ixl{overflow:visible}
 }
+
+/* architect of record removed from all project documentation (9/30/26) */
+[class*="stamp"],.seal{display:none !important}
 </style>
 </head>
 <body>
@@ -287,7 +290,7 @@ const SET = {
             { k: 'Very High FHSZ · Chapter 7A' } ],
   issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' },
                { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
-  stamp: { role: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
+  stamp: { role: 'Architect of record', name: '', note: 'Stamp at design review submittal' },
   status: 'Feasibility · not for construction',
   drawnBy: 'AM',
   copyright: '© 2026 André Mandel. Drawings are instruments of service.',
@@ -497,7 +500,7 @@ function indexSheetHTML(sh) {
     ['Project', `${P.name}. ${P.lines[0]}`], ['Address', '8154 Lahontan Drive, Truckee CA'], ['APN', '108 160 012 000'],
     ['Zoning', 'RS PD 1.7'], ['Jurisdiction', 'Placer County'], ['Owner', 'Dustin Walsh, Elevated Developers'],
     ['Design review', 'Lahontan design review (LCC), no. pending'], ['Building permit', 'Placer County, no. pending'],
-    ['Fire', 'Very High FHSZ · Chapter 7A'], ['Designer', 'André Mandel, Residential design'], ['Architect of record', SET.stamp.name],
+    ['Fire', 'Very High FHSZ · Chapter 7A'], ['Designer', 'André Mandel, Residential design'],
     ['Status', SET.status]
   ];
   return `<div class="blk" style="left:${I(1)};top:${I(1)};width:${I(14.6)}">
