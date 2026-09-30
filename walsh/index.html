@@ -1370,7 +1370,12 @@
       CW = app.clientWidth; CH = app.clientHeight;
       const wide = CW >= 900;
       let t = 60, b = CH, l = 0, r = CW, nt = null;
-      if (MODE === 'reel') {
+      const INS = document.documentElement.classList.contains('in-sheet');
+      if (MODE === 'reel' && INS) {
+        // inside a living set sheet: the sheet's own header and footer sit over the frame, so frame the model between them
+        const q = new URLSearchParams(location.search);
+        t = CH * (+q.get('t') || 0.16); b = CH * (+q.get('b') || 0.86); nt = t;
+      } else if (MODE === 'reel') {
         // full bleed (André 9/28 9:00 pm): the model fills the screen; it centers a little above the words and runs under them
         const tb = $('.top').getBoundingClientRect(), rb = $('#rb').getBoundingClientRect();
         t = tb.bottom + 4; b = wide ? rb.top + 70 : rb.top + rb.height * 0.34;
