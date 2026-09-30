@@ -139,6 +139,13 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .qr path{fill:var(--ink)}
 .qr rect{fill:var(--paper)}
 
+/* cover: the pocket model reel drives the footer; the model's own controls take over the field when it's entered */
+.ticks i.run b{animation:rtick var(--dur,10s) linear forwards}
+@keyframes rtick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.act .row{display:flex;gap:calc(var(--u)*.18);justify-content:flex-end}
+.sheet[data-kind="model"] .rt,.sheet[data-kind="model"] .rb,.sheet[data-kind="model"] .model::after{transition:opacity .45s ease}
+.sheet.live-model .rt,.sheet.live-model .rb,.sheet.live-model .model::after{opacity:0;pointer-events:none}
+.sheet.live-model .rb > *{pointer-events:none}
 /* cover model */
 .model{position:absolute;left:calc(var(--u)*.25);top:calc(var(--u)*.25);right:calc(var(--u)*.25);bottom:calc(var(--u)*.25);border-radius:calc(var(--u)*.16);overflow:hidden;background:var(--paper)}
 .model iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
@@ -686,7 +693,7 @@ function siteFooter(sh, i) {
     <h2 class="shot">${esc(sh.foot || sh.short || sh.title)}</h2>
     <p class="shotline">${esc(sh.cap || '')}</p>
     <ul class="rdata">${(sh.data || []).map((d, k) => `<li style="--k:${k}">${esc(d)}</li>`).join('')}</ul>
-    <div class="act">${live}<button type="button" class="btn" data-panel>Sheet index</button></div>
+    <div class="act">${live}<div class="row">${sh.kind === 'model' ? '<button type="button" class="btn" data-reel="toModel">Enter the model</button><button type="button" class="btn" data-reel="toInfo">FA package</button>' : ''}<button type="button" class="btn" data-panel>Sheet index</button></div></div>
   </footer>`;
 }
 function liveText() {
@@ -838,9 +845,42 @@ let cur = -1, anim = null;
 function loadModel(sheet) {
   const f = sheet.querySelector('iframe[data-src]');
   if (f && !f.src) {
-    f.addEventListener('load', () => { f.classList.add('ready'); const s = sheet.querySelector('.still'); if (s) s.classList.add('gone'); }, { once: true });
+    f.addEventListener('load', () => { f.classList.add('ready'); const s = sheet.querySelector('.still'); if (s) s.classList.add('gone'); reelBridge(sheet, f); }, { once: true });
     f.src = f.dataset.src;
   }
+}
+/* the cover runs the pocket model's reel: its shot title, caption, data and timing ticks feed the sheet footer,
+   and the footer's buttons drive the model. Same origin, so the sheet reads the model page directly. */
+function reelBridge(sheet, f) {
+  let doc;
+  try { doc = f.contentDocument; } catch (e) { return; }
+  if (!doc) return;
+  const q = id => doc.getElementById(id);
+  sheet.querySelectorAll('[data-reel]').forEach(b => b.addEventListener('click', () => { const t = q(b.dataset.reel); if (t) t.click(); }));
+  const rb = sheet.querySelector('.rb'), shot = rb.querySelector('.shot'), line = rb.querySelector('.shotline'), data = rb.querySelector('.rdata'), ticks = rb.querySelector('.ticks');
+  let last = '', lastLive = null;
+  const tick = () => {
+    const app = q('app');
+    if (!app) return;
+    const plans = doc.querySelector('.plansheet');
+    const info = q('info');
+    const live = app.dataset.mode === 'model' || (info && !info.hidden) || (plans && !plans.hidden && getComputedStyle(plans).display !== 'none');
+    if (live !== lastLive) { sheet.classList.toggle('live-model', live); lastLive = live; }
+    if (app.dataset.mode !== 'reel') return;
+    const t = (q('shotTitle') || {}).textContent || '';
+    const l = (q('shotLine') || {}).textContent || '';
+    const d = [...doc.querySelectorAll('#shotData li')].map(li => li.textContent);
+    const no = (q('shotNo') || {}).textContent || '';
+    const key = t + '|' + l + '|' + d.join('|') + '|' + no;
+    if (!t || key === last) return;
+    last = key;
+    shot.textContent = t; line.textContent = l;
+    data.innerHTML = d.map((x, k) => `<li style="--k:${k}">${esc(x)}</li>`).join('');
+    const src = [...doc.querySelectorAll('#ticks i')];
+    ticks.innerHTML = src.map(i => `<i class="${i.className}" style="--dur:${i.style.getPropertyValue('--dur') || '10s'}"><b></b></i>`).join('') + `<span>${esc(no)}</span>`;
+  };
+  setInterval(tick, 250);
+  tick();
 }
 function arrive(el, prevIdx) {
   el.classList.remove('play');
