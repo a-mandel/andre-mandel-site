@@ -221,6 +221,8 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .tb .tlive .url{white-space:normal;word-break:break-all}
 .tb .status{letter-spacing:.14em}
 .tb .tlive .url{font-size:max(calc(7.5px * var(--fl)),calc(var(--u)*.105))}
+/* team sheets: html(ctx) draws in field inches, origin at the field's top left (sheet x 1.25, y 0.5) */
+.fhtml{position:absolute;inset:0}
 /* cover: the pocket model reel drives the footer; the model's own controls take over the field when it's entered */
 .ticks i.run b{animation:rtick var(--dur,10s) linear forwards}
 @keyframes rtick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -231,7 +233,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 /* cover model */
 .model{position:absolute;left:calc(var(--u)*.25);top:calc(var(--u)*.25);right:calc(var(--u)*.25);bottom:calc(var(--u)*.25);border-radius:calc(var(--u)*.16);overflow:hidden;background:var(--paper)}
 .model iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
-.model .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;opacity:.95;transform:scale(1.42);transform-origin:56% 100%}
+.model .still{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 50%}
 .model::after{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--u)*4.2);pointer-events:none;background:linear-gradient(to bottom,rgba(246,245,241,.9),rgba(246,245,241,.55) 55%,rgba(246,245,241,0))}
 .model iframe.ready + .still,.model .still.gone{display:none}
 
@@ -392,6 +394,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   .legend-demo{position:relative !important;width:100% !important;height:150px !important}
   .dv{max-height:none;margin-bottom:12px}
   .dv .lbl{display:none}
+  .fhtml{position:relative;inset:auto}
   .sheet[data-kind="draw"] .vfree{margin:0 0 22px}
   .sheet[data-kind="draw"] .vfree .note{display:block;margin:0 0 6px}
   .dvt,.dtab,.dkey,.dnorth{position:relative !important;left:auto !important;top:auto !important;margin:0 0 26px}
@@ -472,6 +475,20 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Sheet index"></div>
 
 <script src="draw/drawings.js"></script>
+<script>window.LIVING_SHEETS = [];</script>
+<script src="sheets/cover-a.js"></script>
+<script src="sheets/cover-b.js"></script>
+<script src="sheets/reg-a.js"></script>
+<script src="sheets/reg-b.js"></script>
+<script src="sheets/plans-a.js"></script>
+<script src="sheets/plans-b.js"></script>
+<script src="sheets/sectelev-a.js"></script>
+<script src="sheets/sectelev-b.js"></script>
+<script src="sheets/land-a.js"></script>
+<script src="sheets/land-b.js"></script>
+<script src="sheets/sched-a.js"></script>
+<script src="sheets/sched-b.js"></script>
+
 <script>
 /* ================================================================
    THE CORNER IN THE BREEZE. Named so the email GIF can match it.
@@ -515,7 +532,7 @@ const SET = {
   date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
   copy: '© 2026 André Mandel. Drawings are instruments of service.',
   live: { url: 'https://mango-mushroom.github.io/andre-mandel-site/walsh/set/v2.html', show: ['mango-mushroom.github.io', '/andre-mandel-site', '/walsh/set/v2.html'], label: 'The living set' },
-  model: { src: '../?sheet', still: '../preview-house.jpg' },
+  model: { src: '../?sheet', still: 'sheets/assets/cover-a/cover-still.webp' },
   marks: { lockup: '../marks/am10_lockup.webp', mark: '../marks/am10_mark.webp' },
   groups: ['General', 'Feasibility', 'Architectural', 'Landscape'],
   sheets: [
@@ -607,6 +624,21 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const U = n => `calc(var(--u) * ${+n.toFixed(4)})`;
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const MQ = matchMedia('screen and (max-width:760px), screen and (max-aspect-ratio:1/1) and (max-width:1100px)');
+/* team sheets (9/30): each crew registers sheets in sheets/<team>.js with LIVING_SHEETS.push({ id, group, title, ..., html(ctx) });
+   a sheet with an existing id replaces it, new ids slot in by group, then by sheet number */
+(function mergeTeamSheets() {
+  const add = (window.LIVING_SHEETS || []).filter(t => t && t.id);
+  add.forEach(t => {
+    const k = SET.sheets.findIndex(s => s.id === t.id);
+    const sh = Object.assign({ issued: [4], scale: 'As noted' }, t, t.html ? { kind: 'html' } : {});
+    if (k >= 0) SET.sheets[k] = Object.assign({}, SET.sheets[k], sh); else SET.sheets.push(sh);
+  });
+  const gi = g => { const i = SET.groups.indexOf(g); return i < 0 ? 99 : i; };
+  const num = id => id.replace(/^[A-Z]+/, '').split('.').map(Number);
+  const pre = id => id.match(/^[A-Z]+/)[0];
+  SET.sheets.sort((a, b) => gi(a.group) - gi(b.group) || (pre(a.id) < pre(b.id) ? -1 : pre(a.id) > pre(b.id) ? 1 : 0) ||
+    num(a.id)[0] - num(b.id)[0] || (num(a.id)[1] || 0) - (num(b.id)[1] || 0));
+})();
 const SHEETS = SET.sheets;
 const N = SHEETS.length;
 const pad2 = n => String(n).padStart(2, '0');
@@ -814,6 +846,12 @@ function northArrow(n) {
     <svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r=".78"/><g transform="rotate(${a})"><path class="nd" d="M0 -.98 L.2 .18 L0 .02 L-.2 .18 Z"/><path class="nl" d="M0 .02 V.78"/></g></svg>
     <span style="left:${PC(.5 + .62 * Math.sin(a * Math.PI / 180))}%;top:${PC(.5 - .62 * Math.cos(a * Math.PI / 180))}%">N</span></div>`;
 }
+function fieldHTML(sh) {
+  const ctx = { U, esc, viewTitle, noteHTML, FX, FY, SET, DRW, BL, TBX, sheet: sh, W: 31.25, H: 23 };
+  let h = '';
+  try { h = sh.html(ctx) || ''; } catch (e) { console.error('sheet', sh.id, e); h = ''; }
+  return `<div class="fhtml">${h}</div>` + sheetNotesFree(sh);
+}
 function fieldDraw(sh) {
   const D = DRW.sheets[sh.id];
   let h = '';
@@ -878,7 +916,7 @@ const cells = s => [...s].map(c => `<span class="fc${c === '.' ? ' pt' : ''}">${
 
 function buildSheet(sh, i) {
   const kind = sh.kind || 'cartoon';
-  const field = kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : kind === 'draw' && DRW.sheets[sh.id] ? fieldDraw(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
+  const field = kind === 'html' ? fieldHTML(sh) : kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : kind === 'draw' && DRW.sheets[sh.id] ? fieldDraw(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
   const el = document.createElement('section');
   el.className = 'sheet';
   el.dataset.id = sh.id; el.dataset.kind = kind;
