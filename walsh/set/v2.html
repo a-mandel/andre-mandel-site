@@ -13,7 +13,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Tenor+Sans&family=Nothing+You+Could+Do&display=swap">
 <style>
 :root{
-  --paper:#f6f5f1; --paper2:#ebe9e3; --ink:#1b1a18; --muted:#6c6963; --faint:#a19e97; --rule:rgba(27,26,24,.2); --accent:#c07a2c;
+  --paper:#f6f3ec; --paper2:#ebe9e3; --ink:#1b1a18; --muted:#6c6963; --faint:#a19e97; --rule:rgba(27,26,24,.2); --accent:#c07a2c;
+  --desk:var(--paper2); /* what shows through the torn corner: the desk on screen, bare stock in print */
+  --cs:1;        /* corner scale: the frayed corner and its flap, larger on phones */
   --u:46px;      /* px per inch, set by script; 1in in print */
   --fl:1;        /* 1 = apply screen px floors to type, 0 = pure inches */
   --ft:'Tenor Sans','Gill Sans','Optima',sans-serif;
@@ -64,6 +66,13 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
    lines. Baked once at startup into one full sheet bitmap (see bakePaper), so page turns only composite a cached
    image. Nothing here animates. Print stays clean. */
 .tex{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:var(--paper-tex,none) 0 0/100% 100% no-repeat}
+/* the frayed corner (André 9/30): torn deckle along both edges near the top right corner, loose fibers, an aged tone
+   at the tear. Static; the flap in the breeze (.curl) draws the same outline as it lifts. */
+.tear{position:absolute;right:0;top:0;width:calc(var(--u)*3*var(--cs));height:calc(var(--u)*3*var(--cs));overflow:visible;pointer-events:none;z-index:5}
+.tear .tm{fill:var(--desk)}
+.tear .te{fill:none;stroke-width:.7;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.tear .fib,.curl .fib{fill:none;stroke:rgba(112,94,70,.36);stroke-width:.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.tear .fib{display:none}
 
 /* binding: black book cloth, one inch, the paper runs under it to the left edge */
 .bindg{position:absolute;left:0;top:0;bottom:0;width:var(--u);z-index:4;pointer-events:none;
@@ -82,8 +91,9 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .rv::after{content:"";position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle at 60% 65%,rgba(255,255,255,.55),rgba(60,57,52,.55) 70%);box-shadow:inset 0 0 1px rgba(0,0,0,.5)}
 
 /* the corner in the breeze */
-.curl{position:absolute;right:0;top:0;width:calc(var(--u)*3);height:calc(var(--u)*3);overflow:visible;pointer-events:none;z-index:5}
+.curl{position:absolute;right:0;top:0;width:calc(var(--u)*3*var(--cs));height:calc(var(--u)*3*var(--cs));overflow:visible;pointer-events:none;z-index:5}
 .curl .flap{stroke:rgba(27,26,24,.2);stroke-width:.8;vector-effect:non-scaling-stroke}
+.curl .fz{fill:none;stroke:rgba(150,112,62,.17);stroke-width:1.3;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .curl .hl{fill:none;stroke:rgba(255,255,255,.75);stroke-width:1;vector-effect:non-scaling-stroke}
 .curl .crest{fill:none;stroke:#fbfaf7;stroke-width:2.2;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:blur(.6px)}
 
@@ -223,6 +233,8 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 .tb .tlive .url{font-size:max(calc(7.5px * var(--fl)),calc(var(--u)*.105))}
 /* team sheets: html(ctx) draws in field inches, origin at the field's top left (sheet x 1.25, y 0.5) */
 .fhtml{position:absolute;inset:0}
+.fover{position:absolute;inset:0;pointer-events:none}
+.fover .hit{pointer-events:auto}
 /* cover: the pocket model reel drives the footer; the model's own controls take over the field when it's entered */
 .ticks i.run b{animation:rtick var(--dur,10s) linear forwards}
 @keyframes rtick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
@@ -364,7 +376,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 
 /* mobile: drawing fills the screen, title block becomes a bottom strip */
 @media screen and (max-width:760px), screen and (max-aspect-ratio:1/1) and (max-width:1100px){
-  :root{--sh:78px}
+  :root{--sh:78px;--cs:2.4}
   #stage{left:0 !important;top:0 !important;width:100vw;height:calc(100dvh - var(--sh) - env(safe-area-inset-bottom,0px));perspective:1400px;perspective-origin:0 50%}
   .sheet{transform-origin:0 50%}
   .sheet.turning{clip-path:none}
@@ -425,6 +437,7 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
   .curl{display:none}
+  .tear .fib{display:inline}
 }
 
 /* print: every sheet at true size, final static state, the corner flat */
@@ -436,10 +449,15 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
   #stage{position:static !important;width:3456px;height:auto;perspective:none}
   .sheet{position:relative;inset:auto;width:3456px;height:2304px;visibility:visible !important;transform:none !important;opacity:1 !important;clip-path:none !important;break-after:page;page-break-after:always;overflow:hidden}
   .sheet:last-child{break-after:auto;page-break-after:auto}
+  .sheet{contain:strict}   /* one sheet's overflow can no longer shrink every page to fit */
   .sheet .bindg{visibility:visible !important}
   .paper{box-shadow:none;border-radius:0}
   .bindg{border-radius:0}
-  .ctrl,.strip,.drawer,.scrim,.thumb,.caret,.shade,.curl,.btn,.tex{display:none !important}
+  .ctrl,.strip,.drawer,.scrim,.thumb,.caret,.shade,.curl,.btn{display:none !important}
+  /* the aging prints lighter for a clean read; the torn corner prints flat, bare stock where the paper is gone */
+  :root{--desk:#fff !important;--cs:1 !important}
+  .tex{opacity:.5}
+  .tear .fib{display:inline}
   .model iframe{display:none !important}
   .model .still{display:block !important;opacity:1}
   .zl{opacity:.62 !important;color:var(--muted) !important}
@@ -475,7 +493,8 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Sheet index"></div>
 
 <script src="draw/drawings.js"></script>
-<script>window.LIVING_SHEETS = [];</script>
+<script>window.LIVING_SHEETS = []; window.LIVING_OVERLAYS = [];</script>
+<script src="draw/shared.js"></script>
 <script src="sheets/cover-a.js"></script>
 <script src="sheets/cover-b.js"></script>
 <script src="sheets/reg-a.js"></script>
@@ -488,6 +507,11 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:1px solid 
 <script src="sheets/land-b.js"></script>
 <script src="sheets/sched-a.js"></script>
 <script src="sheets/sched-b.js"></script>
+<script src="sheets/height.js"></script>
+<script src="sheets/overlays-plans.js"></script>
+<script src="sheets/overlays-sectelev.js"></script>
+<script src="sheets/overlays-site.js"></script>
+<script src="sheets/overlays-style.js"></script>
 
 <script>
 /* ================================================================
@@ -521,7 +545,7 @@ const FLUTTER = {
    cap and data feed the footer, like the live Walsh page reel.
    ================================================================ */
 const SET = {
-  firm: { name: 'ANDRÉ MANDEL', line: 'Residential design', addr: ['40 Edith St #4', 'San Francisco CA 94133'], phone: '510.459.7686', email: 'andre.mandel@gmail.com' },
+  firm: { name: 'ANDRÉ MANDEL', signer: 'André Mandel, LEED AP', line: 'Residential design', addr: ['40 Edith St #4', 'San Francisco CA 94133'], phone: '510.459.7686', email: 'andre.mandel@gmail.com' },
   project: { name: 'Walsh Residence', site: 'Lahontan Lot 235', street: '8154 Lahontan Drive', city: 'Truckee CA', address: '8154 Lahontan Drive, Truckee CA', apn: '108 160 012 000', zoning: 'RS PD 1.7', county: 'Placer County', owner: 'Dustin Walsh', ownerCo: 'Elevated Developers' },
   // the site's own title lines, upper left of every sheet
   header: { title: 'Walsh Residence', lines: ['8154 Lahontan Drive · Lot 235 · Truckee', 'APN 108 160 012 000 · RS PD 1.7', 'Feasibility FA2 · 9/28/26'] },
@@ -727,20 +751,91 @@ function bindingHTML() {
   return `<div class="bindg" aria-hidden="true">${[4, 12, 20].map(y => `<i class="rv" style="top:${U(y)}"></i>`).join('')}</div>`;
 }
 
+/* ================================================================ the frayed corner
+   One torn outline in corner inches (the sheet's top right corner at 0,0, the page toward x<0, y>0), seeded so every
+   sheet and every print agree. The page, the flap in the breeze and print all draw this same outline. */
+const FRAY = {
+  reach: 2.8,     // inches along each edge that the tear runs from the corner
+  depth: 0.105,   // inches, the deepest deckle, near the corner
+  step: 0.016,    // inches between outline samples
+  bite: 0.045,    // inches, the very corner worn away
+  fibers: 22,     // loose fibers standing off the tear
+  seed: 235
+};
+const FRAYED = (() => {
+  let sd = FRAY.seed >>> 0;
+  const rnd = () => (sd = (Math.imul(sd, 1664525) + 1013904223) >>> 0) / 4294967296;
+  const noise = n => { const v = Array.from({ length: n }, rnd); return x => { const i = Math.floor(x), f = x - i, k = f * f * (3 - 2 * f); return v[i % n] * (1 - k) + v[(i + 1) % n] * k; }; };
+  // depth of the tear at t inches from the corner: a quick falloff, soft bites, fine deckle, a couple of sharp nicks
+  const edge = nicks => {
+    const big = noise(97), mid = noise(389), R = FRAY.reach;
+    return t => {
+      const r = t / R, env = FRAY.depth * (0.3 + 0.7 * Math.exp(-t / 1.1)) * Math.max(0, 1 - r * r);
+      let d = env * (0.12 + 0.55 * big(t / 0.34) + 0.33 * mid(t / 0.055));
+      nicks.forEach(([p, w, h]) => { d += h * Math.max(0, 1 - Math.abs(t - p) / w) * Math.max(0, 1 - r); });
+      return d;
+    };
+  };
+  const dT = edge([[0.52, 0.07, 0.075], [1.46, 0.05, 0.04]]), dR = edge([[0.34, 0.06, 0.06], [1.12, 0.08, 0.05], [2.0, 0.05, 0.03]]);
+  const pts = [], side = [], par = [];     // the outline, which edge each point is on (0 top, 1 right), its t
+  const t0 = FRAY.bite;
+  for (let t = FRAY.reach; t >= t0 - 1e-9; t -= FRAY.step) { const j = (rnd() - 0.5) * 0.006; pts.push([-t + j, dT(t)]); side.push(0); par.push(t); }
+  // the worn corner: a short ragged run between the two edges
+  const a0 = pts[pts.length - 1], b0 = [-dR(t0), t0];
+  pts.push([(a0[0] * 0.4 + b0[0] * 0.6) - 0.012, (a0[1] * 0.6 + b0[1] * 0.4) + 0.01]); side.push(0); par.push(0);
+  for (let t = t0; t <= FRAY.reach + 1e-9; t += FRAY.step) { const j = (rnd() - 0.5) * 0.006; pts.push([-dR(t), t + j]); side.push(1); par.push(t); }
+  const f4 = v => +v.toFixed(4), P = p => `${f4(p[0])} ${f4(p[1])}`;
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + P(p)).join(' ');
+  const R = FRAY.reach, o = 0.004;
+  const mask = `M${-R - 0.02} ${-o} L${P(pts[0])} ${line.replace(/^M/, 'L')} L${o} ${R + 0.02} L${o} ${-o} Z`;
+  const region = `${line} L0 3.4 L-3.4 3.4 L-3.4 0 Z`;
+  // loose fibers: rooted on the tear, most near the corner, standing off the edge and curling a little
+  const fibers = [];
+  for (let k = 0; k < FRAY.fibers; k++) {
+    const e = k % 2, t = t0 + (R * 0.7 - t0) * Math.pow(rnd(), 1.7);
+    let i = 0, best = 9;
+    pts.forEach((p, j) => { if (side[j] === e && Math.abs(par[j] - t) < best) { best = Math.abs(par[j] - t); i = j; } });
+    const base = pts[i], out = e ? [1, 0] : [0, -1], ang = (rnd() - 0.5) * 1.9, len = 0.025 + 0.085 * Math.pow(rnd(), 1.4) * (1 - t / R * 0.6);
+    const dx = out[0] * Math.cos(ang) - out[1] * Math.sin(ang), dy = out[0] * Math.sin(ang) + out[1] * Math.cos(ang);
+    const tip = [base[0] + dx * len - (e ? 0.02 : 0), base[1] + dy * len + (e ? 0 : 0.02)];
+    const bend = (rnd() - 0.5) * 0.9 * len;
+    const ctl = [(base[0] + tip[0]) / 2 - dy * bend, (base[1] + tip[1]) / 2 + dx * bend];
+    fibers.push({ e, t: par[i], pts: [base, ctl, tip] });
+  }
+  const fibPath = fibers.map(f => `M${P(f.pts[0])} Q${P(f.pts[1])} ${P(f.pts[2])}`).join(' ');
+  return { pts, side, par, line, mask, region, fibers, fibPath };
+})();
+
 function curlSVG(k) {
-  return `<svg class="curl" viewBox="-3 0 3 3" aria-hidden="true">
+  const W = FRAYED;
+  return `<svg class="tear" viewBox="-3 0 3 3" aria-hidden="true">
+    <defs><clipPath id="tc${k}"><path d="${W.region}"/></clipPath>
+      <radialGradient id="tg${k}" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${FRAY.reach}">
+        <stop offset="0" stop-color="rgb(150,112,62)"/><stop offset=".45" stop-color="rgb(150,112,62)" stop-opacity=".7"/><stop offset="1" stop-color="rgb(150,112,62)" stop-opacity="0"/></radialGradient>
+      <radialGradient id="th${k}" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${FRAY.reach}">
+        <stop offset="0" stop-color="rgb(96,78,54)" stop-opacity=".24"/><stop offset=".6" stop-color="rgb(96,78,54)" stop-opacity=".14"/><stop offset="1" stop-color="rgb(96,78,54)" stop-opacity="0"/></radialGradient></defs>
+    <g clip-path="url(#tc${k})" fill="none" stroke="url(#tg${k})" stroke-linejoin="round">
+      <path d="${W.line}" stroke-width=".2" stroke-opacity=".035"/><path d="${W.line}" stroke-width=".11" stroke-opacity=".05"/>
+      <path d="${W.line}" stroke-width=".05" stroke-opacity=".08"/><path d="${W.line}" stroke-width=".018" stroke-opacity=".12"/></g>
+    <path class="tm" d="${W.mask}"/>
+    <path class="te" d="${W.line}" stroke="url(#th${k})"/>
+    <path class="fib" d="${W.fibPath}"/>
+  </svg><svg class="curl" viewBox="-3 0 3 3" aria-hidden="true">
     <defs>
       <linearGradient id="cg${k}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#d6d2c8"/><stop offset=".5" stop-color="#e6e3dc"/><stop offset="1" stop-color="#f4f2ed"/></linearGradient>
+        <stop offset="0" stop-color="#d8d1c3"/><stop offset=".5" stop-color="#e7e1d6"/><stop offset="1" stop-color="#f4f0e7"/></linearGradient>
       <linearGradient id="cr${k}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#e2dfd7"/><stop offset="1" stop-color="#f1efe9"/></linearGradient>
+        <stop offset="0" stop-color="#e2dccf"/><stop offset="1" stop-color="#eee9df"/></linearGradient>
       <filter id="cb${k}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation=".05"/></filter>
+      <clipPath id="cp${k}"><path d="${W.region}"/></clipPath>
     </defs>
-    <path class="rev" fill="url(#cr${k})" d=""/>
+    <path class="rev" fill="url(#cr${k})" clip-path="url(#cp${k})" d=""/>
     <path class="csh" fill="#1b1a18" filter="url(#cb${k})" d=""/>
     <path class="flap" fill="url(#cg${k})" d=""/>
+    <path class="fz" d=""/>
     <path class="crest" d=""/>
     <path class="hl" d=""/>
+    <path class="fib" d=""/>
   </svg>`;
 }
 
@@ -846,6 +941,14 @@ function northArrow(n) {
     <svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r=".78"/><g transform="rotate(${a})"><path class="nd" d="M0 -.98 L.2 .18 L0 .02 L-.2 .18 Z"/><path class="nl" d="M0 .02 V.78"/></g></svg>
     <span style="left:${PC(.5 + .62 * Math.sin(a * Math.PI / 180))}%;top:${PC(.5 - .62 * Math.cos(a * Math.PI / 180))}%">N</span></div>`;
 }
+/* overlays (9/30): crews add layers on any sheet, e.g. grids, dimensions, room names, compliance tags, with
+   LIVING_OVERLAYS.push({ id: 'A2.1', z: 4, html: ctx => '...' }); drawn in field inches like html sheets */
+function overlaysFor(sh) {
+  const ctx = { U, esc, viewTitle, noteHTML, FX, FY, SET, DRW, BL, TBX, sheet: sh, W: 31.25, H: 23, SHARED: window.SHARED || {} };
+  return (window.LIVING_OVERLAYS || []).filter(o => o && o.id === sh.id).map(o => {
+    try { return `<div class="fover" style="z-index:${o.z || 4}">${o.html(ctx) || ''}</div>`; } catch (e) { console.error('overlay', sh.id, e); return ''; }
+  }).join('');
+}
 function fieldHTML(sh) {
   const ctx = { U, esc, viewTitle, noteHTML, FX, FY, SET, DRW, BL, TBX, sheet: sh, W: 31.25, H: 23 };
   let h = '';
@@ -897,7 +1000,7 @@ function titleBlock(sh, i) {
   }).join('');
   // no sheet index here (André 9/30): it lives on A0.1 and behind the Sheet index button
   const lw = LOCK.w, lx = LOCK.x - TBX, ly = LOCK.y - 0.5;
-  const colo = `<b>${esc(F.name)}</b> · <i>${esc(F.line)}</i>. ${F.addr.map(esc).join(', ')} · ${esc(F.phone)} · ${esc(F.email)}. ${esc(SET.copy)}`;
+  const colo = `<b>${esc(F.signer || F.name)}</b> · <i>${esc(F.line)}</i>. ${F.addr.map(esc).join(', ')} · ${esc(F.phone)} · ${esc(F.email)}. ${esc(SET.copy)}`;
   return `<aside class="tb" aria-label="Title block">
     <img class="lock" src="${esc(SET.marks.lockup)}" alt="André Mandel" width="357" height="520" style="left:${U(lx)};top:${U(ly)};width:${U(lw)}">
     <div class="tbc" style="top:${U(LOCK_BOTTOM - 0.5 + 0.22)}">
@@ -916,7 +1019,7 @@ const cells = s => [...s].map(c => `<span class="fc${c === '.' ? ' pt' : ''}">${
 
 function buildSheet(sh, i) {
   const kind = sh.kind || 'cartoon';
-  const field = kind === 'html' ? fieldHTML(sh) : kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : kind === 'draw' && DRW.sheets[sh.id] ? fieldDraw(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
+  const field = overlaysFor(sh) + (kind === 'html' ? fieldHTML(sh) : kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : kind === 'draw' && DRW.sheets[sh.id] ? fieldDraw(sh) : fieldCartoon(sh) + sheetNotesFree(sh));
   const el = document.createElement('section');
   el.className = 'sheet';
   el.dataset.id = sh.id; el.dataset.kind = kind;
@@ -1329,30 +1432,61 @@ const lerp2 = (A, B, k) => [A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k];
 function drawCurl(sv, S, k) {
   if (!sv) return;
   const { P, Q, F, T, n, L } = S, cu = FLUTTER.curl * (0.8 + 0.6 * L), ro = FLUTTER.roll * L;
-  const hinge = bow(Q, P, T, cu * 0.5);          // the hinge bows toward the corner: a curl, not a crease
-  // the free edges are cubic: they leave the hinge nearly straight, then roll over toward the tip
-  const sz = Math.hypot(n[0], n[1]);
+  const sz = Math.hypot(n[0], n[1]), nh = [n[0] / sz, n[1] / sz];
+  const cosT = ((T[0] - F[0]) * nh[0] + (T[1] - F[1]) * nh[1]) / sz;
   const M = lerp2(P, Q, 0.5), tipIn = lerp2(T, M, ro);                  // the tip rolls back over the flap as it lifts
-  const e1a = bow(P, lerp2(P, T, 0.7), Q, cu * 0.5), e1b = bow(lerp2(P, tipIn, 0.45), tipIn, Q, cu * (1 + 1.5 * ro));
-  const e2a = bow(tipIn, lerp2(Q, tipIn, 0.45), P, cu * (1 + 1.5 * ro)), e2b = bow(lerp2(Q, T, 0.7), Q, P, cu * 0.5);
-  const edge = (m = x => x) => `M${pt(P)} C${pt(m(e1a))} ${pt(m(e1b))} ${pt(m(tipIn))} C${pt(m(e2a))} ${pt(m(e2b))} ${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
-  const flap = edge();
-  const rev = `M${pt(P)} L0 0 L${pt(Q)} Q${pt(hinge)} ${pt(P)} Z`;
-  // the shadow drifts further and softens as the flap stands up off the page
-  const off = [-(0.05 + 0.1 * L) * sz - 0.01, (0.08 + 0.16 * L) * sz + 0.012];
-  const shadow = edge(p => [p[0] + off[0], p[1] + off[1]]);
+  const pull = [(M[0] - T[0]) * ro, (M[1] - T[1]) * ro];
+  // the flap's free edges bow outward and roll over toward the tip (the cubic bows of the plain corner, as offsets)
+  const perp = (A, B, away) => { const d = [B[0] - A[0], B[1] - A[1]], l = Math.hypot(d[0], d[1]) || 1; let p = [-d[1] / l, d[0] / l];
+    const m = lerp2(A, B, .5); if ((m[0] - away[0]) * p[0] + (m[1] - away[1]) * p[1] < 0) p = [-p[0], -p[1]]; return [p, l]; };
+  const [pT, lT] = perp(P, tipIn, Q), [pR, lR] = perp(Q, tipIn, P);
+  const o1 = 0.35 * cu, o2 = 0.55 * cu * (1 + 1.5 * ro), aa = -P[0], bb = Q[1];
+  const hOf = X => (X[0] - F[0]) * nh[0] + (X[1] - F[1]) * nh[1];
+  // a point of the page's corner, carried onto the turned flap: over the fold, foreshortened, rolled and bowed
+  const carry = (X, e, t) => {
+    const h = hOf(X), tt = h / sz, s2 = h * cosT - h;
+    const u = Math.max(0, Math.min(1, 1 - t / (e ? bb : aa))), g = 3 * u * (1 - u) * (1 - u) * o1 + 3 * u * u * (1 - u) * o2;
+    const pp = e ? pR : pT, ll = e ? lR : lT;
+    return [X[0] + nh[0] * s2 + pull[0] * tt * tt + pp[0] * g * ll, X[1] + nh[1] * s2 + pull[1] * tt * tt + pp[1] * g * ll];
+  };
+  // the torn outline inside the fold turns over with the flap
+  const W = FRAYED, pts = W.pts;
+  let i0 = -1, i1 = -1;
+  for (let i = 0; i < pts.length; i++) if (hOf(pts[i]) > 0) { if (i0 < 0) i0 = i; i1 = i; }
+  const cross = (A, B) => { const ha = hOf(A), hb = hOf(B), k2 = ha / (ha - hb); return lerp2(A, B, k2); };
+  const q = n => sv.querySelector(n);
+  let flap = '', shadow = '', fz = '', A = P, B = Q, hinge = bow(Q, P, T, cu * 0.5);
+  if (i0 >= 0) {
+    A = i0 > 0 ? cross(pts[i0 - 1], pts[i0]) : pts[i0];
+    B = i1 < pts.length - 1 ? cross(pts[i1], pts[i1 + 1]) : pts[i1];
+    hinge = bow(B, A, T, cu * 0.5);               // the hinge bows toward the corner: a curl, not a crease
+    const run = [];
+    for (let i = i0; i <= i1; i++) run.push(carry(pts[i], W.side[i], W.par[i]));
+    const off = [-(0.05 + 0.1 * L) * sz - 0.01, (0.08 + 0.16 * L) * sz + 0.012];   // the shadow drifts and softens as it lifts
+    const poly = (d = [0, 0]) => `M${pt([A[0] + d[0], A[1] + d[1]])} ` + run.map(p => `L${f4(p[0] + d[0])} ${f4(p[1] + d[1])}`).join(' ') +
+      ` L${pt([B[0] + d[0], B[1] + d[1]])} Q${pt([hinge[0] + d[0], hinge[1] + d[1]])} ${pt([A[0] + d[0], A[1] + d[1]])} Z`;
+    flap = poly(); shadow = poly(off);
+    fz = `M${pt(A)} ` + run.map(p => 'L' + pt(p)).join(' ') + ` L${pt(B)}`;
+  }
+  // loose fibers ride the flap when their root is inside the fold, otherwise they stay on the page
+  const fib = W.fibers.map(f => {
+    const q3 = hOf(f.pts[0]) > 0 ? f.pts.map(p => carry(p, f.e, f.t)) : f.pts;
+    return `M${pt(q3[0])} Q${pt(q3[1])} ${pt(q3[2])}`;
+  }).join(' ');
+  const rev = `M${pt(A)} L${pt(P)} L0 0 L${pt(Q)} L${pt(B)} Q${pt(hinge)} ${pt(A)} Z`;
   // the roll's crest: a soft highlight across the flap where it turns over
   const c0 = lerp2(P, tipIn, 0.55 + 0.2 * (1 - L)), c1 = lerp2(Q, tipIn, 0.55 + 0.2 * (1 - L));
-  const crest = `M${pt(c0)} Q${pt(bow(c0, c1, T, cu * 0.6))} ${pt(c1)}`;
-  const q = n => sv.querySelector(n);
+  const crest = flap ? `M${pt(c0)} Q${pt(bow(c0, c1, T, cu * 0.6))} ${pt(c1)}` : '';
   q('.rev').setAttribute('d', rev);
   q('.csh').setAttribute('d', shadow);
   q('.csh').setAttribute('opacity', (FLUTTER.shadow * (1 - 0.4 * L) * Math.min(1, sz / 0.25)).toFixed(3));
   q('#cb' + k + ' feGaussianBlur').setAttribute('stdDeviation', f4(FLUTTER.blur[0] + (FLUTTER.blur[1] - FLUTTER.blur[0]) * L));
   q('.flap').setAttribute('d', flap);
+  q('.fz').setAttribute('d', fz);
   q('.crest').setAttribute('d', crest);
   q('.crest').setAttribute('stroke-opacity', (0.15 + 0.5 * L).toFixed(3));
-  q('.hl').setAttribute('d', `M${pt(Q)} Q${pt(hinge)} ${pt(P)}`);
+  q('.hl').setAttribute('d', flap ? `M${pt(B)} Q${pt(hinge)} ${pt(A)}` : '');
+  q('.fib').setAttribute('d', fib);
   const g = q('#cg' + k), r = q('#cr' + k);
   const H = [(hinge[0] + M[0]) / 2, (hinge[1] + M[1]) / 2];
   g.setAttribute('x1', f4(H[0])); g.setAttribute('y1', f4(H[1])); g.setAttribute('x2', f4(tipIn[0])); g.setAttribute('y2', f4(tipIn[1]));
@@ -1402,7 +1536,8 @@ const PAPER_SVG = `<svg xmlns='http://www.w3.org/2000/svg' width='${PAPER.W}' he
   "<filter id='g' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='2' seed='2'/><feColorMatrix values='0 0 0 0 .30 0 0 0 0 .28 0 0 0 0 .25 1.6 0 0 0 -.62'/></filter>" +
   "<filter id='m' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.0016 .0021' numOctaves='4' seed='23'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .47 0 0 0 0 .36 2.2 0 0 0 -1.0'/></filter>" +
   "<filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.0012' numOctaves='3' seed='5'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 .99 2.4 0 0 0 -1.15'/></filter>" +
-  "<rect width='100%' height='100%' filter='url(#m)' opacity='.09'/><rect width='100%' height='100%' filter='url(#w)' opacity='.35'/>" +
+  "<filter id='y' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.0009 .0013' numOctaves='3' seed='47'/><feColorMatrix values='0 0 0 0 .78 0 0 0 0 .62 0 0 0 0 .36 3 0 0 0 -1.2'/></filter>" +
+  "<rect width='100%' height='100%' filter='url(#y)' opacity='.045'/><rect width='100%' height='100%' filter='url(#m)' opacity='.09'/><rect width='100%' height='100%' filter='url(#w)' opacity='.35'/>" +
   "<rect width='100%' height='100%' filter='url(#a)' opacity='.05'/><rect width='100%' height='100%' filter='url(#c)' opacity='.3'/><rect width='100%' height='100%' filter='url(#g)' opacity='.06'/></svg>";
 // [x, y] in sheet fractions, radii in inches, rgb, alpha at the center
 const FOX = [
@@ -1413,6 +1548,57 @@ const FOX = [
 ];
 // long faint construction lines: [x1, y1, x2, y2] in sheet fractions, alpha
 const GRAPHITE = [[0, .375, 1, .375, .05], [.618, 0, .618, 1, .04], [0, .70, 1, .722, .035], [.172, 0, .188, 1, .03]];
+/* age: a gentle yellowing, deeper toward the edges and the binding, foxing specks, stray fibers and a hint of handling
+   wear where hands turn the sheets. Seeded, so every visit ages the same way. */
+const AGE = {
+  tint: 'rgba(206,176,118,.012)',   // the whole sheet, a warm cast
+  edge: [1.7, 'rgba(168,128,66,', .065],   // inches, color, alpha at the very edge
+  bind: [5, .045],                         // inches from the binding and alpha of the extra yellowing there
+  specks: 170, fibers: 90, seed: 71
+};
+function age(x, W, H, ppi) {
+  let sd = AGE.seed;
+  const rnd = () => (sd = (Math.imul(sd, 1664525) + 1013904223) >>> 0) / 4294967296;
+  x.fillStyle = AGE.tint; x.fillRect(0, 0, W, H);
+  // edges: soft and uneven, deeper at the corners where they overlap
+  const [ei, ec, ea] = AGE.edge, e = ei * ppi;
+  const band = (x0, y0, x1, y1, rx, ry, rw, rh) => { const g = x.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, ec + ea + ')'); g.addColorStop(.3, ec + (ea * .42).toFixed(3) + ')'); g.addColorStop(1, ec + '0)'); x.fillStyle = g; x.fillRect(rx, ry, rw, rh); };
+  band(0, 0, 0, e, 0, 0, W, e); band(0, H, 0, H - e, 0, H - e, W, e); band(W, 0, W - e, 0, W - e, 0, e, H); band(0, 0, e, 0, 0, 0, e, H);
+  // the binding side: the paper by the spine has seen the most air
+  const b0 = 1 * ppi, g = x.createLinearGradient(b0, 0, b0 + AGE.bind[0] * ppi, 0);
+  g.addColorStop(0, `rgba(172,132,70,${AGE.bind[1]})`); g.addColorStop(.35, `rgba(172,132,70,${(AGE.bind[1] * .4).toFixed(3)})`); g.addColorStop(1, 'rgba(172,132,70,0)');
+  x.fillStyle = g; x.fillRect(0, 0, b0 + AGE.bind[0] * ppi, H);
+  const soft = (cx, cy, rx, ry, rgb, a, rot = 0) => { x.save(); x.translate(cx, cy); x.rotate(rot); x.scale(1, ry / rx);
+    const gr = x.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(.55, `rgba(${rgb},${(a * .45).toFixed(3)})`); gr.addColorStop(1, `rgba(${rgb},0)`);
+    x.fillStyle = gr; x.fillRect(-rx, -rx, 2 * rx, 2 * rx); x.restore(); };
+  // handling wear: where thumbs turn the sheet (right edge, lower half) and the lower right corner
+  soft(W - .5 * ppi, H * .62, 1.1 * ppi, 3.2 * ppi, '110,96,76', .03, .08);
+  soft(W - .35 * ppi, H * .8, .8 * ppi, 1.6 * ppi, '110,96,76', .025, -.1);
+  soft(W - 1.2 * ppi, H - 1 * ppi, 3 * ppi, 2 * ppi, '150,118,72', .05);
+  soft(2.4 * ppi, H - .8 * ppi, 2.2 * ppi, 1 * ppi, '110,96,76', .02);
+  // a faint old crease across the lower right corner, a pale ridge with a soft shadow line
+  x.lineCap = 'round';
+  [[W - 4.1 * ppi, H, W, H - 3.3 * ppi]].forEach(([x1, y1, x2, y2]) => {
+    x.lineWidth = 2.2; x.strokeStyle = 'rgba(255,253,247,.22)'; x.beginPath(); x.moveTo(x1, y1); x.quadraticCurveTo((x1 + x2) / 2 + 6, (y1 + y2) / 2 + 4, x2, y2); x.stroke();
+    x.lineWidth = 1; x.strokeStyle = 'rgba(110,92,66,.07)'; x.beginPath(); x.moveTo(x1 + 1.6, y1 + 1); x.quadraticCurveTo((x1 + x2) / 2 + 7.6, (y1 + y2) / 2 + 5, x2 + 1.6, y2 + 1); x.stroke();
+  });
+  // foxing: small rust specks, more of them near the edges, a few with a darker core
+  for (let k = 0; k < AGE.specks; k++) {
+    let px = rnd(), py = rnd();
+    if (rnd() < .6) { const s2 = rnd() < .5 ? 0 : 1, d = Math.pow(rnd(), 2.2) * .16; if (rnd() < .5) px = s2 ? 1 - d : 1 / 36 + d; else py = s2 ? 1 - d : d; }
+    const r = (0.008 + 0.035 * Math.pow(rnd(), 2.4)) * ppi, a = .07 + .16 * rnd();
+    soft(px * W, py * H, r * 2.4, r * (1.6 + rnd()), '168,112,56', a * .45, rnd() * 3);
+    if (rnd() < .45) soft(px * W, py * H, r * .7, r * .6, '130,82,38', a);
+  }
+  // stray fibers in the sheet
+  for (let k = 0; k < AGE.fibers; k++) {
+    const x0 = rnd() * W, y0 = rnd() * H, l = (0.08 + 0.3 * rnd()) * ppi, a = rnd() * Math.PI;
+    x.lineWidth = .7; x.strokeStyle = `rgba(118,100,74,${(.04 + .06 * rnd()).toFixed(3)})`;
+    x.beginPath(); x.moveTo(x0, y0);
+    x.quadraticCurveTo(x0 + Math.cos(a + .6) * l * .5, y0 + Math.sin(a + .6) * l * .5, x0 + Math.cos(a) * l, y0 + Math.sin(a) * l); x.stroke();
+  }
+}
 function bakePaper() {
   const { W, H, ppi } = PAPER, img = new Image();
   img.onload = () => {
@@ -1428,9 +1614,7 @@ function bakePaper() {
       });
       x.lineWidth = 1.3;
       GRAPHITE.forEach(([x1, y1, x2, y2, a]) => { x.strokeStyle = `rgba(27,26,24,${a})`; x.beginPath(); x.moveTo(x1 * W, y1 * H); x.lineTo(x2 * W, y2 * H); x.stroke(); });
-      // weathered edges: a soft warm darkening that fades in from the paper's edges
-      const e = 1.1 * ppi, edge = (x0, y0, x1, y1, rx, ry, rw, rh) => { const g = x.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(130,105,70,.075)'); g.addColorStop(1, 'rgba(130,105,70,0)'); x.fillStyle = g; x.fillRect(rx, ry, rw, rh); };
-      edge(0, 0, 0, e, 0, 0, W, e); edge(0, H, 0, H - e, 0, H - e, W, e); edge(0, 0, e, 0, 0, 0, e, H); edge(W, 0, W - e, 0, W - e, 0, e, H);
+      age(x, W, H, ppi);
       c.toBlob(b => { if (b) root.style.setProperty('--paper-tex', `url(${URL.createObjectURL(b)})`); }, 'image/png');
     } catch (err) { /* no grain: the paper stays plain */ }
   };
