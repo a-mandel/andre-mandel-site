@@ -733,7 +733,7 @@
   // two tilted wheels, the compass spinning clockwise and the mark counterclockwise, both swinging upright together.
   const ldBar = $('#ldBar'), ldMsg = $('#ldMsg');
   const MSGS = ['Sharpening the pencils', 'Leveling the grade', 'Setting the beam at 6012', 'Framing the gable ends', 'Squaring the windows', 'Planting the pines', 'Checking 30 ft over grade'];
-  const LD_T = 4.1, LD_HOLD = 0.45;               // seconds of motion, then a beat at rest before diving in
+  const LD_T = 4.6, LD_HOLD = 0.4;               // seconds of motion, then a beat at rest before diving in
   const LD = { built: 0, done: false, err: false, a: 0 };      // a: motion progress 0..1, advanced only by drawn frames
   function step(i) { LD.built = (i + 1) / MSGS.length; if (i >= MSGS.length - 1) LD.done = true; }
   const clampL = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -746,7 +746,8 @@
     // a drafting construction: a compass circle, overshooting cross hairs and tick marks, drawn in pencil
     arc(ring, 150, -2.1, -2.1 + Math.PI * 2.04, 1.3, 0.85); arc(ring, 156, -1.2, -1.2 + Math.PI * 1.1, 0.7, 0.4);
     line(ring, 22, 210, 398, 210, 0.7, 0.45); line(ring, 210, 22, 210, 398, 0.7, 0.45);
-    line(ring, 40, 332, 380, 88, 0.6, 0.3); line(ring, 60, 60, 360, 360, 0.5, 0.22);
+    { const NA = (39.3 - 90) * Math.PI / 180, c = Math.cos(NA), s = Math.sin(NA);   // cross lines on the true north axis (André 9/29 9:38 pm)
+      line(ring, 210 - c * 190, 210 - s * 190, 210 + c * 190, 210 + s * 190, 0.6, 0.3); line(ring, 210 + s * 170, 210 - c * 170, 210 - s * 170, 210 + c * 170, 0.5, 0.22); }
     for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2, r0 = k % 6 ? 146 : 140; line(ring, 210 + Math.cos(a) * r0, 210 + Math.sin(a) * r0, 210 + Math.cos(a) * 154, 210 + Math.sin(a) * 154, k % 6 ? 0.6 : 1.1, 0.7); }
     // a fine starburst around the mark, echoing the compass on the site
     for (let k = 0; k < 48; k++) { const a = k / 48 * Math.PI * 2, r1 = k % 6 ? (k % 2 ? 78 : 86) : 98; line(burst, 210 + Math.cos(a) * 70, 210 + Math.sin(a) * 70, 210 + Math.cos(a) * r1, 210 + Math.sin(a) * r1, k % 6 ? 0.45 : 0.8, k % 6 ? 0.28 : 0.5); }
@@ -786,9 +787,19 @@
       g.fillStyle = '#a8813f'; g.beginPath(); g.moveTo(...tip); g.lineTo(...r); g.lineTo(...m); g.closePath(); g.fill();
       g.strokeStyle = '#1b1a18'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(...tip); g.lineTo(...l); g.lineTo(...m); g.closePath(); g.stroke();
       g.beginPath(); g.moveTo(...tip); g.lineTo(...r); g.stroke();
-      g.globalAlpha = k; g.fillStyle = '#a8813f'; g.font = 'italic 500 30px "EB Garamond", Garamond, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-      const nP = Q(204, 0); g.fillText('N', nP[0], nP[1]); g.globalAlpha = 1;
+      g.globalAlpha = k; g.fillStyle = '#1b1a18'; g.font = 'italic 500 30px "EB Garamond", Garamond, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      { const nP = Q(204, 0); g.save(); g.translate(nP[0], nP[1]); g.rotate(NA + Math.PI / 2); g.fillText('N', 0, 0); g.restore(); } g.globalAlpha = 1;
     }
+  }
+  function gyroC(t) {   // study C, Gimbal (André 9/29 9:38 pm)
+    const a = 78 * Math.pow(1 - t, 1.3), d = p => Math.pow(1 - t, p);
+    return {
+      R: `rotateX(${a * Math.cos(5 * Math.PI * t)}deg) rotateY(${a * 0.4 * Math.sin(3 * Math.PI * t)}deg) rotateZ(${-540 * d(2)}deg)`,
+      B: `rotateY(${a * Math.sin(4 * Math.PI * t + 1)}deg) rotateX(${a * 0.3 * Math.cos(2 * Math.PI * t)}deg)`,
+      A: `rotateX(${a * 0.6 * Math.sin(6 * Math.PI * t)}deg) rotateZ(${-360 * d(2)}deg)`,
+      M: `translateZ(${70 * d(1.5)}px) rotateY(${720 * d(2.4)}deg) rotateX(${a * 0.4 * Math.cos(5 * Math.PI * t)}deg)`,
+      shadow: 0.8 * (1 - t)
+    };
   }
   function gyro(t) {
     const u = eOutL(clampL(t / 0.95), 1.7), w = eBackL(clampL(t / 0.92)), k = 1 - u, kw = 1 - w;   // spin eases out over the whole 6.8 s (André 9/29 8:15 pm)
@@ -801,8 +812,8 @@
   function loaderArt() {
     const S2 = ldStrokes(), comp = $('#ldComp'), mk = $('#ldMk'), nmI = $('#ldMk img.nm'), sh = $('#ldShadow'), cR = $('#ldRingC'), cB = $('#ldBurst'), cA = $('#ldArrow');
     const paint = t => {
-      const m = gyro(t);
-      comp.style.transform = m.comp; mk.style.transform = m.mark;
+      const m = gyroC(t);
+      comp.style.transform = 'none'; cR.style.transform = m.R; cB.style.transform = m.B; cA.style.transform = m.A; mk.style.transform = m.M;
       mk.style.opacity = clampL((t - 0.03) / 0.25); nmI.style.opacity = clampL((t - 0.86) / 0.12);
       sh.style.opacity = t > 0 && t < 1 ? clampL(m.shadow) : 0; sh.style.transform = `scaleX(${0.7 + 0.3 * clampL(m.shadow)})`;
       ldDraw(cR, S2.ring, clampL(t / 0.55)); ldDraw(cB, S2.burst, clampL((t - 0.15) / 0.5)); ldArrow(cA, clampL((t - 0.45) / 0.45));
