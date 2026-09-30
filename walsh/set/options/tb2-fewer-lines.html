@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Walsh Living Set</title>
+<meta name="description" content="Walsh Residence living plan set, title block option 2, fewer lines. ANDRÉ MANDEL residential design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Tenor+Sans&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f6f5f1;
+  --paper2: #ebe9e3;
+  --desk: #e4e2da;
+  --ink: #1b1a18;
+  --muted: #6c6963;
+  --faint: #a19e97;
+  --rule: rgba(27,26,24,.2);
+  --hair: rgba(27,26,24,.55);
+  --accent: #c07a2c;
+  --u: 46px;            /* px per inch, set by script */
+  --fl: 1;              /* screen floor multiplier, eased down on small windows */
+  --zfs: .16px;         /* zone label size in sheet user units */
+  --f-cap: 'Tenor Sans', 'Helvetica Neue', Arial, sans-serif;
+  --f-serif: 'EB Garamond', Garamond, Georgia, serif;
+  --f-hand: 'Nothing You Could Do', 'Bradley Hand', cursive;
+}
+:root, .sheet, #panel {
+  /* type, inches with a screen floor */
+  --t-lab: max(calc(9px * var(--fl)), calc(var(--u) * .115));
+  --t-val: max(calc(10px * var(--fl)), calc(var(--u) * .15));
+  --t-sm: max(calc(9.5px * var(--fl)), calc(var(--u) * .13));
+  --t-name: max(calc(17px * var(--fl)), calc(var(--u) * .32));
+  --t-sheet: max(calc(15px * var(--fl)), calc(var(--u) * .27));
+  --t-num: max(calc(40px * var(--fl)), calc(var(--u) * 1.22));
+  --t-note: max(calc(14px * var(--fl)), calc(var(--u) * .34));
+  --t-vt: max(calc(10px * var(--fl)), calc(var(--u) * .2));
+  --t-vs: max(calc(10.5px * var(--fl)), calc(var(--u) * .2));
+
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font: 400 15px/1.4 var(--f-serif);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+/* ---------- desk and book ---------- */
+#desk {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 40%, #ecebe5 0%, var(--desk) 70%, #dcd9d0 100%);
+}
+#book {
+  position: absolute;
+  left: 50%; top: 0;
+  width: calc(var(--u) * 36); height: calc(var(--u) * 24);
+  perspective: calc(var(--u) * 90);
+}
+.sheet {
+  position: absolute; left: 0; top: 0;
+  width: calc(var(--u) * 36); height: calc(var(--u) * 24);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(27,26,24,.08), 0 10px 30px rgba(27,26,24,.12), 0 30px 80px rgba(27,26,24,.08);
+  transform-origin: 0 50%;
+  backface-visibility: hidden;
+  visibility: hidden;
+  overflow: hidden;
+}
+.sheet.on { visibility: visible; z-index: 2; }
+.sheet.under { visibility: visible; z-index: 1; }
+.sheet.turn-out { visibility: visible; z-index: 3; animation: turnOut .78s cubic-bezier(.45,.05,.4,1) forwards; }
+.sheet.turn-in { visibility: visible; z-index: 3; animation: turnIn .78s cubic-bezier(.3,.2,.3,1) forwards; }
+.sheet::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(27,26,24,.0) 0%, rgba(27,26,24,.14) 100%);
+}
+.sheet.turn-out::after { animation: shade .78s ease-in forwards; }
+.sheet.turn-in::after { animation: shade .78s ease-out reverse forwards; }
+@keyframes turnOut { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(-96deg); } }
+@keyframes turnIn { 0% { transform: rotateY(-96deg); } 100% { transform: rotateY(0deg); } }
+@keyframes shade { 0% { opacity: 0; } 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sheet.turn-out, .sheet.turn-in { animation-duration: .01s; }
+}
+
+/* ---------- sheet frame ---------- */
+.frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.frame .bd { fill: none; stroke: var(--ink); stroke-width: 1.1; vector-effect: non-scaling-stroke; }
+.frame .vr { stroke: var(--ink); stroke-width: .9; vector-effect: non-scaling-stroke; }
+.frame .tk { stroke: var(--hair); stroke-width: .7; vector-effect: non-scaling-stroke; }
+.frame .tk.l { stroke: var(--ink); }
+.frame .zl { font-family: var(--f-cap); font-size: var(--zfs); fill: var(--faint); letter-spacing: .02px; }
+.frame .bind { fill: var(--paper2); opacity: .75; }
+.frame .post { fill: var(--paper); stroke: var(--hair); stroke-width: .8; vector-effect: non-scaling-stroke; }
+.frame .slot { stroke: var(--hair); stroke-width: .8; vector-effect: non-scaling-stroke; }
+
+/* ---------- drawing area ---------- */
+.draw {
+  position: absolute;
+  left: calc(var(--u) * .75); top: calc(var(--u) * .5);
+  width: calc(var(--u) * 31.25); height: calc(var(--u) * 23);
+  border-radius: calc(var(--u) * .25) 0 0 calc(var(--u) * .25);
+  overflow: hidden;
+}
+.model { position: absolute; inset: 0; }
+.model iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: var(--paper); }
+.model .still { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.model .cap {
+  position: absolute; left: calc(var(--u) * .6); bottom: calc(var(--u) * .5);
+  pointer-events: none;
+}
+
+.views { position: absolute; inset: 0; }
+.view { position: absolute; }
+.view .box {
+  position: absolute; inset: 0;
+  border: 1px dashed rgba(27,26,24,.42);
+  border-radius: calc(var(--u) * .28);
+}
+.vt {
+  position: absolute; left: 0; top: calc(100% + var(--u) * .22);
+  display: grid; grid-template-columns: auto 1fr; column-gap: calc(var(--u) * .2); align-items: center;
+  white-space: nowrap;
+}
+.vt .bub {
+  grid-row: span 2;
+  width: max(calc(22px * var(--fl)), calc(var(--u) * .56)); height: max(calc(22px * var(--fl)), calc(var(--u) * .56));
+  border: 1px solid var(--ink); border-radius: 50%;
+  display: grid; place-items: center;
+  font: 400 var(--t-vt)/1 var(--f-cap);
+}
+.vt .vtt { font: 400 var(--t-vt)/1.15 var(--f-cap); letter-spacing: .16em; text-transform: uppercase; }
+.vt .vts { font: italic 400 var(--t-vs)/1.15 var(--f-serif); color: var(--muted); }
+.note {
+  position: absolute; transform: translateY(-50%);
+  font: 400 var(--t-note)/1.1 var(--f-hand); color: #3b3935;
+  white-space: nowrap; pointer-events: none;
+}
+.leader { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.leader path { fill: none; stroke: rgba(27,26,24,.6); stroke-width: .8; vector-effect: non-scaling-stroke; }
+.dot {
+  position: absolute; width: max(calc(6px * var(--fl)), calc(var(--u) * .13)); height: max(calc(6px * var(--fl)), calc(var(--u) * .13));
+  margin: calc(max(calc(6px * var(--fl)), calc(var(--u) * .13)) / -2) 0 0 calc(max(calc(6px * var(--fl)), calc(var(--u) * .13)) / -2);
+  border-radius: 50%; background: var(--accent);
+}
+
+/* A0.1 index and project data */
+.dx { position: absolute; }
+.dx h3 { margin: 0 0 calc(var(--u) * .3); font: 400 max(calc(10px * var(--fl)), calc(var(--u) * .17))/1.2 var(--f-cap); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.mx { width: 100%; border-collapse: collapse; }
+.mx td, .mx th { padding: 0; height: max(calc(19px * var(--fl)), calc(var(--u) * .5)); vertical-align: middle; }
+.mx th { font: 400 max(calc(9px * var(--fl)), calc(var(--u) * .13))/1 var(--f-cap); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-align: left; }
+.mx th.c, .mx td.c { text-align: center; width: max(calc(38px * var(--fl)), calc(var(--u) * 1.3)); }
+.mx .g td { padding-top: calc(var(--u) * .3); height: auto; font: 400 max(calc(9px * var(--fl)), calc(var(--u) * .14))/1.2 var(--f-cap); letter-spacing: .22em; text-transform: uppercase; color: var(--accent); }
+.mx .no { font: 400 max(calc(10px * var(--fl)), calc(var(--u) * .19))/1 var(--f-cap); letter-spacing: .08em; width: max(calc(46px * var(--fl)), calc(var(--u) * 1.4)); }
+.mx .ti { font: italic 400 max(calc(11px * var(--fl)), calc(var(--u) * .24))/1.15 var(--f-serif); }
+.mx .sc { font: italic 400 max(calc(10px * var(--fl)), calc(var(--u) * .19))/1.15 var(--f-serif); color: var(--muted); width: max(calc(90px * var(--fl)), calc(var(--u) * 3)); }
+.mx .pip { display: inline-block; width: max(calc(6px * var(--fl)), calc(var(--u) * .13)); height: max(calc(6px * var(--fl)), calc(var(--u) * .13)); border-radius: 50%; background: var(--ink); }
+.mx .pip.new { background: var(--accent); }
+.mx tr.row { cursor: pointer; }
+.mx tr.row:hover .ti { color: var(--accent); }
+.pd { display: grid; grid-template-columns: max-content 1fr; column-gap: calc(var(--u) * .45); row-gap: calc(var(--u) * .2); align-items: baseline; }
+.pd dt { font: 400 max(calc(9px * var(--fl)), calc(var(--u) * .13))/1.3 var(--f-cap); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.pd dd { margin: 0; font: italic 400 max(calc(11px * var(--fl)), calc(var(--u) * .22))/1.3 var(--f-serif); }
+.pd dd.big { font: 400 max(calc(16px * var(--fl)), calc(var(--u) * .42))/1.1 var(--f-serif); }
+
+/* ---------- title block ---------- */
+.tb {
+  position: absolute;
+  left: calc(var(--u) * 32); top: calc(var(--u) * .5);
+  width: calc(var(--u) * 3.5); height: calc(var(--u) * 23);
+}
+.tb .lock { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
+.tbc {
+  position: absolute; left: calc(var(--u) * .3); right: calc(var(--u) * .3);
+  bottom: calc(var(--u) * .28);
+  display: flex; flex-direction: column;
+}
+.sec { position: relative; flex: none; }
+.sec + .sec { margin-top: calc(var(--u) * .12); }
+.sec.dat::before {
+  content: ""; position: absolute;
+  left: calc(var(--u) * -.3 - max(calc(5px * var(--fl)), calc(var(--u) * .1)) / 2);
+  top: calc(var(--t-lab) * .65 - max(calc(5px * var(--fl)), calc(var(--u) * .1)) / 2);
+  width: max(calc(5px * var(--fl)), calc(var(--u) * .1)); height: max(calc(5px * var(--fl)), calc(var(--u) * .1));
+  border-radius: 50%; background: var(--accent);
+}
+.lab { display: block; font: 400 var(--t-lab)/1.3 var(--f-cap); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.val { font: italic 400 var(--t-val)/1.3 var(--f-serif); }
+.sm { font: 400 var(--t-sm)/1.32 var(--f-serif); color: var(--muted); }
+.il { font: 400 var(--t-lab)/1 var(--f-cap); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-right: .45em; font-style: normal; }
+.pname { font: 400 var(--t-name)/1.05 var(--f-serif); margin: .12em 0 .1em; }
+.line { display: block; }
+.iss { list-style: none; margin: 0; padding: 0; }
+.iss li { display: grid; grid-template-columns: 1.3em 4.4em 1fr; align-items: baseline; font: italic 400 var(--t-val)/1.3 var(--f-serif); color: var(--muted); }
+.iss li:first-child { color: var(--ink); }
+.iss .n, .iss .d { font: 400 var(--t-lab)/1 var(--f-cap); letter-spacing: .08em; font-style: normal; }
+.pend { color: var(--muted); }
+.idx { flex: 1 1 auto; min-height: 0; margin-top: calc(var(--u) * .3); }
+.toc { list-style: none; margin: 0; padding: 0; }
+.toc .gh { font: 400 var(--t-lab)/1.3 var(--f-cap); letter-spacing: .2em; text-transform: uppercase; color: var(--faint); margin-top: .55em; }
+.toc .gh:first-child { margin-top: .15em; }
+.toc a {
+  position: relative; display: grid; grid-template-columns: 1fr auto; column-gap: .6em; align-items: baseline;
+  font: italic 400 var(--t-val)/1.2 var(--f-serif); color: var(--muted);
+  padding: .02em 0;
+}
+.toc a .n { font: 400 var(--t-lab)/1 var(--f-cap); letter-spacing: .1em; font-style: normal; color: var(--faint); }
+.toc a:hover { color: var(--ink); }
+.toc a:hover .n { color: var(--ink); }
+.toc a.cur { color: var(--ink); font-style: normal; }
+.toc a.cur .n { color: var(--accent); }
+.toc a.cur::before {
+  content: ""; position: absolute;
+  left: calc(var(--u) * -.3 - max(calc(9px * var(--fl)), calc(var(--u) * .19)) / 2);
+  top: 50%; margin-top: calc(max(calc(9px * var(--fl)), calc(var(--u) * .19)) / -2);
+  width: max(calc(9px * var(--fl)), calc(var(--u) * .19)); height: max(calc(9px * var(--fl)), calc(var(--u) * .19));
+  border-radius: 50%; box-sizing: border-box; border: 1.5px solid var(--accent); background: var(--paper);
+}
+.stamp { display: grid; grid-template-columns: 1fr auto; column-gap: calc(var(--u) * .12); align-items: start; }
+.stamp .lab { grid-column: 1 / -1; }
+.stamp .seal { grid-column: 2; grid-row: 2 / span 2; }
+.colo { font: 400 var(--t-sm)/1.34 var(--f-serif); color: var(--muted); }
+.colo b { font: 400 var(--t-lab)/1 var(--f-cap); letter-spacing: .2em; color: var(--ink); font-weight: 400; }
+.colo i { color: var(--ink); }
+.seal {
+  width: max(calc(40px * var(--fl)), calc(var(--u) * .86)); height: max(calc(40px * var(--fl)), calc(var(--u) * .86));
+  border-radius: 50%; border: 1.2px dotted rgba(27,26,24,.38);
+  display: grid; place-items: center; text-align: center;
+  font: 400 max(calc(7px * var(--fl)), calc(var(--u) * .085))/1.25 var(--f-cap); letter-spacing: .14em; color: var(--faint); text-transform: uppercase;
+}
+.stitle { font: 400 var(--t-sheet)/1.12 var(--f-serif); margin: .1em 0 .25em; }
+.meta { display: flex; flex-wrap: wrap; column-gap: .9em; row-gap: 0; }
+.meta span:first-child { flex-basis: 100%; }
+.meta > span { font: italic 400 var(--t-val)/1.3 var(--f-serif); white-space: nowrap; }
+.status { margin-top: .35em; font: 400 var(--t-lab)/1.3 var(--f-cap); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+.snum { font: 400 var(--t-num)/1 var(--f-cap); letter-spacing: .02em; margin: .06em 0 0 -.04em; white-space: nowrap; }
+.snum small { font-size: .22em; letter-spacing: .2em; color: var(--muted); margin-left: .5em; vertical-align: .35em; }
+.copy { font: italic 400 max(calc(9px * var(--fl)), calc(var(--u) * .11))/1.3 var(--f-serif); color: var(--muted); margin-top: .5em; }
+
+/* ---------- floating control ---------- */
+#ctl {
+  position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 2px;
+  background: rgba(246,245,241,.92); border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(27,26,24,.1), 0 6px 18px rgba(27,26,24,.1);
+  padding: 4px; z-index: 20;
+  font: 400 11px/1 var(--f-cap); letter-spacing: .16em; text-transform: uppercase;
+}
+#ctl button { height: 30px; min-width: 32px; padding: 0 12px; border-radius: 999px; color: var(--ink); }
+#ctl button:hover { background: var(--paper2); }
+#ctl .arw { font: 400 18px/1 var(--f-serif); padding: 0 10px; }
+#ctl #cNum { min-width: 64px; }
+#ctl #cNum b { font-weight: 400; }
+#ctl .sep { width: 1px; height: 16px; background: var(--rule); margin: 0 2px; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- mobile ---------- */
+#strip, #panel, #scrim { display: none; }
+@media screen {
+  html.mobile body { background: var(--paper); }
+  html.mobile #desk { background: var(--paper); }
+  html.mobile #ctl { display: none; }
+  html.mobile #book { left: 0 !important; top: 0 !important; width: 100vw; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); perspective: 2400px; }
+  html.mobile .sheet { width: 100%; height: 100%; box-shadow: none; }
+  html.mobile .frame, html.mobile .tb { display: none; }
+  html.mobile .draw { left: 0; top: 0; width: 100%; height: 100%; border-radius: 0; overflow: auto; -webkit-overflow-scrolling: touch; }
+  html.mobile .views { position: static; padding: 20px 16px 36px; display: flex; flex-direction: column; gap: 70px; }
+  html.mobile .views .shead { display: block; }
+  html.mobile .view { position: relative; left: auto !important; top: auto !important; width: 100% !important; height: auto !important; aspect-ratio: var(--ar); }
+  html.mobile .vt { top: calc(100% + 10px); }
+  html.mobile .model .cap { left: 16px; bottom: 16px; }
+  html.mobile .dx { position: static; width: auto !important; }
+  html.mobile .a01 { padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 40px; }
+  html.mobile .a01 .view { aspect-ratio: auto; }
+  html.mobile .mx .sc { display: none; }
+  html.mobile .a01 .note, html.mobile .a01 .leader, html.mobile .a01 .dot { display: none; }
+  html.mobile #strip {
+    display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; column-gap: 12px;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    height: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 0 12px env(safe-area-inset-bottom, 0px) 14px;
+    background: var(--paper); box-shadow: 0 -1px 0 var(--rule), 0 -8px 24px rgba(27,26,24,.06);
+  }
+  html.mobile #strip img { height: 38px; width: auto; display: block; }
+  html.mobile #strip .sn { font: 400 22px/1 var(--f-cap); letter-spacing: .04em; }
+  html.mobile #strip .st { font: italic 400 15px/1.2 var(--f-serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  html.mobile #strip .st small { display: block; font: 400 9px/1.3 var(--f-cap); font-style: normal; letter-spacing: .2em; color: var(--accent); text-transform: uppercase; }
+  html.mobile #strip button { height: 40px; padding: 0 14px; border-radius: 999px; background: var(--paper2); font: 400 11px/1 var(--f-cap); letter-spacing: .18em; text-transform: uppercase; }
+  html.mobile #scrim { display: block; position: fixed; inset: 0; z-index: 38; background: rgba(27,26,24,.18); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+  html.mobile #panel {
+    display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    max-height: 84dvh; overflow: auto; background: var(--paper);
+    border-radius: 16px 16px 0 0; box-shadow: 0 -10px 40px rgba(27,26,24,.16);
+    transform: translateY(105%); transition: transform .38s cubic-bezier(.3,.2,.2,1);
+    padding: 22px 24px calc(28px + env(safe-area-inset-bottom, 0px)) 34px;
+    --u: 46px;
+  }
+  html.mobile.panel-open #panel { transform: none; }
+  html.mobile.panel-open #scrim { opacity: 1; pointer-events: auto; }
+  html.mobile #panel .phead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  html.mobile #panel .phead img { height: 64px; width: auto; }
+  html.mobile #panel .phead button { font: 400 11px/1 var(--f-cap); letter-spacing: .18em; text-transform: uppercase; padding: 10px 12px; border-radius: 999px; background: var(--paper2); }
+  html.mobile #panel .sec + .sec { margin-top: 18px; }
+  html.mobile #panel .sec.dat::before { left: -18px; }
+  html.mobile #panel .toc a.cur::before { left: -22px; }
+  html.mobile #panel .toc a { padding: 6px 0; }
+}
+.shead { display: none; font: 400 11px/1.3 var(--f-cap); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.shead b { display: block; font: 400 26px/1.1 var(--f-serif); letter-spacing: 0; text-transform: none; color: var(--ink); margin-top: 4px; }
+
+/* ---------- print ---------- */
+@page { size: 36in 24in; margin: 0; }
+@media print {
+  html { --u: 96px !important; --zfs: .115px !important; }
+  .sheet { --fl: 1 !important; }
+  html, body { height: auto; overflow: visible; background: #fff; }
+  #desk { position: static; background: none; }
+  #book { position: static; transform: none !important; width: 36in; height: auto; perspective: none; }
+  .sheet {
+    position: relative; visibility: visible !important; transform: none !important; animation: none !important;
+    width: 36in; height: 24in; box-shadow: none; break-after: page; page-break-after: always;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sheet:last-child { break-after: auto; page-break-after: auto; }
+  .sheet::after { display: none; }
+  .model iframe { display: none; }
+  .model .still { display: block; }
+  #ctl, #strip, #panel, #scrim { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="desk"><div id="book" aria-live="polite"></div></div>
+
+<nav id="ctl" aria-label="Sheet controls">
+  <button class="arw" id="cPrev" aria-label="Previous sheet">&#8249;</button>
+  <button id="cNum" aria-label="Current sheet"><b>A0.0</b></button>
+  <button class="arw" id="cNext" aria-label="Next sheet">&#8250;</button>
+  <span class="sep" aria-hidden="true"></span>
+  <button id="cPrint" aria-label="Print the set">Print</button>
+</nav>
+
+<div id="strip" role="navigation" aria-label="Sheet">
+  <img src="../../marks/am10_mark.webp" alt="ANDRÉ MANDEL">
+  <span class="sn" id="mNum">A0.0</span>
+  <span class="st" id="mTitle">Cover</span>
+  <button id="mIdx" aria-expanded="false" aria-controls="panel">Index</button>
+</div>
+<div id="scrim"></div>
+<aside id="panel" aria-label="Title block"></aside>
+
+<script>
+/* =====================================================================
+   SET DATA. Everything the set shows lives here. Later agents extend
+   this object: add issuances (newest last, the page sorts), add sheets
+   to a group, give a sheet views [{t, s, x, y, w, h}] in sheet inches
+   (x from the sheet's left edge, y from its top) or a layout name,
+   and one handwritten note.
+   ===================================================================== */
+const SET = {
+  firm: {
+    name: 'ANDRÉ MANDEL',
+    kind: 'Residential design',
+    address: ['40 Edith St #4', 'San Francisco CA 94133'],
+    phone: '510.459.7686',
+    email: 'andre.mandel@gmail.com',
+    lockup: '../../marks/am10_lockup.webp',
+    mark: '../../marks/am10_mark.webp'
+  },
+  project: {
+    name: 'Walsh Residence',
+    lot: 'Lahontan Lot 235',
+    street: '8154 Lahontan Drive',
+    city: 'Truckee CA',
+    apn: '108 160 012 000',
+    zoning: 'RS PD 1.7',
+    county: 'Placer County',
+    owner: 'Dustin Walsh, Elevated Developers'
+  },
+  agency: [
+    { k: 'Lahontan design review (LCC)', tb: 'Design review (LCC)', v: 'no.', p: 'pending' },
+    { k: 'Placer County building permit', tb: 'Building permit', v: 'no.', p: 'pending' },
+    { k: 'Very High FHSZ · Chapter 7A' }
+  ],
+  architect: { name: 'Joseph Benveniste, AIA', role: 'Architect of record', note: 'Stamp at design review submittal' },
+  drawnBy: 'AM',
+  status: 'Feasibility · not for construction',
+  statusShort: 'Not for construction',
+  copyright: '© 2026 André Mandel. Drawings are instruments of service.',
+  issuances: [
+    { no: 1, date: '9/28/26', for: 'Feasibility FA2' },
+    { no: 2, date: '9/30/26', for: 'Living set, cartoon' }
+  ],
+  model: { src: '../../?sheet', still: '../../preview-house.jpg' },
+  groups: [
+    { name: 'General', sheets: [
+      { no: 'A0.0', title: 'Cover · the site', short: 'Cover · the site', idx: 'Cover · the site (live model)', scale: 'Live model', issued: [2], kind: 'model' },
+      { no: 'A0.1', title: 'Sheet index and project data', short: 'Index and project data', scale: 'None', issued: [2], kind: 'index',
+        note: { view: 0, text: 'the set grows with each issue', tx: .5, ty: .8, ax: .955, ay: .655 } }
+    ]},
+    { name: 'Feasibility', sheets: [
+      { no: 'F1.0', title: 'Regulatory report', scale: 'As noted', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Zoning and design review', s: 'not to scale' }, { t: 'Height envelope', s: '1/8 in = 1 ft' }, { t: 'Setbacks and easements', s: '1/16 in = 1 ft' }],
+        note: { view: 1, text: 'every roof under 30 ft', tx: .1, ty: .2, ax: .55, ay: .62 } },
+      { no: 'F2.0', title: 'Budget framework', scale: 'None', issued: [2], layout: 'threeCol',
+        views: [{ t: 'Cost by system', s: 'not to scale' }, { t: 'Allowances', s: 'not to scale' }, { t: 'Contingency and fees', s: 'not to scale' }],
+        note: { view: 0, text: 'a framework, not a bid', tx: .2, ty: .12, ax: .5, ay: .42 } },
+      { no: 'F3.0', title: 'Preliminary timeline', scale: 'None', issued: [2], layout: 'twoRow',
+        views: [{ t: 'Design and approvals', s: 'not to scale' }, { t: 'Construction sequence', s: 'not to scale' }],
+        note: { view: 0, text: 'LCC meets the 2nd Wednesday', tx: .62, ty: .2, ax: .42, ay: .6 } },
+      { no: 'F4.0', title: 'Outline specifications', scale: 'None', issued: [2], layout: 'twoCol',
+        views: [{ t: 'Shell and structure', s: 'divisions 01 to 07' }, { t: 'Openings and finishes', s: 'divisions 08 to 33' }],
+        note: { view: 0, text: 'cedar, dark steel, board form concrete', tx: .12, ty: .14, ax: .3, ay: .45 } }
+    ]},
+    { name: 'Architectural', sheets: [
+      { no: 'A1.0', title: 'Site plan', scale: '1/8 in = 1 ft', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Site plan', s: '1/8 in = 1 ft' }, { t: 'Vicinity', s: 'not to scale' }, { t: 'Site data', s: 'not to scale' }],
+        note: { view: 0, text: 'keep the signature tree', tx: .58, ty: .22, ax: .44, ay: .5 } },
+      { no: 'A2.1', title: 'Main level plan', scale: '3/16 in = 1 ft', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Main level plan', s: '3/16 in = 1 ft' }, { t: 'Key plan', s: '1/32 in = 1 ft' }, { t: 'Plan notes', s: 'not to scale' }],
+        note: { view: 0, text: 'approach from the west', tx: .2, ty: .16, ax: .05, ay: .52 } },
+      { no: 'A2.2', title: 'Lower level plan', scale: '3/16 in = 1 ft', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Lower level plan', s: '3/16 in = 1 ft' }, { t: 'Key plan', s: '1/32 in = 1 ft' }, { t: 'Plan notes', s: 'not to scale' }],
+        note: { view: 0, text: 'one step down with the grade', tx: .56, ty: .2, ax: .72, ay: .56 } },
+      { no: 'A2.3', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Roof plan', s: '3/16 in = 1 ft' }, { t: 'Roof heights', s: '1/32 in = 1 ft' }, { t: 'Drainage and snow', s: 'not to scale' }],
+        note: { view: 0, text: 'every roof under 30 ft', tx: .58, ty: .18, ax: .78, ay: .5 } },
+      { no: 'A3.1', title: 'Elevations west and north', scale: '3/16 in = 1 ft', issued: [2], layout: 'twoRow',
+        views: [{ t: 'West elevation', s: '3/16 in = 1 ft' }, { t: 'North elevation', s: '3/16 in = 1 ft' }],
+        note: { view: 0, text: 'approach from the west', tx: .66, ty: .22, ax: .5, ay: .62 } },
+      { no: 'A3.2', title: 'Elevations east and south', scale: '3/16 in = 1 ft', issued: [2], layout: 'twoRow',
+        views: [{ t: 'East elevation', s: '3/16 in = 1 ft' }, { t: 'South elevation', s: '3/16 in = 1 ft' }],
+        note: { view: 0, text: 'clerestory at the fold', tx: .64, ty: .22, ax: .46, ay: .5 } },
+      { no: 'A4.1', title: 'Building sections', scale: '3/16 in = 1 ft', issued: [2], layout: 'threeRow',
+        views: [{ t: 'Section at the living wing', s: '3/16 in = 1 ft' }, { t: 'Section at the bridge', s: '3/16 in = 1 ft' }, { t: 'Section at the south wing', s: '3/16 in = 1 ft' }],
+        note: { view: 0, text: 'the tip sits at max height', tx: .66, ty: .28, ax: .82, ay: .7 } },
+      { no: 'A5.1', title: 'Exterior materials and colors', short: 'Materials and colors', scale: 'None', issued: [2], layout: 'grid6',
+        views: [{ t: 'Roof', s: 'standing seam, dark' }, { t: 'Soffits', s: 'deep cedar' }, { t: 'Fascia and columns', s: 'dark steel' },
+                { t: 'Walls', s: 'warm plaster' }, { t: 'Chimneys', s: 'board form concrete' }, { t: 'Terraces', s: 'stone and decking' }],
+        note: { view: 1, text: 'cedar, dark steel, board form concrete', tx: .08, ty: .2, ax: .4, ay: .56 } },
+      { no: 'A6.1', title: 'Wildfire hardening · Chapter 7A', short: 'Wildfire · Chapter 7A', scale: 'As noted', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Defensible space plan', s: '1/16 in = 1 ft' }, { t: 'Vents and eaves', s: '1 1/2 in = 1 ft' }, { t: 'Glazing and decks', s: '1 1/2 in = 1 ft' }],
+        note: { view: 0, text: 'Very High FHSZ, full 7A', tx: .56, ty: .2, ax: .4, ay: .55 } },
+      { no: 'A9.1', title: 'Perspectives', scale: 'None', issued: [2], layout: 'perspectives',
+        views: [{ t: 'Arrival from the west', s: 'perspective' }, { t: 'The rear court', s: 'perspective' }, { t: 'The living room tip', s: 'perspective' }],
+        note: { view: 0, text: 'greet the arrival', tx: .6, ty: .18, ax: .44, ay: .5 } }
+    ]},
+    { name: 'Landscape', sheets: [
+      { no: 'L1.0', title: 'Landscape concept', scale: '1/8 in = 1 ft', issued: [2], layout: 'bigSide',
+        views: [{ t: 'Landscape concept', s: '1/8 in = 1 ft' }, { t: 'Plant palette', s: 'not to scale' }, { t: 'Zone 0 and pines', s: 'not to scale' }],
+        note: { view: 0, text: 'keep the signature tree', tx: .6, ty: .2, ax: .46, ay: .48 } }
+    ]}
+  ]
+};
+
+/* ---------- geometry (inches) ---------- */
+const G = {
+  W: 36, H: 24, L: .75, T: .5, R: 35.5, B: 23.5, rad: .25,
+  tbX: 32, pad: .3,
+  lockS: .0053,            /* inches per lockup px */
+  lockTop: .72,            /* top of the brushed stroke */
+  gap: .28,                /* perpendicular gap, roof stroke to the cut */
+  slope: .738,             /* dx/dy of the roof stroke, 53.6 degrees */
+  env: 41,                 /* stroke envelope x = env + slope * y, lockup px, measured at the top knob */
+  fillet: .22
+};
+(function () {
+  G.X0 = G.tbX + G.pad - 26 * G.lockS;            /* lockup post left edge on the text column */
+  G.Y0 = G.lockTop - 2 * G.lockS;
+  const aEnv = G.X0 + G.env * G.lockS - G.slope * G.Y0;
+  G.aCut = aEnv + Math.hypot(1, G.slope) * G.gap;  /* cut line: x = aCut + slope * y */
+  G.cutX = G.aCut + G.slope * G.T;                 /* where the cut leaves the top edge */
+  G.cutY = (G.R - G.aCut) / G.slope;               /* where it meets the right edge */
+  G.lockBottom = G.Y0 + 518 * G.lockS;
+})();
+
+const LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const SHEETS = [];
+SET.groups.forEach(g => g.sheets.forEach(s => { s.group = g.name; SHEETS.push(s); }));
+
+/* ---------- layouts, sheet inches ---------- */
+const LAYOUTS = {
+  bigSide: [[1.6, 1.3, 21.6, 18.6], [24.4, 1.3, 6.8, 7.4], [24.4, 11.1, 6.8, 8.8]],
+  twoRow:  [[1.6, 1.3, 29.6, 8.2], [1.6, 11.8, 29.6, 8.2]],
+  threeRow:[[1.6, 1.3, 29.6, 5.0], [1.6, 8.3, 29.6, 5.0], [1.6, 15.3, 29.6, 5.0]],
+  threeCol:[[1.6, 1.3, 9.2, 18.6], [11.8, 1.3, 9.2, 18.6], [22.0, 1.3, 9.2, 18.6]],
+  twoCol:  [[1.6, 1.3, 14.3, 18.6], [16.9, 1.3, 14.3, 18.6]],
+  grid6:   [[1.6, 1.3, 9.2, 7.8], [11.8, 1.3, 9.2, 7.8], [22.0, 1.3, 9.2, 7.8],
+            [1.6, 11.9, 9.2, 7.8], [11.8, 11.9, 9.2, 7.8], [22.0, 11.9, 9.2, 7.8]],
+  perspectives: [[1.6, 1.3, 18.4, 18.6], [21.0, 1.3, 10.2, 7.9], [21.0, 12.0, 10.2, 7.9]]
+};
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const inch = v => `calc(var(--u) * ${+v.toFixed(4)})`;
+const issuedSorted = () => SET.issuances.slice().sort((a, b) => b.no - a.no);
+function sheetDate(s) {
+  const nos = s.issued || [];
+  const iss = SET.issuances.filter(i => nos.includes(i.no)).sort((a, b) => b.no - a.no)[0];
+  return iss ? iss.date : '';
+}
+
+/* ---------- frame svg (shared) ---------- */
+function framePath() {
+  const { L, T, R, B, rad, slope, fillet: f } = G;
+  const cx = G.cutX, cy = G.cutY;
+  const ux = slope / Math.hypot(1, slope), uy = 1 / Math.hypot(1, slope); /* unit vector down the cut */
+  const p = [];
+  p.push(`M ${L + rad} ${T}`);
+  p.push(`L ${cx - f} ${T}`);
+  p.push(`Q ${cx} ${T} ${cx + ux * f} ${T + uy * f}`);
+  p.push(`L ${R - ux * f} ${cy - uy * f}`);
+  p.push(`Q ${R} ${cy} ${R} ${cy + f}`);
+  p.push(`L ${R} ${B - rad}`);
+  p.push(`Q ${R} ${B} ${R - rad} ${B}`);
+  p.push(`L ${L + rad} ${B}`);
+  p.push(`Q ${L} ${B} ${L} ${B - rad}`);
+  p.push(`L ${L} ${T + rad}`);
+  p.push(`Q ${L} ${T} ${L + rad} ${T}`);
+  return p.join(' ');
+}
+let FRAME = '';
+function buildFrame() {
+  const { L, T, R, B } = G;
+  let s = `<svg class="frame" viewBox="0 0 36 24" preserveAspectRatio="none" aria-hidden="true">`;
+  /* binding strip and screw posts */
+  s += `<rect class="bind" x="0" y="0" width=".42" height="24"/>`;
+  [3, 12, 21].forEach(y => {
+    s += `<circle class="post" cx=".21" cy="${y}" r=".1"/><line class="slot" x1=".15" y1="${y}" x2=".27" y2="${y}"/>`;
+  });
+  s += `<path class="bd" d="${framePath()}"/>`;
+  s += `<line class="vr" x1="${G.tbX}" y1="${T}" x2="${G.tbX}" y2="${B}"/>`;
+  /* ticks across (top, bottom) */
+  for (let x = 1; x <= 35; x++) {
+    const long = x % 6 === 0, len = long ? .2 : .1, c = long ? 'tk l' : 'tk';
+    if (x < G.cutX - G.fillet - .05) s += `<line class="${c}" x1="${x}" y1="${T}" x2="${x}" y2="${T - len}"/>`;
+    s += `<line class="${c}" x1="${x}" y1="${B}" x2="${x}" y2="${B + len}"/>`;
+  }
+  for (let n = 1; n <= 34; n++) {
+    const x = n + .5;
+    if (x < G.cutX - .35) s += `<text class="zl" x="${x}" y="${T - .2}" text-anchor="middle">${n}</text>`;
+    s += `<text class="zl" x="${x}" y="${B + .33}" text-anchor="middle">${n}</text>`;
+  }
+  /* ticks down (left, right) */
+  for (let y = 1; y <= 23; y++) {
+    const long = y % 6 === 0, len = long ? .2 : .1, c = long ? 'tk l' : 'tk';
+    s += `<line class="${c}" x1="${L}" y1="${y}" x2="${L - len}" y2="${y}"/>`;
+    if (y > G.cutY + G.fillet + .05) s += `<line class="${c}" x1="${R}" y1="${y}" x2="${R + len}" y2="${y}"/>`;
+  }
+  for (let k = 1; k <= 22; k++) {
+    const y = k + .5, ch = LETTERS[k - 1];
+    s += `<text class="zl" x="${L - .2}" y="${y}" text-anchor="middle" dominant-baseline="central">${ch}</text>`;
+    if (y > G.cutY + .35) s += `<text class="zl" x="${R + .25}" y="${y}" text-anchor="middle" dominant-baseline="central">${ch}</text>`;
+  }
+  s += `</svg>`;
+  FRAME = s;
+}
+
+/* ---------- title block sections ---------- */
+function tocHTML(cur) {
+  let h = '<ol class="toc">';
+  SET.groups.forEach(g => {
+    h += `<li class="gh">${esc(g.name)}</li>`;
+    g.sheets.forEach(s => {
+      h += `<li><a href="#${s.no}" data-go="${s.no}" class="${s.no === cur.no ? 'cur' : ''}"${s.no === cur.no ? ' aria-current="page"' : ''}><span>${esc(s.short || s.title)}</span><span class="n">${s.no}</span></a></li>`;
+    });
+  });
+  return h + '</ol>';
+}
+function tbTopHTML() {
+  const p = SET.project;
+  return `
+  <div class="sec dat">
+    <span class="lab">Project</span>
+    <div class="pname">${esc(p.name)}</div>
+    <span class="val line">${esc(p.lot)}</span>
+    <span class="val line">${esc(p.street)}</span>
+    <span class="val line">${esc(p.city)} · ${esc(p.county)}</span>
+    <span class="val line"><span class="il">APN</span>${esc(p.apn)}</span>
+    <span class="val line"><span class="il">Zoning</span>${esc(p.zoning)}</span>
+    <span class="val line"><span class="il">Owner</span>${esc(p.owner)}</span>
+  </div>
+  <div class="sec dat">
+    <span class="lab">Issued</span>
+    <ol class="iss">${issuedSorted().map(i => `<li><span class="n">${i.no}</span><span class="d">${esc(i.date)}</span><span>${esc(i.for)}</span></li>`).join('')}</ol>
+  </div>
+  <div class="sec dat">
+    <span class="lab">Agency and permits</span>
+    ${SET.agency.map(a => `<span class="val line">${esc(a.tb || a.k)}${a.v ? ` <span class="pend">${esc(a.v)} ${esc(a.p)}</span>` : ''}</span>`).join('')}
+  </div>`;
+}
+function colophon() {
+  const f = SET.firm;
+  return `<b>${esc(f.name)}</b> · <i>${esc(f.kind)}</i>. ${f.address.map(esc).join(', ')} · ${esc(f.phone)} · ${esc(f.email)}. ${esc(SET.copyright)}`;
+}
+function tbBottomHTML(s) {
+  const a = SET.architect;
+  return `
+  <div class="sec dat stamp">
+    <span class="lab">${esc(a.role)}</span>
+    <span class="val line">${esc(a.name)}</span>
+    <div class="seal" aria-label="Stamp area">Stamp</div>
+    <span class="sm line">${esc(a.note)}</span>
+  </div>
+  <div class="sec dat">
+    <span class="lab">Sheet</span>
+    <div class="stitle">${esc(s.title)}</div>
+    <div class="meta"><span><span class="il">Scale</span>${esc(s.scale)}</span><span><span class="il">Date</span>${esc(sheetDate(s))}</span><span><span class="il">Drawn</span>${esc(SET.drawnBy)}</span></div>
+    <div class="status">${esc(SET.status)}</div>
+  </div>
+  <div class="sec dat">
+    <div class="snum" aria-label="Sheet number">${s.no}</div>
+  </div>
+  <div class="sec colo">${colophon()}</div>`;
+}
+function titleBlockHTML(s) {
+  const w = 357 * G.lockS, x = G.X0 - G.tbX, y = G.Y0 - G.T;
+  return `<div class="tb">
+    <img class="lock" src="${SET.firm.lockup}" alt="ANDRÉ MANDEL" style="left:${inch(x)};top:${inch(y)};width:${inch(w)}">
+    <div class="tbc" style="top:${inch(G.lockBottom - G.T + .2)}">
+      ${tbTopHTML()}
+      <div class="sec dat idx"><span class="lab">Sheets</span>${tocHTML(s)}</div>
+      ${tbBottomHTML(s)}
+    </div>
+  </div>`;
+}
+
+/* ---------- drawing area ---------- */
+function viewHTML(v, i, sheet) {
+  const x = v.x - G.L, y = v.y - G.T;
+  let h = `<div class="view" style="left:${inch(x)};top:${inch(y)};width:${inch(v.w)};height:${inch(v.h)};--ar:${(v.w / v.h).toFixed(4)}">`;
+  h += `<div class="box"></div>`;
+  const n = sheet.note;
+  if (n && n.view === i) h += noteHTML(n);
+  h += `<div class="vt"><span class="bub">${i + 1}</span><span class="vtt">${esc(v.t)}</span><span class="vts">${esc(v.s)}</span></div>`;
+  return h + '</div>';
+}
+function noteHTML(n) {
+  const sx = n.tx * 100 - .8, sy = n.ty * 100;
+  const ex = n.ax * 100, ey = n.ay * 100;
+  const cx = sx + (ex - sx) * .15, cy = ey - (ey - sy) * .15;
+  return `<svg class="leader" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M ${sx.toFixed(2)} ${sy.toFixed(2)} Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${ex.toFixed(2)} ${ey.toFixed(2)}"/></svg>
+    <span class="dot" style="left:${(n.ax * 100).toFixed(2)}%;top:${(n.ay * 100).toFixed(2)}%"></span>
+    <span class="note" style="left:${(n.tx * 100).toFixed(2)}%;top:${(n.ty * 100).toFixed(2)}%">${esc(n.text)}</span>`;
+}
+function cartoonHTML(s) {
+  const L = LAYOUTS[s.layout] || [];
+  const views = (s.views || []).map((v, i) => {
+    const r = L[i] || [1.6, 1.3, 10, 8];
+    return Object.assign({ x: r[0], y: r[1], w: r[2], h: r[3] }, v);
+  });
+  return `<div class="views"><div class="shead">${esc(s.group)} · ${s.no}<b>${esc(s.title)}</b></div>${views.map((v, i) => viewHTML(v, i, s)).join('')}</div>`;
+}
+function modelHTML(s) {
+  return `<div class="model">
+    <iframe data-src="${SET.model.src}" title="Live 3D model of the Walsh Residence on Lahontan Lot 235" loading="eager" allow="fullscreen; accelerometer; gyroscope"></iframe>
+    <img class="still" src="${SET.model.still}" alt="Walsh Residence model view">
+  </div>`;
+}
+function indexSheetHTML(s) {
+  const iss = SET.issuances.slice().sort((a, b) => a.no - b.no);
+  const newest = Math.max(...iss.map(i => i.no));
+  let rows = '';
+  SET.groups.forEach(g => {
+    rows += `<tr class="g"><td colspan="${3 + iss.length}">${esc(g.name)}</td></tr>`;
+    g.sheets.forEach(t => {
+      rows += `<tr class="row" data-go="${t.no}"><td class="no">${t.no}</td><td class="ti">${esc(t.idx || t.title)}</td><td class="sc">${esc(t.scale)}</td>` +
+        iss.map(i => `<td class="c">${(t.issued || []).includes(i.no) ? `<span class="pip${i.no === newest ? ' new' : ''}"></span>` : ''}</td>`).join('') + `</tr>`;
+    });
+  });
+  const head = `<tr><th>Sheet</th><th>Title</th><th>Scale</th>${iss.map(i => `<th class="c">${i.no}<br>${esc(i.date)}</th>`).join('')}</tr>`;
+  const p = SET.project, a = SET.architect;
+  const pd = [
+    ['Project', `<dd class="big">${esc(p.name)}</dd>`],
+    ['Site', `<dd>${esc(p.lot)}<br>${esc(p.street)}, ${esc(p.city)}</dd>`],
+    ['APN', `<dd>${esc(p.apn)}</dd>`],
+    ['Zoning', `<dd>${esc(p.zoning)}</dd>`],
+    ['Jurisdiction', `<dd>${esc(p.county)}</dd>`],
+    ['Owner', `<dd>${esc(p.owner)}</dd>`],
+    ['Scope', `<dd>New single family residence, feasibility study</dd>`],
+    ['Design review', `<dd>Lahontan design review (LCC), no. pending</dd>`],
+    ['Building permit', `<dd>Placer County, no. pending</dd>`],
+    ['Wildfire', `<dd>Very High FHSZ · Chapter 7A</dd>`],
+    ['Designer', `<dd>${esc(SET.firm.name)}, ${esc(SET.firm.kind.toLowerCase())}</dd>`],
+    ['Architect of record', `<dd>${esc(a.name)}</dd>`]
+  ].map(([k, v]) => `<dt>${k}</dt>${v}`).join('');
+  const issList = issuedSorted().map(i => `<dt>No. ${i.no}</dt><dd>${esc(i.date)} · ${esc(i.for)}</dd>`).join('');
+  const V = [[1.6, 1.3, 17.2, 19.2], [20.4, 1.3, 10.8, 12.4], [20.4, 15.6, 10.8, 4.9]];
+  const pos = r => `left:${inch(r[0] - G.L)};top:${inch(r[1] - G.T)};width:${inch(r[2])};height:${inch(r[3])};--ar:auto`;
+  const vt = (n, t, sc) => `<div class="vt"><span class="bub">${n}</span><span class="vtt">${t}</span><span class="vts">${sc}</span></div>`;
+  const n = s.note;
+  return `<div class="views a01"><div class="shead">${esc(s.group)} · ${s.no}<b>${esc(s.title)}</b></div>
+    <div class="view dx" style="${pos(V[0])}">
+      <table class="mx"><thead>${head}</thead><tbody>${rows}</tbody></table>
+      ${n ? noteHTML(n) : ''}
+      ${vt(1, 'Sheet index', `${SHEETS.length} sheets · ${iss.length} issues`)}
+    </div>
+    <div class="view dx" style="${pos(V[1])}">
+      <dl class="pd">${pd}</dl>
+      ${vt(2, 'Project data', 'as of ' + esc(issuedSorted()[0].date))}
+    </div>
+    <div class="view dx" style="${pos(V[2])}">
+      <dl class="pd">${issList}</dl>
+      ${vt(3, 'Issuances', 'newest first')}
+    </div>
+  </div>`;
+}
+function sheetHTML(s) {
+  let d = '';
+  if (s.kind === 'model') d = modelHTML(s);
+  else if (s.kind === 'index') d = indexSheetHTML(s);
+  else d = cartoonHTML(s);
+  return `${FRAME}<div class="draw">${d}</div>${titleBlockHTML(s)}`;
+}
+
+/* ---------- build ---------- */
+buildFrame();
+const book = $('#book');
+const els = SHEETS.map((s, i) => {
+  const el = document.createElement('section');
+  el.className = 'sheet';
+  el.id = 'sheet-' + s.no;
+  el.setAttribute('aria-label', `Sheet ${s.no}, ${s.title}`);
+  el.innerHTML = sheetHTML(s);
+  book.appendChild(el);
+  return el;
+});
+
+/* ---------- fit ---------- */
+let U = 46;
+function isMobile() { return innerWidth < 760 || innerHeight > innerWidth * 1.05; }
+function fit() {
+  const mob = isMobile();
+  document.documentElement.classList.toggle('mobile', mob);
+  if (mob) { layoutPanel(); return; }
+  const padX = 28, padTop = 18, padBot = 58;
+  U = Math.max(8, Math.min((innerWidth - padX * 2) / 36, (innerHeight - padTop - padBot) / 24));
+  const root = document.documentElement.style;
+  root.setProperty('--u', U + 'px');
+  root.setProperty('--zfs', (Math.max(7.5, U * .115) / U) + 'px');
+  const w = 36 * U, h = 24 * U;
+  book.style.left = ((innerWidth - w) / 2) + 'px';
+  book.style.top = Math.max(padTop, (innerHeight - padBot - h) / 2 + 4) + 'px';
+  els.forEach(snapTitleBlock);
+}
+/* snap each title block section so its datum dot lands on the half inch grid */
+function snapTitleBlock(el) {
+  const tbc = el.querySelector('.tbc'); if (!tbc) return;
+  const secs = [...tbc.children];
+  const idx = tbc.querySelector('.idx');
+  const over = () => idx.scrollHeight > idx.clientHeight + 1;
+  secs.forEach(x => x.style.marginTop = '');
+  el.style.removeProperty('--fl');
+  /* too tall for this window: ease the px floors down until the index fits */
+  let fl = 1;
+  while (over() && fl > .55) { fl -= .05; el.style.setProperty('--fl', fl.toFixed(2)); }
+  /* datum dots of the upper sections land on the quarter inch grid */
+  const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || U;
+  const top0 = el.getBoundingClientRect().top;
+  const labOff = parseFloat(getComputedStyle(secs[0].querySelector('.lab')).fontSize) * .65;
+  for (let k = 0; k < secs.length && secs[k - 1] !== idx; k++) {
+    const sec = secs[k];
+    const cur = (sec.getBoundingClientRect().top - top0 + labOff) / u;
+    const snap = Math.ceil(cur * 4 - .04) / 4;
+    const base = (parseFloat(getComputedStyle(sec).marginTop) || 0) / u;
+    sec.style.marginTop = `calc(var(--u) * ${(base + snap - cur).toFixed(4)})`;
+  }
+  if (over()) secs.forEach(x => x.style.marginTop = '');
+}
+
+/* ---------- navigation ---------- */
+let cur = -1, busy = null;
+function indexOf(no) { return SHEETS.findIndex(s => s.no.toLowerCase() === String(no).toLowerCase()); }
+function loadModel(el) {
+  const f = el.querySelector('iframe[data-src]');
+  if (f && !f.src) f.src = f.dataset.src;
+}
+function settle() {
+  if (!busy) return;
+  clearTimeout(busy.t);
+  busy.els.forEach(e => e.classList.remove('turn-out', 'turn-in', 'under'));
+  els.forEach((e, i) => e.classList.toggle('on', i === cur));
+  busy = null;
+}
+function go(i, opts = {}) {
+  i = Math.max(0, Math.min(SHEETS.length - 1, i));
+  if (i === cur) return;
+  settle();
+  const prev = cur; cur = i;
+  const nEl = els[i], oEl = els[prev];
+  loadModel(nEl);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prev < 0 || opts.instant || reduce) {
+    els.forEach((e, k) => e.classList.toggle('on', k === i));
+  } else if (i > prev) {
+    nEl.classList.add('under');
+    oEl.classList.remove('on'); oEl.classList.add('turn-out');
+    busy = { els: [nEl, oEl], t: setTimeout(settle, 800) };
+  } else {
+    oEl.classList.remove('on'); oEl.classList.add('under');
+    nEl.classList.add('turn-in');
+    busy = { els: [nEl, oEl], t: setTimeout(settle, 800) };
+  }
+  const s = SHEETS[i];
+  $('#cNum b').textContent = s.no;
+  $('#mNum').textContent = s.no;
+  $('#mTitle').innerHTML = `${esc(s.title)}<small>${esc(SET.statusShort)}</small>`;
+  $('#cPrev').disabled = i === 0; $('#cNext').disabled = i === SHEETS.length - 1;
+  document.title = `${s.no} ${s.title} · Walsh Living Set`;
+  if (location.hash.slice(1) !== s.no) history.replaceState(null, '', '#' + s.no);
+  if (document.documentElement.classList.contains('mobile')) layoutPanel();
+}
+const next = () => go(cur + 1), prev = () => go(cur - 1);
+
+/* ---------- mobile panel ---------- */
+function layoutPanel() {
+  const s = SHEETS[Math.max(cur, 0)];
+  $('#panel').innerHTML = `<div class="phead"><img src="${SET.firm.lockup}" alt="ANDRÉ MANDEL"><button id="pClose">Close</button></div>
+    <div class="sec dat idx"><span class="lab">Sheets</span>${tocHTML(s)}</div>
+    ${tbTopHTML()}${tbBottomHTML(s)}`;
+}
+function panel(open) {
+  document.documentElement.classList.toggle('panel-open', open);
+  $('#mIdx').setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { e.preventDefault(); panel(false); go(indexOf(g.dataset.go)); return; }
+  if (e.target.closest('#pClose')) panel(false);
+});
+$('#cPrev').onclick = prev; $('#cNext').onclick = next;
+$('#cPrint').onclick = () => window.print();
+$('#cNum').onclick = () => go(1);
+$('#mIdx').onclick = () => panel(!document.documentElement.classList.contains('panel-open'));
+$('#scrim').onclick = () => panel(false);
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+  else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(SHEETS.length - 1);
+  else if (e.key === 'Escape') panel(false);
+});
+let tx0 = null, ty0 = 0;
+addEventListener('touchstart', e => { if (e.touches.length === 1) { tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; } }, { passive: true });
+addEventListener('touchend', e => {
+  if (tx0 === null) return;
+  const t = e.changedTouches[0], dx = t.clientX - tx0, dy = t.clientY - ty0; tx0 = null;
+  if (document.documentElement.classList.contains('panel-open')) return;
+  if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) (dx < 0 ? next : prev)();
+}, { passive: true });
+addEventListener('hashchange', () => { const i = indexOf(location.hash.slice(1)); if (i >= 0) go(i); });
+addEventListener('resize', fit);
+addEventListener('beforeprint', () => { settle(); els.forEach(snapTitleBlock); });
+addEventListener('afterprint', fit);
+
+/* ---------- start ---------- */
+fit();
+go(Math.max(0, indexOf(decodeURIComponent(location.hash.slice(1)))), { instant: true });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+</script>
+</body>
+</html>

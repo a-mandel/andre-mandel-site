@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Walsh Living Set</title>
+<meta name="description" content="Walsh Residence living plan set, title block option 1, flush strip.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Tenor+Sans&family=Nothing+You+Could+Do&display=swap">
+<style>
+:root{
+  --paper:#f6f5f1; --paper2:#ebe9e3; --ink:#1b1a18; --muted:#6c6963;
+  --rule:rgba(27,26,24,.2); --rule2:rgba(27,26,24,.38); --accent:#c07a2c;
+  --desk:#e5e2da;
+  --tenor:'Tenor Sans', 'Gill Sans', sans-serif;
+  --serif:'EB Garamond', Georgia, serif;
+  --hand:'Nothing You Could Do', cursive;
+  --u:46px;
+  --k:1;  /* eased by fitStrip() only when the title block strip would overflow */
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--desk);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{font-family:var(--serif);overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* desk and stage */
+#desk{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  background:radial-gradient(ellipse at 50% 40%, #ece9e2 0%, var(--desk) 70%)}
+#stage{position:relative;width:calc(var(--u)*36);height:calc(var(--u)*24);perspective:calc(var(--u)*70);perspective-origin:0 50%}
+
+/* the sheet */
+.sheet{
+  --fd:max(calc(10px*var(--k)), calc(var(--u)*.2174));   /* data, 10px floor */
+  --fl:max(calc(9px*var(--k)), calc(var(--u)*.1957));    /* labels, 9px floor */
+  --fb:max(10px, calc(var(--u)*.26));      /* drawing area body */
+  --fh:max(10px, calc(var(--u)*.25));      /* drawing area headings */
+  --fn:max(13px, calc(var(--u)*.36));      /* handwritten notes */
+  position:absolute;inset:0;background:var(--paper);display:none;overflow:hidden;
+  transform-origin:0 50%;backface-visibility:hidden;border-radius:2px;
+  box-shadow:0 1px 2px rgba(27,26,24,.06),0 10px 34px rgba(27,26,24,.13),0 30px 80px rgba(27,26,24,.08)}
+.sheet.on{display:block;z-index:2}
+.sheet.lift{display:block;z-index:3;animation:lift .78s cubic-bezier(.5,.05,.3,1) forwards}
+.sheet.drop{display:block;z-index:3;animation:drop .78s cubic-bezier(.4,0,.25,1) forwards}
+.sheet.lift::after,.sheet.drop::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:9;
+  background:linear-gradient(to right, rgba(27,26,24,0) 30%, rgba(27,26,24,.14));animation:shade .78s forwards}
+.sheet.drop::after{animation-direction:reverse}
+@keyframes lift{from{transform:rotateY(0)}to{transform:rotateY(-104deg)}}
+@keyframes drop{from{transform:rotateY(-104deg)}to{transform:rotateY(0)}}
+@keyframes shade{from{opacity:0}to{opacity:1}}
+
+.frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.frame .zl{font-family:var(--tenor);font-size:.17px;fill:var(--muted);text-anchor:middle;dominant-baseline:central;letter-spacing:.01px}
+
+/* drawing area */
+.draw{position:absolute;left:calc(var(--u)*.75);top:calc(var(--u)*.5);width:calc(var(--u)*31.25);height:calc(var(--u)*23);
+  border-radius:calc(var(--u)*.3) 0 0 calc(var(--u)*.3);overflow:hidden;z-index:1}
+.model{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:var(--paper)}
+.still{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#f7f7f5}
+.cap .bubble{position:static}
+.cap{position:absolute;left:calc(var(--u)*.6);bottom:calc(var(--u)*.6);display:flex;align-items:center;gap:calc(var(--u)*.2);
+  padding:calc(var(--u)*.14) calc(var(--u)*.3) calc(var(--u)*.14) calc(var(--u)*.14);background:rgba(246,245,241,.9);
+  border:1px solid var(--rule);border-radius:calc(var(--u)*.6);pointer-events:none;z-index:2}
+
+/* cartoon views */
+.view{position:absolute}
+.vbox{position:absolute;inset:0;border:1px dashed rgba(27,26,24,.42);border-radius:calc(var(--u)*.2)}
+.bubble{position:absolute;left:0;top:calc(100% + var(--u)*.2);display:flex;align-items:center;gap:calc(var(--u)*.16);white-space:nowrap}
+.bn{width:max(26px, calc(var(--u)*.74));height:max(26px, calc(var(--u)*.74));border:1px solid var(--ink);border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;line-height:1}
+.bn b{font:400 var(--fb)/1 var(--tenor);padding-bottom:calc(var(--u)*.035);border-bottom:1px solid var(--ink);min-width:62%;text-align:center}
+.bn i{font:italic max(7.5px, calc(var(--u)*.16))/1 var(--serif);padding-top:calc(var(--u)*.035);color:var(--muted)}
+.bt{display:flex;flex-direction:column;line-height:1.1}
+.btt{font-family:var(--tenor);font-size:var(--fh);letter-spacing:.14em;text-transform:uppercase;
+  padding:0 calc(var(--u)*.5) calc(var(--u)*.05) 0;border-bottom:1px solid var(--ink)}
+.bs{font-style:italic;font-size:var(--fb);color:var(--muted);padding-top:calc(var(--u)*.04)}
+.note{position:absolute;font-family:var(--hand);font-size:var(--fn);line-height:1.1;color:var(--ink);white-space:nowrap;transform:rotate(-2.5deg);transform-origin:0 50%}
+.lead{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.lead path{fill:none;stroke:var(--ink);stroke-width:.8;vector-effect:non-scaling-stroke;opacity:.8}
+.dot{position:absolute;width:max(6px, calc(var(--u)*.13));height:max(6px, calc(var(--u)*.13));margin:calc(var(--u)*-.065) 0 0 calc(var(--u)*-.065);
+  border-radius:50%;background:var(--accent)}
+
+/* A0.1 blocks */
+.blk{position:absolute}
+.blk h3{margin:0 0 calc(var(--u)*.22);font:400 var(--fh)/1.1 var(--tenor);letter-spacing:.18em;display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:calc(var(--u)*.12);border-bottom:1px solid var(--ink)}
+.blk h3 small{font:italic var(--fb) var(--serif);letter-spacing:0;color:var(--muted)}
+.ix{width:100%;border-collapse:collapse;font-size:var(--fb)}
+.ix th{font:400 var(--fl)/1.2 var(--tenor);letter-spacing:.14em;color:var(--muted);text-align:left;padding:0 0 calc(var(--u)*.1);border-bottom:1px solid var(--rule)}
+.ix td{padding:calc(var(--u)*.07) 0;border-bottom:1px solid var(--rule);line-height:1.2;vertical-align:baseline}
+.ix td.no{font-family:var(--tenor);letter-spacing:.06em;width:12%}
+.ix td.sc{font-style:italic;color:var(--muted);width:24%}
+.ix .c{text-align:center;width:6%}
+.ix tr.g td{font:400 var(--fl)/1 var(--tenor);letter-spacing:.2em;color:var(--muted);padding-top:calc(var(--u)*.26);border-bottom:0}
+.ix tr.here td{color:var(--ink)}
+.ix tr[data-go]{cursor:pointer}
+.ix tr[data-go]:hover td{background:var(--paper2)}
+.idot{display:inline-block;width:max(6px, calc(var(--u)*.13));height:max(6px, calc(var(--u)*.13));border-radius:50%;background:var(--ink)}
+.idot.new{background:var(--accent)}
+.kv{display:grid;grid-template-columns:32% 1fr;font-size:var(--fb);line-height:1.2}
+.kv dt{font:400 var(--fl)/1.5 var(--tenor);letter-spacing:.14em;color:var(--muted);text-transform:uppercase;padding:calc(var(--u)*.08) 0;border-bottom:1px solid var(--rule)}
+.kv dd{margin:0;padding:calc(var(--u)*.08) 0;border-bottom:1px solid var(--rule)}
+.sym{display:flex;flex-direction:column;gap:calc(var(--u)*.45);font-size:var(--fb)}
+.sym .row{display:flex;align-items:center;gap:calc(var(--u)*.5)}
+.sym .row > span:last-child{font-style:italic;color:var(--muted)}
+.sym .bubble{position:static}
+
+/* title block: the flush strip */
+.tb{position:absolute;left:calc(var(--u)*32);top:calc(var(--u)*.5);width:calc(var(--u)*3.5);height:calc(var(--u)*23);
+  display:flex;flex-direction:column;z-index:2;font-size:var(--fd);line-height:1.2}
+.tb .sec{padding:0 calc(var(--u)*.22)}
+.tb .ru{border-top:1px solid var(--rule2)}
+.tb .lab{font:400 var(--fl)/1.25 var(--tenor);letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin:0 0 calc(var(--u)*.06)}
+.tb .lab.row{display:flex;justify-content:space-between}
+.tb .lab.row em{font:italic var(--fl) var(--serif);letter-spacing:0;text-transform:none}
+.tb p{margin:0;overflow-wrap:anywhere}
+.tb-head{position:relative;flex:none}
+.lockup{position:absolute;display:block}
+.tb-firm{padding-bottom:calc(var(--u)*.2)!important}
+.firm-n{font:400 var(--fd)/1.3 var(--tenor);letter-spacing:.2em}
+.firm-l{font-style:italic;color:var(--muted);margin-bottom:calc(var(--u)*.08)!important}
+.tb-job{padding-top:calc(var(--u)*.2)!important;padding-bottom:calc(var(--u)*.2)!important}
+.proj-n{font:400 max(calc(10.5px*var(--k)), calc(var(--u)*.25))/1.2 var(--tenor);letter-spacing:.1em;text-transform:uppercase;margin-bottom:calc(var(--u)*.04)!important}
+.tb .gap{height:calc(var(--u)*.16)}
+.iss{width:100%;border-collapse:collapse}
+.iss th{font:400 var(--fl)/1.2 var(--tenor);letter-spacing:.12em;color:var(--muted);text-align:left;font-weight:400;padding:0 0 calc(var(--u)*.04);border-bottom:1px solid var(--rule)}
+.iss td{padding:calc(var(--u)*.035) 0;border-bottom:1px solid var(--rule)}
+.iss td:nth-child(-n+2){white-space:nowrap}
+.iss td:first-child,.iss th:first-child{width:14%}
+.iss td:nth-child(2),.iss th:nth-child(2){width:30%}
+.iss tr.latest td:first-child{color:var(--accent)}
+.ag{display:grid;grid-template-columns:1fr auto;column-gap:calc(var(--u)*.1)}
+.ag > span{padding:calc(var(--u)*.02) 0;border-bottom:1px solid var(--rule)}
+.ag > span:nth-child(2n){font-style:italic;color:var(--muted);text-align:right}
+.ag .full{grid-column:1 / -1;border-bottom:0}
+.tb-index{flex:1 1 auto;min-height:0;overflow:hidden;padding-top:calc(var(--u)*.16)!important;padding-bottom:calc(var(--u)*.1)!important;display:flex;flex-direction:column}
+.ixl{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--rule) transparent;margin-right:calc(var(--u)*-.1);padding-right:calc(var(--u)*.1)}
+.ig{font:400 var(--fl)/1 var(--tenor);letter-spacing:.2em;color:var(--muted);margin:calc(var(--u)*.1) 0 calc(var(--u)*.03);text-transform:uppercase}
+.ig:first-of-type{margin-top:calc(var(--u)*.04)}
+.igap{height:calc(var(--u)*.07);margin:0 0 calc(var(--u)*.04);border-bottom:1px solid var(--rule)}
+.igap:first-child{height:0;margin:0;border:0}
+.ir{display:flex;align-items:baseline;width:100%;text-align:left;line-height:1.16;padding:calc(var(--u)*.012) calc(var(--u)*.06);margin:0 calc(var(--u)*-.06);
+  width:calc(100% + var(--u)*.12);border-radius:calc(var(--u)*.08);position:relative;color:var(--muted)}
+.ir:hover{background:var(--paper2);color:var(--ink)}
+.ir .in{font:400 var(--fl)/1.2 var(--tenor);letter-spacing:.06em;width:calc(var(--u)*.62);flex:none;color:var(--ink)}
+.ir .it{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ir.on{color:var(--ink);background:rgba(192,122,44,.09)}
+.ir.on .in{color:var(--accent)}
+.ir.on::after{content:"";width:max(5px, calc(var(--u)*.1));height:max(5px, calc(var(--u)*.1));border-radius:50%;background:var(--accent);align-self:center;margin-left:calc(var(--u)*.08)}
+.tb-stamp{padding-top:calc(var(--u)*.16)!important}
+.stamp{border:1px solid var(--rule2);border-radius:calc(var(--u)*.16);padding:calc(var(--u)*.1) calc(var(--u)*.12);display:flex;align-items:center;gap:calc(var(--u)*.12)}
+.stamp > div{min-width:0}
+.seal{flex:none;width:calc(var(--u)*.78);height:calc(var(--u)*.78);border:1px dashed var(--rule2);border-radius:50%}
+.stamp em{color:var(--muted)}
+.tb-title{padding-top:calc(var(--u)*.2)!important}
+.st{font:400 max(calc(10.5px*var(--k)), calc(var(--u)*.25))/1.2 var(--tenor);letter-spacing:.1em;text-transform:uppercase;margin-bottom:calc(var(--u)*.08)!important}
+.meta{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule)}
+.sts{font-style:italic;color:var(--muted);margin:calc(var(--u)*-.06) 0 calc(var(--u)*.1)!important}
+.meta > div{padding:calc(var(--u)*.05) 0;border-bottom:1px solid var(--rule)}
+.meta .w{grid-column:1 / -1}
+.meta .lab{margin:0}
+.status{font-style:italic;color:var(--accent);margin-top:calc(var(--u)*.08)!important}
+.copy{font-size:var(--fl);line-height:1.25;color:var(--muted);margin-top:calc(var(--u)*.1)!important}
+.num{margin:calc(var(--u)*.12) calc(var(--u)*.14) calc(var(--u)*.14);height:calc(var(--u)*1.26);flex:none;background:var(--ink);color:var(--paper);
+  border-radius:calc(var(--u)*.22);position:relative;display:flex;align-items:flex-end;justify-content:space-between;padding:0 calc(var(--u)*.2) calc(var(--u)*.1)}
+.num .lab{position:absolute;left:calc(var(--u)*.2);top:calc(var(--u)*.14);color:rgba(246,245,241,.62);margin:0}
+.num b{font:400 calc(var(--u)*.86)/1 var(--tenor);letter-spacing:.02em}
+.num i{font-size:var(--fd);color:rgba(246,245,241,.62);padding-bottom:calc(var(--u)*.1)}
+
+/* floating control */
+#ctl{display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(246,245,241,.92);border:1px solid var(--rule);border-radius:999px;
+  box-shadow:0 4px 16px rgba(27,26,24,.08);font-size:14px;user-select:none}
+#ctl button{height:30px;min-width:30px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 10px}
+#ctl button:hover{background:var(--paper2)}
+#ctl .arr{font-size:20px;line-height:1;padding:0 0 3px}
+#ctl #cur{min-width:250px;text-align:center;white-space:nowrap}
+#ctl #cur b{font:400 13px var(--tenor);letter-spacing:.1em;color:var(--accent);margin-right:8px}
+#ctl #cur span{font-style:italic}
+#ctl .sep{width:1px;height:18px;background:var(--rule)}
+#ctl #print{font:400 11px var(--tenor);letter-spacing:.16em}
+#mstrip,#mpanel{display:none}
+
+/* mobile: drawing fills the screen, title block becomes a bottom strip */
+@media screen and (max-width: 900px), screen and (orientation: portrait) and (max-width: 1200px){
+  body{overflow:hidden}
+  #desk{justify-content:flex-start;gap:0;background:var(--paper)}
+  #stage{width:100vw;height:calc(100dvh - 64px - env(safe-area-inset-bottom));perspective:1800px}
+  #ctl{display:none}
+  .sheet{--u:40px;--fd:13px;--fl:11px;--fb:15px;--fh:12px;--fn:19px;border-radius:0;box-shadow:none}
+  .frame,.tb{display:none}
+  .draw{left:0;top:0;width:100%;height:100%;border-radius:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:18px 16px 28px}
+  .draw.m0{padding:0;overflow:hidden}
+  .cap{left:12px;bottom:12px}
+  .mhead{display:flex!important}
+  .view,.blk{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;margin:0 0 30px}
+  .vbox{position:relative;aspect-ratio:var(--ar);max-height:62vh;width:100%}
+  .bubble{position:static;margin-top:10px;white-space:normal}
+  .note{white-space:normal;max-width:42%}
+  .blk h3{margin-bottom:10px}
+  #mstrip{display:flex;position:fixed;left:0;right:0;bottom:0;height:calc(64px + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom) 14px;
+    align-items:center;gap:12px;background:var(--paper);border-top:1px solid var(--rule2);z-index:20}
+  #mstrip img{height:36px;width:auto;flex:none}
+  #mstrip .mt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+  #mstrip .mt b{font:400 17px var(--tenor);letter-spacing:.08em;color:var(--accent)}
+  #mstrip .mt span{font-style:italic;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #mstrip button{height:40px;min-width:40px;border-radius:999px;border:1px solid var(--rule);display:inline-flex;align-items:center;justify-content:center}
+  #mstrip .arr{font-size:22px;padding-bottom:3px}
+  #mstrip #mix{font:400 11px var(--tenor);letter-spacing:.16em;padding:0 14px;background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  #mpanel{--fl:12px;--fd:15px;display:block;position:fixed;left:0;right:0;bottom:0;max-height:82dvh;overflow-y:auto;background:var(--paper);z-index:30;
+    border-top:1px solid var(--rule2);border-radius:16px 16px 0 0;box-shadow:0 -12px 40px rgba(27,26,24,.16);padding:14px 16px calc(24px + env(safe-area-inset-bottom));
+    transform:translateY(105%);transition:transform .32s cubic-bezier(.3,.7,.2,1);font-size:15px}
+  #mpanel.open{transform:none}
+  #mpanel .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  #mpanel .ph span{font:400 12px var(--tenor);letter-spacing:.2em}
+  #mpanel .ph button{font:400 11px var(--tenor);letter-spacing:.16em;padding:10px 12px;border:1px solid var(--rule);border-radius:999px}
+  #mpanel .ig{font:400 11px var(--tenor);letter-spacing:.2em;color:var(--muted);margin:16px 0 4px}
+  #mpanel .ir{font-size:16px;padding:9px 8px;margin:0 -8px;width:calc(100% + 16px);border-radius:8px}
+  #mpanel .ir .in{font-size:12px;width:52px}
+  #mpanel .ir.on::after{width:7px;height:7px;margin-left:8px}
+  #mpanel .pinfo{margin-top:20px;padding-top:14px;border-top:1px solid var(--rule);font-size:14px;line-height:1.35;color:var(--muted)}
+  #mpanel .pinfo b{font:400 12px var(--tenor);letter-spacing:.16em;color:var(--ink);display:block;margin-bottom:4px}
+  #mscrim{position:fixed;inset:0;background:rgba(27,26,24,.18);z-index:25;opacity:0;pointer-events:none;transition:opacity .3s}
+  #mscrim.open{opacity:1;pointer-events:auto}
+}
+.mhead{display:none;align-items:baseline;gap:10px;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--ink)}
+.mhead b{font:400 13px var(--tenor);letter-spacing:.12em;color:var(--accent)}
+.mhead span{font:400 13px var(--tenor);letter-spacing:.14em;text-transform:uppercase}
+.mhead i{margin-left:auto;color:var(--muted);font-size:14px;white-space:nowrap}
+
+@media (prefers-reduced-motion: reduce){.sheet.lift,.sheet.drop,.sheet.lift::after,.sheet.drop::after{animation-duration:1ms}}
+
+/* print: one true size sheet per page */
+@page{size:36in 24in;margin:0}
+@media print{
+  html,body{height:auto;background:var(--paper);overflow:visible}
+  #desk{position:static;display:block;background:none}
+  #stage{width:36in;height:auto;perspective:none}
+  #ctl,#mstrip,#mpanel,#mscrim{display:none!important}
+  .sheet{--u:96px;position:relative;display:block!important;transform:none!important;animation:none!important;width:36in;height:24in;
+    box-shadow:none;border-radius:0;break-after:page;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+  .sheet::after{display:none!important}
+  .model{display:none!important}
+  .still{display:block}
+  .ir.on{background:none}
+  .ixl{overflow:visible}
+}
+</style>
+</head>
+<body>
+<div id="desk">
+  <div id="stage" aria-live="polite"></div>
+  <nav id="ctl" aria-label="Sheet controls">
+    <button class="arr" id="prev" aria-label="Previous sheet">&#8249;</button>
+    <span id="cur"></span>
+    <button class="arr" id="next" aria-label="Next sheet">&#8250;</button>
+    <span class="sep"></span>
+    <button id="print" aria-label="Print the set">PRINT</button>
+  </nav>
+</div>
+<div id="mstrip">
+  <img src="../../marks/am10_mark.webp" alt="André Mandel">
+  <div class="mt"><b id="mno"></b><span id="mtitle"></span></div>
+  <button class="arr" id="mprev" aria-label="Previous sheet">&#8249;</button>
+  <button class="arr" id="mnext" aria-label="Next sheet">&#8250;</button>
+  <button id="mix" aria-label="Open the sheet index">INDEX</button>
+</div>
+<div id="mscrim"></div>
+<div id="mpanel" role="dialog" aria-label="Sheet index"></div>
+
+<script>
+/* ============================================================
+   THE SET. One object holds everything the sheets print.
+   Add a sheet: push to SET.sheets (group must be in SET.groups).
+   Add an issuance: push to SET.issuances and list its number in
+   each sheet's `issued` array. Views are in drawing inches, origin
+   at the top left of the drawing area (31.25 x 23 in).
+   ============================================================ */
+const SET = {
+  firm: { name: 'ANDRÉ MANDEL', line: 'Residential design',
+          lines: ['40 Edith St #4', 'San Francisco CA 94133', '510.459.7686', 'andre.mandel@gmail.com'] },
+  project: { name: 'Walsh Residence',
+             lines: ['Lahontan Lot 235', '8154 Lahontan Drive, Truckee CA', 'APN 108 160 012 000', 'Zoning RS PD 1.7 · Placer County'],
+             owner: ['Owner · Dustin Walsh', 'Elevated Developers'] },
+  agency: [ { k: 'Lahontan design review (LCC)', short: 'LCC design review', v: 'no. pending' },
+            { k: 'Placer County building permit', short: 'Placer County permit', v: 'no. pending' },
+            { k: 'Very High FHSZ · Chapter 7A' } ],
+  issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' },
+               { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
+  stamp: { role: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
+  status: 'Feasibility · not for construction',
+  drawnBy: 'AM',
+  copyright: '© 2026 André Mandel. Drawings are instruments of service.',
+  groups: ['General', 'Feasibility', 'Architectural', 'Landscape'],
+  sheets: [
+    { no: 'A0.0', group: 'General', title: 'Cover · the site', scale: 'No scale', issued: [1, 2], kind: 'model' },
+    { no: 'A0.1', group: 'General', title: 'Sheet index and project data', short: 'Index and project data', scale: 'No scale', issued: [2], kind: 'index',
+      views: [ { t: 'Vicinity map', s: 'No scale', x: 1, y: 13.9, w: 14.6, h: 7.1,
+                 note: { t: 'north is up on every sheet', at: [52, 22], to: [30, 58] } } ] },
+    { no: 'F1.0', group: 'Feasibility', title: 'Regulatory report', scale: 'No scale', issued: [1, 2], views: [
+      { t: 'Zoning and land use', s: 'No scale', x: 1, y: 1, w: 14, h: 8.6 },
+      { t: 'Design review path', s: 'No scale', x: 16.25, y: 1, w: 14, h: 8.6, note: { t: 'LCC meets the 2nd Wednesday', at: [40, 30], to: [20, 66] } },
+      { t: 'Height and setbacks', s: 'No scale', x: 1, y: 12, w: 14, h: 8.8 },
+      { t: 'Wildfire requirements', s: 'No scale', x: 16.25, y: 12, w: 14, h: 8.8 } ] },
+    { no: 'F2.0', group: 'Feasibility', title: 'Budget framework', scale: 'No scale', issued: [1, 2], views: [
+      { t: 'Cost summary', s: 'No scale', x: 1, y: 1, w: 18, h: 19.8, note: { t: 'carry an honest contingency', at: [46, 64], to: [26, 80] } },
+      { t: 'Cost by system', s: 'No scale', x: 20.25, y: 1, w: 10, h: 8.6 },
+      { t: 'Alternates and allowances', s: 'No scale', x: 20.25, y: 12, w: 10, h: 8.8 } ] },
+    { no: 'F3.0', group: 'Feasibility', title: 'Preliminary timeline', scale: 'No scale', issued: [1, 2], views: [
+      { t: 'Approvals and permits', s: 'No scale', x: 1, y: 1, w: 29.25, h: 8.6 },
+      { t: 'Design phases', s: 'No scale', x: 1, y: 12, w: 14, h: 8.8 },
+      { t: 'Construction window', s: 'No scale', x: 16.25, y: 12, w: 14, h: 8.8, note: { t: 'build season is short, plan for snow', at: [30, 32], to: [14, 70] } } ] },
+    { no: 'F4.0', group: 'Feasibility', title: 'Outline specifications', scale: 'No scale', issued: [1, 2], views: [
+      { t: 'Structure and envelope', s: 'No scale', x: 1, y: 1, w: 9.2, h: 19.8 },
+      { t: 'Exterior materials', s: 'No scale', x: 11, y: 1, w: 9.2, h: 19.8, note: { t: 'match the design book', at: [30, 40], to: [16, 56] } },
+      { t: 'Interiors and systems', s: 'No scale', x: 21, y: 1, w: 9.2, h: 19.8 } ] },
+    { no: 'A1.0', group: 'Architectural', title: 'Site plan', scale: '1/8 in = 1 ft', issued: [2], views: [
+      { t: 'Site plan', s: '1/8 in = 1 ft', x: 1, y: 1, w: 20, h: 19.8, note: { t: 'approach from the west', at: [30, 44], to: [8, 52] } },
+      { t: 'Vicinity map', s: 'No scale', x: 22.25, y: 1, w: 8, h: 8.6 },
+      { t: 'Site data', s: 'No scale', x: 22.25, y: 12, w: 8, h: 8.8 } ] },
+    { no: 'A2.1', group: 'Architectural', title: 'Main level plan', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'Main level plan', s: '3/16 in = 1 ft', x: 1, y: 1, w: 22, h: 19.8, note: { t: 'confirm the stair location', at: [52, 30], to: [36, 48] } },
+      { t: 'Area summary', s: 'No scale', x: 24.25, y: 1, w: 6, h: 8.6 },
+      { t: 'Key plan', s: 'No scale', x: 24.25, y: 12, w: 6, h: 8.8 } ] },
+    { no: 'A2.2', group: 'Architectural', title: 'Lower level plan', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'Lower level plan', s: '3/16 in = 1 ft', x: 1, y: 1, w: 22, h: 19.8, note: { t: 'daylight every bedroom', at: [50, 60], to: [30, 76] } },
+      { t: 'Enlarged stair', s: '1/2 in = 1 ft', x: 24.25, y: 1, w: 6, h: 8.6 },
+      { t: 'Key plan', s: 'No scale', x: 24.25, y: 12, w: 6, h: 8.8 } ] },
+    { no: 'A2.3', group: 'Architectural', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'Roof plan', s: '3/16 in = 1 ft', x: 1, y: 1, w: 22, h: 19.8, note: { t: 'every roof under 30 ft', at: [48, 26], to: [30, 44] } },
+      { t: 'Roof edge detail', s: '1 1/2 in = 1 ft', x: 24.25, y: 1, w: 6, h: 8.6 },
+      { t: 'Roof heights', s: 'No scale', x: 24.25, y: 12, w: 6, h: 8.8 } ] },
+    { no: 'A3.1', group: 'Architectural', title: 'Elevations west and north', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'West elevation', s: '3/16 in = 1 ft', x: 1, y: 1, w: 29.25, h: 8.6, note: { t: 'garage roof turns high to the west', at: [58, 26], to: [44, 64] } },
+      { t: 'North elevation', s: '3/16 in = 1 ft', x: 1, y: 12, w: 29.25, h: 8.8 } ] },
+    { no: 'A3.2', group: 'Architectural', title: 'Elevations east and south', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'East elevation', s: '3/16 in = 1 ft', x: 1, y: 1, w: 29.25, h: 8.6 },
+      { t: 'South elevation', s: '3/16 in = 1 ft', x: 1, y: 12, w: 29.25, h: 8.8, note: { t: '2 ft eaves on the south', at: [60, 28], to: [46, 62] } } ] },
+    { no: 'A4.1', group: 'Architectural', title: 'Building sections', scale: '3/16 in = 1 ft', issued: [2], views: [
+      { t: 'Longitudinal section', s: '3/16 in = 1 ft', x: 1, y: 1, w: 29.25, h: 8.6, note: { t: 'cut through the tallest ridge', at: [58, 28], to: [44, 64] } },
+      { t: 'Cross section at living', s: '3/16 in = 1 ft', x: 1, y: 12, w: 14, h: 8.8 },
+      { t: 'Cross section at garage', s: '3/16 in = 1 ft', x: 16.25, y: 12, w: 14, h: 8.8 } ] },
+    { no: 'A5.1', group: 'Architectural', title: 'Exterior materials and colors', short: 'Materials and colors', scale: 'No scale', issued: [2], views: [
+      { t: 'Material board', s: 'No scale', x: 1, y: 1, w: 14, h: 19.8, note: { t: 'cedar, dark steel, board form concrete', at: [18, 44], to: [12, 60] } },
+      { t: 'Color palette', s: 'No scale', x: 16.25, y: 1, w: 14, h: 8.6 },
+      { t: 'Material key elevation', s: 'No scale', x: 16.25, y: 12, w: 14, h: 8.8 } ] },
+    { no: 'A6.1', group: 'Architectural', title: 'Wildfire hardening · Chapter 7A', short: 'Wildfire · Chapter 7A', scale: 'As noted', issued: [2], views: [
+      { t: 'Defensible space plan', s: '1/16 in = 1 ft', x: 1, y: 1, w: 14, h: 8.6, note: { t: 'Very High FHSZ, full 7A', at: [40, 30], to: [22, 64] } },
+      { t: 'Ember resistant vents', s: '3 in = 1 ft', x: 16.25, y: 1, w: 14, h: 8.6 },
+      { t: 'Eaves and soffits', s: '1 1/2 in = 1 ft', x: 1, y: 12, w: 14, h: 8.8 },
+      { t: 'Glazing and decks', s: '1 1/2 in = 1 ft', x: 16.25, y: 12, w: 14, h: 8.8 } ] },
+    { no: 'A9.1', group: 'Architectural', title: 'Perspectives', scale: 'No scale', issued: [1, 2], views: [
+      { t: 'Approach from the west', s: 'No scale', x: 1, y: 1, w: 20, h: 19.8, note: { t: 'dusk view for LCC', at: [52, 58], to: [34, 72] } },
+      { t: 'Living room', s: 'No scale', x: 22.25, y: 1, w: 8, h: 8.6 },
+      { t: 'Aerial from the south', s: 'No scale', x: 22.25, y: 12, w: 8, h: 8.8 } ] },
+    { no: 'L1.0', group: 'Landscape', title: 'Landscape concept', scale: 'As noted', issued: [2], views: [
+      { t: 'Landscape plan', s: '1/8 in = 1 ft', x: 1, y: 1, w: 20, h: 19.8, note: { t: 'keep the signature tree', at: [46, 36], to: [30, 52] } },
+      { t: 'Plant palette', s: 'No scale', x: 22.25, y: 1, w: 8, h: 8.6 },
+      { t: 'Defensible space zones', s: 'No scale', x: 22.25, y: 12, w: 8, h: 8.8 } ] }
+  ]
+};
+
+/* Sheet geometry, inches. The corner cut follows the logo's roof stroke:
+   53.6 deg from horizontal, dx/dy = 0.738. The lockup is centered on the
+   strip and the cut is placed a constant gap off the stroke's envelope
+   (x = env + 0.738 y in lockup px, env measured at the brushed cap). */
+const K = 0.738;
+const G = { L: .75, T: .5, R: 35.5, B: 23.5, TBX: 32, s: .005, cx: 33.75, y0: .72, env: 41, gap: .13, r: .3, rf: .6 };
+G.x0 = G.cx - 178.5 * G.s;
+G.xa = G.x0 + G.env * G.s + G.gap * Math.hypot(1, K) - K * (G.y0 - G.T);
+G.ya = G.T + (G.R - G.xa) / K;
+/* the firm block starts under the lockup and runs beside the cut (its lines are short) */
+G.head = G.y0 + 520 * G.s + .2 - G.T;
+
+const I = v => `calc(var(--u)*${+v.toFixed(4)})`;
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const f2 = n => +n.toFixed(4);
+
+function roundPoly(pts, radii) {
+  let d = '';
+  const n = pts.length;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i + n - 1) % n], p = pts[i], p1 = pts[(i + 1) % n], r = radii[i];
+    const a1 = [p[0] - p0[0], p[1] - p0[1]], a2 = [p1[0] - p[0], p1[1] - p[1]];
+    const l1 = Math.hypot(...a1), l2 = Math.hypot(...a2);
+    const u1 = [a1[0] / l1, a1[1] / l1], u2 = [a2[0] / l2, a2[1] / l2];
+    const phi = Math.acos(Math.max(-1, Math.min(1, u1[0] * u2[0] + u1[1] * u2[1])));
+    const t = r * Math.tan(phi / 2);
+    const A = [p[0] - u1[0] * t, p[1] - u1[1] * t], B = [p[0] + u2[0] * t, p[1] + u2[1] * t];
+    d += `${i ? 'L' : 'M'}${f2(A[0])} ${f2(A[1])}A${r} ${r} 0 0 1 ${f2(B[0])} ${f2(B[1])}`;
+  }
+  return d + 'Z';
+}
+
+const LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // I and O skipped, 24 rows
+function frameSVG() {
+  let s = `<svg class="frame" viewBox="0 0 36 24" preserveAspectRatio="xMidYMid meet" aria-hidden="true">`;
+  // binding strip and screw posts, pale
+  s += `<rect x="0" y="0" width=".5" height="24" fill="#ebe9e3"/><line x1=".5" y1="0" x2=".5" y2="24" stroke="rgba(27,26,24,.2)" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  for (const y of [2, 12, 22]) s += `<circle cx=".25" cy="${y}" r=".13" fill="#f6f5f1" stroke="rgba(27,26,24,.42)" stroke-width="1" vector-effect="non-scaling-stroke"/><circle cx=".25" cy="${y}" r=".045" fill="rgba(27,26,24,.3)"/><line x1=".17" y1="${y}" x2=".33" y2="${y}" stroke="rgba(27,26,24,.35)" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  // inch ticks, every 6th longer
+  let t = '';
+  for (let i = 1; i < 36; i++) { const l = i % 6 ? .1 : .22; t += `M${i} 0V${l}M${i} 24V${24 - l}`; }
+  for (let j = 1; j < 24; j++) { const l = j % 6 ? .1 : .22; t += `M36 ${j}H${36 - l}M.5 ${j}H${.5 + (j % 6 ? .08 : .16)}`; }
+  s += `<path d="${t}" stroke="rgba(27,26,24,.5)" stroke-width="1" vector-effect="non-scaling-stroke" fill="none"/>`;
+  for (let i = 1; i < 36; i++) s += `<text class="zl" x="${i + .5}" y=".3">${i}</text><text class="zl" x="${i + .5}" y="23.73">${i}</text>`;
+  for (let j = 0; j < 24; j++) s += `<text class="zl" x="35.76" y="${j + .5}">${LETTERS[j]}</text><text class="zl" x=".64" y="${j + .5}">${LETTERS[j]}</text>`;
+  // border with the corner cut, and the one rule that separates the title block
+  const pts = [[G.L, G.T], [G.xa, G.T], [G.R, G.ya], [G.R, G.B], [G.L, G.B]];
+  s += `<path d="${roundPoly(pts, [G.r, G.rf, G.rf, G.r, G.r])}" fill="none" stroke="#1b1a18" stroke-width="1.15" vector-effect="non-scaling-stroke"/>`;
+  s += `<line x1="${G.TBX}" y1="${G.T}" x2="${G.TBX}" y2="${G.B}" stroke="#1b1a18" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  return s + `</svg>`;
+}
+
+const sheetsIn = g => SET.sheets.filter(s => s.group === g);
+const issOf = sh => SET.issuances.filter(x => sh.issued.includes(x.no));
+const dateOf = sh => { const l = issOf(sh); return l.length ? l[l.length - 1].date : SET.issuances[SET.issuances.length - 1].date; };
+
+function indexRows(cur, heads = true) {
+  return SET.groups.map(g => (heads ? `<div class="ig">${g}</div>` : `<div class="igap" title="${g}"></div>`) + sheetsIn(g).map(s =>
+    `<button class="ir${s === cur ? ' on' : ''}" data-go="${s.no}"${s === cur ? ' aria-current="page"' : ''}><span class="in">${s.no}</span><span class="it">${esc(s.short || s.title)}</span></button>`).join('')).join('');
+}
+
+function titleBlock(sh, idx) {
+  const iss = [...SET.issuances].reverse();
+  const latest = SET.issuances[SET.issuances.length - 1].no;
+  const lk = { l: G.x0 - G.TBX, t: G.y0 - G.T, w: 357 * G.s };
+  return `<aside class="tb" aria-label="Title block">
+    <div class="tb-head" style="height:${I(G.head)}"><img class="lockup" src="../../marks/am10_lockup.webp" alt="André Mandel" style="left:${I(lk.l)};top:${I(lk.t)};width:${I(lk.w)}"></div>
+    <div class="sec tb-firm">
+      <p class="firm-n">${SET.firm.name}</p>
+      <p class="firm-l">${SET.firm.line}</p>
+      ${SET.firm.lines.map(l => `<p>${esc(l)}</p>`).join('')}
+    </div>
+    <div class="sec ru tb-job">
+      <p class="lab">Project</p>
+      <p class="proj-n">${SET.project.name}</p>
+      ${SET.project.lines.concat(SET.project.owner).map(l => `<p>${esc(l)}</p>`).join('')}
+      <div class="gap"></div>
+      <p class="lab">Issuances</p>
+      <table class="iss"><thead><tr><th>No.</th><th>Date</th><th>Issued for</th></tr></thead><tbody>
+        ${iss.map(x => `<tr class="${x.no === latest ? 'latest' : ''}"><td>${x.no}</td><td>${x.date}</td><td>${esc(x.for)}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="gap"></div>
+      <p class="lab">Agency and permits</p>
+      <div class="ag">${SET.agency.map(a => a.v ? `<span title="${esc(a.k)}">${esc(a.short || a.k)}</span><span>${esc(a.v)}</span>` : `<span class="full">${esc(a.k)}</span>`).join('')}</div>
+    </div>
+    <nav class="sec ru tb-index" aria-label="Sheet index">
+      <p class="lab row">Sheet index<em>${SET.sheets.length} sheets</em></p>
+      <div class="ixl">${indexRows(sh, false)}</div>
+    </nav>
+    <div class="sec ru tb-stamp">
+      <div class="stamp">
+        <span class="seal"></span>
+        <div><p class="lab">${SET.stamp.role}</p><p>${SET.stamp.name}</p><p><em>${SET.stamp.note}</em></p></div>
+      </div>
+    </div>
+    <div class="sec tb-title">
+      <p class="lab">Sheet title</p>
+      <p class="st">${esc(sh.title)}</p>
+      <p class="sts">Scale ${esc(sh.scale)}</p>
+      <div class="meta">
+        <div><p class="lab">Date</p><p>${dateOf(sh)}</p></div>
+        <div><p class="lab">Drawn by</p><p>${SET.drawnBy}</p></div>
+      </div>
+      <p class="status">${SET.status}</p>
+      <p class="copy">${SET.copyright}</p>
+    </div>
+    <div class="num"><p class="lab">Sheet</p><b>${sh.no}</b><i>${idx + 1} of ${SET.sheets.length}</i></div>
+  </aside>`;
+}
+
+function bubble(n, t, s, ref) {
+  return `<div class="bubble"><span class="bn"><b>${n}</b><i>${ref}</i></span><span class="bt"><span class="btt">${esc(t)}</span><span class="bs">${esc(s)}</span></span></div>`;
+}
+
+function noteHTML(nt, w, h) {
+  const [x, y] = nt.at, [tx, ty] = nt.to;
+  const sx = x - (.14 / w) * 100, sy = y + (.22 / h) * 100;
+  return `<svg class="lead" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M${f2(sx)} ${f2(sy)}Q${f2(tx)} ${f2(sy)} ${tx} ${ty}"/></svg>
+    <span class="note" style="left:${x}%;top:${y}%">${esc(nt.t)}</span><i class="dot" style="left:${tx}%;top:${ty}%"></i>`;
+}
+
+function viewsHTML(sh) {
+  return (sh.views || []).map((v, k) => `<div class="view" style="left:${I(v.x)};top:${I(v.y)};width:${I(v.w)};height:${I(v.h)};--ar:${f2(v.w / v.h)}">
+      <div class="vbox">${v.note ? noteHTML(v.note, v.w, v.h) : ''}</div>${bubble(k + 1, v.t, v.s, sh.no)}</div>`).join('');
+}
+
+function indexSheetHTML(sh) {
+  const latest = SET.issuances[SET.issuances.length - 1].no;
+  const cols = SET.issuances.map(x => `<th class="c">${x.no}</th>`).join('');
+  const rows = SET.groups.map(g => `<tr class="g"><td colspan="${3 + SET.issuances.length}">${g.toUpperCase()}</td></tr>` +
+    sheetsIn(g).map(s => `<tr data-go="${s.no}"${s === sh ? ' class="here"' : ''}><td class="no">${s.no}</td><td>${esc(s.title)}</td><td class="sc">${esc(s.scale)}</td>${
+      SET.issuances.map(x => `<td class="c">${s.issued.includes(x.no) ? `<span class="idot${x.no === latest ? ' new' : ''}"></span>` : ''}</td>`).join('')}</tr>`).join('')).join('');
+  const P = SET.project;
+  const data = [
+    ['Project', `${P.name}. ${P.lines[0]}`], ['Address', '8154 Lahontan Drive, Truckee CA'], ['APN', '108 160 012 000'],
+    ['Zoning', 'RS PD 1.7'], ['Jurisdiction', 'Placer County'], ['Owner', 'Dustin Walsh, Elevated Developers'],
+    ['Design review', 'Lahontan design review (LCC), no. pending'], ['Building permit', 'Placer County, no. pending'],
+    ['Fire', 'Very High FHSZ · Chapter 7A'], ['Designer', 'André Mandel, Residential design'], ['Architect of record', SET.stamp.name],
+    ['Status', SET.status]
+  ];
+  return `<div class="blk" style="left:${I(1)};top:${I(1)};width:${I(14.6)}">
+      <h3>SHEET INDEX<small>${SET.sheets.length} sheets · issued ${SET.issuances.map(x => x.no).join(', ')}</small></h3>
+      <table class="ix"><thead><tr><th>NO.</th><th>TITLE</th><th>SCALE</th>${cols}</tr></thead><tbody>${rows}</tbody></table>
+    </div>
+    <div class="blk" style="left:${I(17)};top:${I(1)};width:${I(13.25)}">
+      <h3>PROJECT DATA<small>Lahontan Lot 235</small></h3>
+      <dl class="kv">${data.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+    </div>
+    <div class="blk" style="left:${I(17)};top:${I(10.9)};width:${I(13.25)}">
+      <h3>ISSUANCES<small>newest first</small></h3>
+      <table class="ix"><thead><tr><th>NO.</th><th>DATE</th><th>ISSUED FOR</th><th class="c">SHEETS</th></tr></thead><tbody>
+      ${[...SET.issuances].reverse().map(x => `<tr><td class="no">${x.no}</td><td>${x.date}</td><td>${esc(x.for)}</td><td class="c">${SET.sheets.filter(s => s.issued.includes(x.no)).length}</td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="blk" style="left:${I(17)};top:${I(15.2)};width:${I(13.25)}">
+      <h3>SYMBOLS<small>how to read the set</small></h3>
+      <div class="sym">
+        <div class="row">${bubble(1, 'View title', 'scale', 'A2.1')}<span>view number over the sheet it lives on</span></div>
+        <div class="row"><span class="idot new"></span><span>latest issuance · the orange dot also ends a note leader</span></div>
+      </div>
+    </div>
+    ${viewsHTML(sh)}`;
+}
+
+function modelHTML() {
+  return `<iframe class="model" src="../../?sheet" title="Live 3D model of the Walsh Residence" loading="eager" allow="fullscreen"></iframe>
+    <img class="still" src="../../preview-house.jpg" alt="Walsh Residence, Lahontan Lot 235">
+    <div class="cap">${bubble(1, 'The site', 'Live model · drag to orbit', 'A0.0')}</div>`;
+}
+
+const FRAME = frameSVG();
+const stage = document.getElementById('stage');
+stage.innerHTML = SET.sheets.map((sh, i) => `<section class="sheet" id="s${i}" data-no="${sh.no}" aria-label="Sheet ${sh.no}, ${esc(sh.title)}">
+    <div class="draw${sh.kind === 'model' ? ' m0' : ''}">
+      ${sh.kind === 'model' ? '' : `<div class="mhead"><b>${sh.no}</b><span>${esc(sh.title)}</span><i>${esc(sh.scale)}</i></div>`}
+      ${sh.kind === 'model' ? modelHTML() : sh.kind === 'index' ? indexSheetHTML(sh) : viewsHTML(sh)}
+    </div>
+    ${titleBlock(sh, i)}
+    ${FRAME}
+  </section>`).join('');
+const SHEETS = [...stage.querySelectorAll('.sheet')];
+
+/* fit to window */
+const MQ = matchMedia('screen and (max-width: 900px), screen and (orientation: portrait) and (max-width: 1200px)');
+function fit() {
+  if (MQ.matches) return;
+  const u = Math.max(8, Math.min((innerWidth - 40) / 36, (innerHeight - 76) / 24));
+  document.documentElement.style.setProperty('--u', u.toFixed(3) + 'px');
+}
+/* keep the whole strip visible: if px floors push it past the border, ease them */
+function fitStrip() {
+  const sh = SHEETS[cur]; if (!sh || MQ.matches) return;
+  const tb = sh.querySelector('.tb'), ix = sh.querySelector('.ixl');
+  const over = () => tb.scrollHeight > tb.clientHeight + 1 || ix.scrollHeight > ix.clientHeight + 1;
+  let k = 1; stage.style.setProperty('--k', 1);
+  while (over() && k > .76) { k -= .02; stage.style.setProperty('--k', k.toFixed(2)); }
+}
+addEventListener('resize', () => { fit(); fitStrip(); });
+fit();
+if (document.fonts) document.fonts.ready.then(fitStrip);
+
+/* paging, hinged on the left binding */
+let cur = -1, busy = null;
+function finish() { if (busy) { busy(); busy = null; } }
+function show(i, animate) {
+  i = Math.max(0, Math.min(SET.sheets.length - 1, i));
+  if (i === cur) return;
+  finish();
+  const prev = cur; cur = i;
+  const a = SHEETS[prev], b = SHEETS[i];
+  if (!a || !animate) {
+    SHEETS.forEach(s => s.className = 'sheet');
+    b.classList.add('on');
+  } else if (i > prev) {
+    b.classList.add('on');
+    a.classList.remove('on'); a.classList.add('lift');
+    const done = () => { a.classList.remove('lift'); };
+    busy = done; a.addEventListener('animationend', function h(e) { if (e.target !== a) return; a.removeEventListener('animationend', h); if (busy === done) finish(); });
+  } else {
+    b.classList.add('on', 'drop');
+    const done = () => { b.classList.remove('drop'); a.classList.remove('on'); };
+    busy = done; b.addEventListener('animationend', function h(e) { if (e.target !== b) return; b.removeEventListener('animationend', h); if (busy === done) finish(); });
+  }
+  fitStrip();
+  const sh = SET.sheets[i];
+  document.getElementById('cur').innerHTML = `<b>${sh.no}</b><span>${esc(sh.title)}</span>`;
+  document.getElementById('mno').textContent = sh.no;
+  document.getElementById('mtitle').textContent = sh.short || sh.title;
+  document.title = `${sh.no} · Walsh Living Set`;
+  if (decodeURIComponent(location.hash.slice(1)) !== sh.no) history.replaceState(null, '', '#' + sh.no);
+  const on = b.querySelector('.ixl .ir.on'), box = on && on.closest('.ixl');
+  if (box && box.scrollHeight > box.clientHeight) box.scrollTop = on.offsetTop - box.offsetTop - box.clientHeight / 2;
+  document.querySelectorAll('#mpanel .ir').forEach(el => el.classList.toggle('on', el.dataset.go === sh.no));
+}
+const go = no => { const i = SET.sheets.findIndex(s => s.no === no); if (i >= 0) show(i, true); };
+const step = d => show(cur + d, true);
+
+document.getElementById('prev').onclick = () => step(-1);
+document.getElementById('next').onclick = () => step(1);
+document.getElementById('mprev').onclick = () => step(-1);
+document.getElementById('mnext').onclick = () => step(1);
+document.getElementById('print').onclick = () => window.print();
+document.addEventListener('click', e => { const t = e.target.closest('[data-go]'); if (t) { go(t.dataset.go); closePanel(); } });
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea')) return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { step(1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { step(-1); e.preventDefault(); }
+  else if (e.key === 'Home') show(0, true);
+  else if (e.key === 'End') show(SET.sheets.length - 1, true);
+  else if (e.key === 'Escape') closePanel();
+});
+addEventListener('hashchange', () => go(decodeURIComponent(location.hash.slice(1))));
+
+/* swipe */
+let sx = null, sy = null;
+stage.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+stage.addEventListener('touchend', e => {
+  if (sx === null) return;
+  const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; sx = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) step(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+/* mobile index panel */
+const panel = document.getElementById('mpanel'), scrim = document.getElementById('mscrim');
+panel.innerHTML = `<div class="ph"><span>SHEET INDEX</span><button id="mclose">CLOSE</button></div>${indexRows(null)}
+  <div class="pinfo"><b>${SET.project.name.toUpperCase()}</b>${SET.project.lines.map(esc).join('<br>')}<br>${SET.project.owner.map(esc).join('<br>')}</div>
+  <div class="pinfo"><b>ISSUANCES</b>${[...SET.issuances].reverse().map(x => `${x.no} · ${x.date} · ${esc(x.for)}`).join('<br>')}</div>
+  <div class="pinfo"><b>${SET.firm.name}</b>${SET.firm.line}<br>${SET.firm.lines.map(esc).join('<br>')}<br><br>${SET.stamp.role}: ${SET.stamp.name}<br><i>${SET.status}</i></div>`;
+function closePanel() { panel.classList.remove('open'); scrim.classList.remove('open'); }
+document.getElementById('mix').onclick = () => { panel.classList.add('open'); scrim.classList.add('open'); };
+document.getElementById('mclose').onclick = closePanel;
+scrim.onclick = closePanel;
+
+/* start on the deep link, or the cover */
+const start = SET.sheets.findIndex(s => s.no === decodeURIComponent(location.hash.slice(1)));
+show(start < 0 ? 0 : start, false);
+</script>
+</body>
+</html>

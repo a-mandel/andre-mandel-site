@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Walsh Living Set</title>
+<meta name="description" content="Walsh Residence living plan set. Title block option 4, the living HUD.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ebe9e3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Tenor+Sans&family=Nothing+You+Could+Do&display=swap">
+<style>
+:root{
+  --paper:#f6f5f1; --paper2:#ebe9e3; --ink:#1b1a18; --muted:#6c6963; --rule:rgba(27,26,24,.2); --accent:#c07a2c;
+  --u:46px;      /* px per inch, set by script; 1in in print */
+  --fl:1;        /* 1 = apply screen px floors to type, 0 = pure inches */
+  --ft:'Tenor Sans','Gill Sans','Optima',sans-serif;
+  --fs:'EB Garamond',Garamond,'Times New Roman',serif;
+  --fh:'Nothing You Could Do','Segoe Print','Bradley Hand',cursive;
+  --ease:cubic-bezier(.55,.05,.25,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--paper2);color:var(--ink);-webkit-text-size-adjust:100%}
+body{overflow:hidden;font-family:var(--fs)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+img{display:block}
+
+/* desk and stage */
+#desk{position:fixed;inset:0;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:calc(var(--u)*36);height:calc(var(--u)*24);perspective:calc(var(--u)*120);perspective-origin:0 50%}
+.sheet{position:absolute;inset:0;visibility:hidden;transform-origin:0 50%;backface-visibility:hidden}
+.sheet.on{visibility:visible;z-index:2}
+.sheet.top{z-index:3}
+.paper{position:absolute;inset:0;background:var(--paper);border-radius:calc(var(--u)*.05);
+  box-shadow:0 1px 2px rgba(27,26,24,.07),0 calc(var(--u)*.25) calc(var(--u)*.9) rgba(27,26,24,.11)}
+.shade{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(90deg,rgba(27,26,24,.02),rgba(27,26,24,.16));border-radius:inherit}
+.frame{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.frame .bd{fill:none;stroke:var(--ink);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.frame .vr{stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.frame .tk{stroke:var(--ink);stroke-opacity:.42;stroke-width:1;vector-effect:non-scaling-stroke;transition:stroke-opacity .18s,stroke .18s}
+.frame .tk.hot{stroke:var(--accent);stroke-opacity:1}
+.frame .bind{fill:var(--paper2)}
+.frame .bindl{stroke:var(--rule);stroke-width:1;vector-effect:non-scaling-stroke}
+.frame .post{fill:var(--paper);stroke:var(--ink);stroke-opacity:.45;stroke-width:1;vector-effect:non-scaling-stroke}
+.frame .posti{fill:var(--ink);fill-opacity:.4}
+.zl{position:absolute;transform:translate(-50%,-50%);font-family:var(--ft);font-size:max(calc(var(--fl)*8px),calc(var(--u)*.13));color:var(--muted);opacity:.62;letter-spacing:.06em;line-height:1;pointer-events:none;transition:color .18s,opacity .18s}
+.zl.warm{opacity:.95;color:var(--ink)}
+.zl.hot{opacity:1;color:var(--accent)}
+
+/* drawing field */
+.field{position:absolute;left:calc(var(--u)*.75);top:calc(var(--u)*.5);width:calc(var(--u)*31.25);height:calc(var(--u)*23)}
+.view{position:absolute}
+.view .box{position:absolute;inset:0;border:1px dashed rgba(27,26,24,.42);border-radius:calc(var(--u)*.24)}
+.vt{position:absolute;left:0;top:calc(100% + var(--u)*.2);display:flex;align-items:center;gap:calc(var(--u)*.16);white-space:nowrap}
+.vn{flex:none;width:max(calc(var(--fl)*20px),calc(var(--u)*.5));height:max(calc(var(--fl)*20px),calc(var(--u)*.5));border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--ft);font-size:max(calc(var(--fl)*10px),calc(var(--u)*.2));line-height:1}
+.vtt{display:flex;flex-direction:column;line-height:1.15}
+.vtt b{font-family:var(--ft);font-weight:400;text-transform:uppercase;letter-spacing:.14em;font-size:max(calc(var(--fl)*10px),calc(var(--u)*.21))}
+.vtt i{font-family:var(--fs);font-style:italic;color:var(--muted);font-size:max(calc(var(--fl)*10.5px),calc(var(--u)*.2))}
+.vfree{position:absolute;inset:0;pointer-events:none}
+.ld{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.ld path{fill:none;stroke:var(--ink);stroke-opacity:.8;stroke-width:.022px;stroke-linecap:round;stroke-dasharray:1 1;stroke-dashoffset:0}
+.note{position:absolute;font-family:var(--fh);font-size:max(calc(var(--fl)*14px),calc(var(--u)*.34));line-height:1.1;white-space:nowrap;color:var(--ink);transform:translate(0,-58%);pointer-events:none}
+.note.r{transform:translate(-100%,-58%)}
+.dot{position:absolute;width:max(calc(var(--fl)*6px),calc(var(--u)*.13));height:max(calc(var(--fl)*6px),calc(var(--u)*.13));border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);pointer-events:none}
+
+/* cover model */
+.model{position:absolute;left:calc(var(--u)*.25);top:calc(var(--u)*.25);right:calc(var(--u)*.25);bottom:calc(var(--u)*.25);border-radius:calc(var(--u)*.16);overflow:hidden;background:var(--paper)}
+.model iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+.model .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:0% 50%;opacity:.95}
+.model iframe.ready + .still,.model .still.gone{display:none}
+.cov{position:absolute;left:calc(var(--u)*.5);bottom:calc(var(--u)*.45);pointer-events:none;background:rgba(246,245,241,.9);border-radius:calc(var(--u)*.4);padding:calc(var(--u)*.12) calc(var(--u)*.3) calc(var(--u)*.12) calc(var(--u)*.14)}
+.cov .vt{position:static}
+
+/* index sheet A0.1 */
+.blk{position:absolute}
+.h2{font-family:var(--ft);text-transform:uppercase;letter-spacing:.18em;font-size:max(calc(var(--fl)*12px),calc(var(--u)*.3));line-height:1;margin:0 0 calc(var(--u)*.45)}
+.trow{display:grid;align-items:center;height:max(calc(var(--fl)*20px),calc(var(--u)*.5));font-size:max(calc(var(--fl)*11px),calc(var(--u)*.24));line-height:1.1}
+.trow.hd{font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-size:max(calc(var(--fl)*9px),calc(var(--u)*.15))}
+.trow.gp{font-family:var(--ft);text-transform:uppercase;letter-spacing:.16em;font-size:max(calc(var(--fl)*9.5px),calc(var(--u)*.17));height:max(calc(var(--fl)*24px),calc(var(--u)*.7));align-items:end;padding-bottom:calc(var(--u)*.08)}
+.si-t{grid-template-columns:calc(var(--u)*1.5) 1fr calc(var(--u)*3) calc(var(--u)*.8) calc(var(--u)*.8)}
+.si-t .n{font-family:var(--ft);letter-spacing:.06em}
+.si-t .c{text-align:center}
+.si-t.link{cursor:pointer}
+.si-t.link:hover .t{color:var(--accent)}
+.idot{display:inline-block;width:max(calc(var(--fl)*6px),calc(var(--u)*.12));height:max(calc(var(--fl)*6px),calc(var(--u)*.12));border-radius:50%;background:var(--ink)}
+.idot.new{background:var(--accent)}
+.pd-t{grid-template-columns:calc(var(--u)*4.4) 1fr}
+.pd-t .k{font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-size:max(calc(var(--fl)*9px),calc(var(--u)*.15))}
+.is-t{grid-template-columns:calc(var(--u)*1.5) calc(var(--u)*2.4) 1fr calc(var(--u)*2)}
+.legend-p{font-style:italic;color:var(--muted);font-size:max(calc(var(--fl)*11px),calc(var(--u)*.24));line-height:1.35;margin:0;max-width:calc(var(--u)*6.4)}
+
+/* title block */
+.tb{position:absolute;left:calc(var(--u)*32);top:calc(var(--u)*.5);width:calc(var(--u)*3.5);height:calc(var(--u)*23)}
+.tb .lock{position:absolute;left:calc(var(--u)*1.06);top:calc(var(--u)*.4);width:calc(var(--u)*2.2);height:auto;pointer-events:none}
+.tbin{position:absolute;inset:0;padding:calc(var(--u)*3.72) calc(var(--u)*.18) calc(var(--u)*.26) calc(var(--u)*.26);display:flex;flex-direction:column}
+.lbl{font-family:var(--ft);text-transform:uppercase;letter-spacing:.16em;color:var(--muted);font-size:max(calc(var(--fl)*9px),calc(var(--u)*.14));line-height:1.3}
+.dt{font-family:var(--fs);font-size:max(calc(var(--fl)*10px),calc(var(--u)*.2));line-height:1.24}
+.dt.it{font-style:italic;color:var(--muted)}
+.sec{margin-top:max(calc(var(--fl)*9px),calc(var(--u)*.24))}
+.sec:first-child{margin-top:0}
+.firm .nm{font-family:var(--ft);letter-spacing:.2em;font-size:max(calc(var(--fl)*10.5px),calc(var(--u)*.2));line-height:1.3}
+.pj .nm{font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;font-size:max(calc(var(--fl)*12.5px),calc(var(--u)*.27));line-height:1.2;margin-bottom:calc(var(--u)*.04)}
+.kv{display:flex;justify-content:space-between;gap:calc(var(--u)*.12)}
+.kv .v{font-style:italic;color:var(--muted);white-space:nowrap}
+.iss{display:grid;grid-template-columns:max(calc(var(--fl)*17px),calc(var(--u)*.32)) max(calc(var(--fl)*40px),calc(var(--u)*.8)) 1fr;column-gap:calc(var(--u)*.04);align-items:baseline}
+.iss .hd{font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-size:max(calc(var(--fl)*8.5px),calc(var(--u)*.13))}
+.ir{display:contents}
+.ir span{position:relative;white-space:nowrap}
+.ir .no{font-family:var(--ft);font-size:max(calc(var(--fl)*9.5px),calc(var(--u)*.17))}
+.ir .tick{position:absolute;left:calc(-1 * max(calc(var(--fl)*11px),calc(var(--u)*.22)));top:50%;width:max(calc(var(--fl)*8px),calc(var(--u)*.16));height:max(calc(var(--fl)*8px),calc(var(--u)*.16));transform:translateY(-50%);opacity:0;overflow:visible}
+.ir .tick path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.idx{position:relative;margin-top:calc(var(--u)*.05)}
+.ix{position:relative;display:grid;grid-template-columns:max(calc(var(--fl)*34px),calc(var(--u)*.64)) 1fr;align-items:center;width:100%;height:max(calc(var(--fl)*13.5px),calc(var(--u)*.27));text-align:left;color:var(--muted)}
+.ix.g0{margin-top:max(calc(var(--fl)*4px),calc(var(--u)*.1))}
+.ix:first-child{margin-top:0}
+.ix .n{font-family:var(--ft);letter-spacing:.06em;font-size:max(calc(var(--fl)*9.5px),calc(var(--u)*.16))}
+.ix .t{font-family:var(--fs);font-size:max(calc(var(--fl)*10px),calc(var(--u)*.19));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ix:hover{color:var(--ink)}
+.ix.cur{color:var(--ink)}
+.ix.cur .t{font-style:italic}
+.ix.cur::before{content:"";position:absolute;left:calc(-1 * max(calc(var(--fl)*9px),calc(var(--u)*.17)));top:50%;width:max(calc(var(--fl)*5px),calc(var(--u)*.1));height:max(calc(var(--fl)*5px),calc(var(--u)*.1));margin-top:calc(-.5 * max(calc(var(--fl)*5px),calc(var(--u)*.1)));border-radius:50%;background:var(--accent)}
+.ix:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
+.grow{flex:1 1 0;min-height:calc(var(--u)*.1)}
+.stampw{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*.1)}
+.seal{flex:none;width:max(calc(var(--fl)*62px),calc(var(--u)*1.45));height:max(calc(var(--fl)*62px),calc(var(--u)*1.45));border:1px dashed rgba(27,26,24,.38);border-radius:50%;display:grid;place-items:center;text-align:center;padding:calc(var(--u)*.18)}
+.seal span{font-style:italic;color:var(--muted);font-size:max(calc(var(--fl)*9px),calc(var(--u)*.15));line-height:1.2}
+.stt{font-family:var(--ft);text-transform:uppercase;letter-spacing:.12em;font-size:max(calc(var(--fl)*11px),calc(var(--u)*.22));line-height:1.25;margin:calc(var(--u)*.02) 0 calc(var(--u)*.1)}
+.meta{display:grid;grid-template-columns:1.7fr 1.1fr .7fr;row-gap:calc(var(--u)*.06);column-gap:calc(var(--u)*.1)}
+.meta .full{grid-column:1 / -1}
+.status{margin-top:calc(var(--u)*.14);font-family:var(--ft);text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-size:max(calc(var(--fl)*8.5px),calc(var(--u)*.14));line-height:1.3}
+.snw{margin-top:max(calc(var(--fl)*8px),calc(var(--u)*.2));display:flex;align-items:flex-end;justify-content:space-between}
+.sn{font-family:var(--ft);font-size:max(calc(var(--fl)*40px),calc(var(--u)*.98));line-height:.9;letter-spacing:0;white-space:nowrap}
+.fc{display:inline-block;width:.7em;text-align:center;transform-origin:50% 55%}
+.fc.pt{width:.3em}
+.fc.flip{animation:flap 60ms linear}
+@keyframes flap{0%{transform:scaleY(.2);opacity:.55}100%{transform:none;opacity:1}}
+.of{font-style:italic;color:var(--muted);font-size:max(calc(var(--fl)*10px),calc(var(--u)*.17));padding-bottom:calc(var(--u)*.06);text-align:right;line-height:1.2}
+.copy{margin-top:max(calc(var(--fl)*6px),calc(var(--u)*.14));font-size:max(calc(var(--fl)*9px),calc(var(--u)*.13));line-height:1.3;color:var(--muted)}
+
+/* arrival choreography, screen only; the base styles above are the final state */
+.play .ld path{animation:draw .95s var(--ease) both;animation-delay:calc(var(--d) * 1ms)}
+.play .note{animation:write .95s ease both;animation-delay:calc(var(--d) * 1ms + 820ms)}
+.play .dot{animation:land .55s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--d) * 1ms + 1700ms)}
+.play .ir span{animation:rowIn .5s ease both;animation-delay:calc(var(--d) * 1ms)}
+.play .ir.new .tick{animation:tick 1.8s ease both;animation-delay:calc(var(--d) * 1ms + 380ms)}
+.play .ix.cur::before{animation:slide .75s var(--ease) both;animation-delay:.2s}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes write{from{clip-path:inset(-30% 100% -30% -6%);opacity:.3}to{clip-path:inset(-30% -6% -30% -6%);opacity:1}}
+@keyframes land{0%{opacity:0;transform:translate(-50%,-190%) scale(.4)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(calc(var(--u)*.14))}to{opacity:1;transform:none}}
+@keyframes tick{0%{opacity:0;transform:translateY(-50%) scale(.3)}18%{opacity:1;transform:translateY(-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translateY(-50%) scale(1)}}
+@keyframes slide{from{transform:translateY(var(--from,0px))}to{transform:none}}
+
+/* live thumbnail and drafting readout */
+.thumb{position:absolute;z-index:6;pointer-events:none;border-radius:4px;background:var(--paper);box-shadow:0 1px 2px rgba(27,26,24,.12),0 10px 28px rgba(27,26,24,.16);opacity:0;transform:translateX(8px) scale(.98);transform-origin:100% 50%;transition:opacity .2s ease,transform .25s ease;overflow:hidden}
+.thumb.show{opacity:1;transform:none}
+.thumb .tpaper{position:absolute;left:0;top:0;width:calc(var(--u)*36);height:calc(var(--u)*24)}
+.thumb .tpaper .paper{box-shadow:none}
+.thumb .cap{position:absolute;left:8px;bottom:6px;font-family:var(--ft);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:rgba(246,245,241,.9);padding:2px 5px;border-radius:2px}
+.caret{position:absolute;z-index:5;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .2s}
+.caret.show{opacity:1}
+#cx{border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--accent);transform:translateX(-50%)}
+#cy{border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--accent);transform:translateY(-50%)}
+
+.ctrl{position:fixed;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:2px;padding:4px 6px;border-radius:999px;background:rgba(246,245,241,.92);box-shadow:0 1px 2px rgba(27,26,24,.1),0 4px 14px rgba(27,26,24,.08);font-family:var(--ft);font-size:11px;letter-spacing:.14em;text-transform:uppercase;z-index:20;white-space:nowrap}
+.ctrl button{height:26px;min-width:28px;padding:0 9px;border-radius:999px;color:var(--ink)}
+.ctrl button:hover{background:var(--paper2)}
+.ctrl button:focus-visible{outline:1px solid var(--accent)}
+.ctrl .cn{min-width:48px;text-align:center}
+.ctrl .rd{min-width:74px;text-align:center;color:var(--muted);font-size:10px}
+.ctrl .rd b{font-weight:400;color:var(--accent)}
+.ctrl .sep{width:1px;height:14px;background:var(--rule);margin:0 3px}
+.strip,.drawer,.scrim{display:none}
+
+/* mobile: drawing fills the screen, title block becomes a bottom strip */
+@media screen and (max-width:760px), screen and (max-aspect-ratio:1/1) and (max-width:1100px){
+  :root{--sh:64px}
+  #stage{left:0 !important;top:0 !important;width:100vw;height:calc(100dvh - var(--sh) - env(safe-area-inset-bottom,0px));perspective:1400px}
+  .paper{border-radius:0;box-shadow:none}
+  .frame,.tb,.zl,.ctrl,.caret,.thumb{display:none !important}
+  .field{left:0;top:0;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:18px 16px 36px}
+  .view{position:relative !important;left:auto !important;top:auto !important;width:100% !important;height:auto !important;aspect-ratio:var(--ar);min-height:150px;margin-bottom:66px}
+  .vfree{position:relative;inset:auto;margin:-40px 0 32px}
+  .vfree .ld,.vfree .dot{display:none}
+  .vfree .note{position:static;transform:none;white-space:normal;max-width:none}
+  .note{white-space:normal;font-size:15px;width:max-content;max-width:calc(100% - var(--nx) * 1% - 10px)}
+  .note.r{max-width:calc(var(--nx) * 1% - 10px);text-align:right}
+  .view{max-height:62vh}
+  .blk{position:relative !important;left:auto !important;top:auto !important;width:auto !important;margin-bottom:34px}
+  .si-t{grid-template-columns:44px 1fr 92px 16px 16px}
+  .pd-t{grid-template-columns:118px 1fr}
+  .is-t{grid-template-columns:40px 64px 1fr 58px}
+  .trow{height:auto;min-height:26px;padding:3px 0}
+  .legend-demo{position:relative !important;width:100% !important;height:150px !important}
+  .sheet[data-kind="model"] .field{padding:0;overflow:hidden}
+  .model{inset:0;border-radius:0}
+  .cov{display:none}
+  .strip{display:flex;position:fixed;left:0;right:0;bottom:0;height:calc(var(--sh) + env(safe-area-inset-bottom,0px));padding:0 12px env(safe-area-inset-bottom,0px);align-items:center;gap:12px;background:var(--paper);border-top:1px solid var(--rule);z-index:30}
+  .strip img{height:40px;width:auto;flex:none}
+  .strip .sn{font-size:24px;flex:none}
+  .strip .stl{flex:1;min-width:0;font-style:italic;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+  .strip .ib{flex:none;font-family:var(--ft);font-size:11px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--rule);border-radius:999px;padding:8px 13px}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(27,26,24,.14);opacity:0;pointer-events:none;transition:opacity .25s;z-index:31}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .drawer{display:block;position:fixed;left:0;right:0;bottom:0;max-height:80dvh;overflow-y:auto;background:var(--paper);z-index:32;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(27,26,24,.14);padding:18px 18px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .32s var(--ease)}
+  .drawer.show{transform:none}
+  .drawer .dg{margin:16px 0 4px}
+  .drawer .dr{display:grid;grid-template-columns:52px 1fr;align-items:center;width:100%;min-height:40px;text-align:left;border-bottom:1px solid rgba(27,26,24,.08)}
+  .drawer .dr .n{font-family:var(--ft);font-size:13px;letter-spacing:.06em}
+  .drawer .dr .t{font-size:17px}
+  .drawer .dr.cur .t{font-style:italic}
+  .drawer .dr.cur .n{color:var(--accent)}
+  .drawer .dp{margin-top:22px;font-size:15px;line-height:1.4}
+  .drawer .dp .lbl{margin:14px 0 2px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+
+/* print: every sheet at true size, final static state */
+@media print{
+  @page{size:36in 24in;margin:0}
+  :root{--u:96px !important;--fl:0 !important}
+  html,body{height:auto;overflow:visible;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #desk{position:static;overflow:visible}
+  #stage{position:static !important;width:3456px;height:auto;perspective:none}
+  .sheet{position:relative;inset:auto;width:3456px;height:2304px;visibility:visible !important;transform:none !important;opacity:1 !important;break-after:page;page-break-after:always;overflow:hidden}
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+  .paper{box-shadow:none;border-radius:0}
+  .ctrl,.strip,.drawer,.scrim,.thumb,.caret,.shade{display:none !important}
+  .model iframe{display:none !important}
+  .model .still{display:block !important;opacity:1}
+  .zl{opacity:.62 !important;color:var(--muted) !important}
+  .ld path{stroke-width:.014px !important}
+  .frame .tk{stroke:var(--ink) !important;stroke-opacity:.42 !important}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<div id="desk">
+  <div id="stage" aria-live="polite"></div>
+</div>
+<nav class="ctrl" id="ctrl" aria-label="Sheet controls">
+  <button id="prev" aria-label="Previous sheet">&#8249;</button>
+  <span class="cn" id="cn">A0.0</span>
+  <button id="next" aria-label="Next sheet">&#8250;</button>
+  <span class="sep"></span>
+  <span class="rd" id="rd" aria-hidden="true">Zone <b>&#183;</b></span>
+  <span class="sep"></span>
+  <button id="print">Print</button>
+</nav>
+<div class="strip" id="strip">
+  <img id="smark" alt="André Mandel" width="236" height="300">
+  <span class="sn" id="ssn" aria-live="polite"></span>
+  <span class="stl" id="stl"></span>
+  <button class="ib" id="ib" aria-expanded="false" aria-controls="drawer">Index</button>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer" role="dialog" aria-label="Sheet index"></div>
+
+<script>
+/* ================================================================
+   THE SET. One object holds everything a later agent needs to extend.
+   Views and sheet notes are in sheet inches (origin top left of the
+   36 x 24 sheet). View notes are fractions of their view box.
+   Note anchor a:'l' = text starts at t, a:'r' = text ends at t.
+   ================================================================ */
+const SET = {
+  firm: { name: 'ANDRÉ MANDEL', line: 'Residential design', addr: ['40 Edith St #4', 'San Francisco CA 94133'], phone: '510.459.7686', email: 'andre.mandel@gmail.com' },
+  project: { name: 'Walsh Residence', site: 'Lahontan Lot 235', address: '8154 Lahontan Drive, Truckee CA', apn: '108 160 012 000', zoning: 'RS PD 1.7', county: 'Placer County', owner: 'Dustin Walsh', ownerCo: 'Elevated Developers' },
+  permits: [ { k: 'Lahontan design review (LCC)', tb: 'LCC design review', v: 'pending' }, { k: 'Placer County building permit', tb: 'Placer building permit', v: 'pending' } ],
+  fire: 'Very High FHSZ · Chapter 7A',
+  // oldest first here; the title block shows newest first
+  issuances: [ { no: 1, date: '9/28/26', for: 'Feasibility FA2' }, { no: 2, date: '9/30/26', for: 'Living set, cartoon' } ],
+  aor: { label: 'Architect of record', name: 'Joseph Benveniste, AIA', note: 'Stamp at design review submittal' },
+  date: '9/30/26', drawnBy: 'AM', status: 'Feasibility · not for construction',
+  copy: '© 2026 André Mandel. Drawings are instruments of service.',
+  model: { src: '../../?sheet', still: '../../preview-house.jpg' },
+  marks: { lockup: '../../marks/am10_lockup.webp', mark: '../../marks/am10_mark.webp' },
+  groups: ['General', 'Feasibility', 'Architectural', 'Landscape'],
+  sheets: [
+    { id: 'A0.0', group: 'General', title: 'Cover · the site', short: 'Cover · the site', scale: 'Live model', kind: 'model', issued: [2] },
+    { id: 'A0.1', group: 'General', title: 'Sheet index and project data', short: 'Index and project data', scale: 'None', kind: 'index', issued: [2],
+      notes: [ { text: 'LCC meets the 2nd Wednesday', t: [24.4, 9.1], p: [26.1, 6.95], a: 'l' } ] },
+    { id: 'F1.0', group: 'Feasibility', title: 'Regulatory report', scale: 'As noted', issued: [2],
+      views: [ { t: 'Zoning and setbacks', s: 'Diagram', x: 1.4, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Height envelope', s: 'Diagram', x: 16.9, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Approvals path', s: 'Not to scale', x: 1.4, y: 12.2, w: 29.9, h: 9.2 } ],
+      notes: [ { v: 1, text: 'every roof under 30 ft', t: [.52, .3], p: [.36, .56], a: 'l' }, { v: 2, text: 'LCC meets the 2nd Wednesday', t: [.62, .32], p: [.5, .6], a: 'l' } ] },
+    { id: 'F2.0', group: 'Feasibility', title: 'Budget framework', scale: 'As noted', issued: [2],
+      views: [ { t: 'Cost by assembly', s: 'Schedule', x: 1.4, y: 1.2, w: 19.6, h: 20.2 }, { t: 'Allowances', s: 'Schedule', x: 22.4, y: 1.2, w: 8.9, h: 9.2 }, { t: 'Soft costs', s: 'Schedule', x: 22.4, y: 12.2, w: 8.9, h: 9.2 } ],
+      notes: [ { v: 0, text: 'unit rates by assembly', t: [.5, .24], p: [.34, .42], a: 'l' } ] },
+    { id: 'F3.0', group: 'Feasibility', title: 'Preliminary timeline', scale: 'As noted', issued: [2],
+      views: [ { t: 'Design review and permit path', s: 'Not to scale', x: 1.4, y: 1.2, w: 29.9, h: 10.4 }, { t: 'Milestones', s: 'Schedule', x: 1.4, y: 13.6, w: 14.4, h: 7.8 }, { t: 'Review calendar', s: 'Schedule', x: 16.9, y: 13.6, w: 14.4, h: 7.8 } ],
+      notes: [ { v: 0, text: 'spring groundbreaking', t: [.74, .3], p: [.88, .56], a: 'r' }, { v: 2, text: 'LCC meets the 2nd Wednesday', t: [.42, .36], p: [.3, .66], a: 'l' } ] },
+    { id: 'F4.0', group: 'Feasibility', title: 'Outline specifications', scale: 'None', issued: [2],
+      views: [ { t: 'Structure', s: 'Outline', x: 1.4, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Envelope', s: 'Outline', x: 16.9, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Interiors', s: 'Outline', x: 1.4, y: 12.2, w: 14.4, h: 9.2 }, { t: 'Systems', s: 'Outline', x: 16.9, y: 12.2, w: 14.4, h: 9.2 } ],
+      notes: [ { v: 1, text: 'cedar, dark steel, board form concrete', t: [.22, .34], p: [.12, .62], a: 'l' } ] },
+    { id: 'A1.0', group: 'Architectural', title: 'Site plan', scale: '1/8 in = 1 ft', issued: [2],
+      views: [ { t: 'Site plan', s: '1/8 in = 1 ft', x: 1.4, y: 1.2, w: 21.6, h: 20.2 }, { t: 'Vicinity', s: 'Not to scale', x: 24.2, y: 1.2, w: 7.1, h: 5.4 }, { t: 'Site data', s: 'Schedule', x: 24.2, y: 8.6, w: 7.1, h: 12.8 } ],
+      notes: [ { v: 0, text: 'keep the signature tree', t: [.6, .26], p: [.47, .46], a: 'l' }, { v: 0, text: 'approach from the west', t: [.3, .8], p: [.08, .6], a: 'l' } ] },
+    { id: 'A2.1', group: 'Architectural', title: 'Main level plan', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'Main level plan', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 23.2, h: 20.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.0, y: 1.2, w: 5.3, h: 4.2 }, { t: 'Plan notes', s: 'General', x: 26.0, y: 7.4, w: 5.3, h: 14.0 } ],
+      notes: [ { v: 0, text: 'the court wraps the tree', t: [.6, .2], p: [.48, .42], a: 'l' }, { v: 0, text: 'living room tip, all glass', t: [.6, .86], p: [.8, .64], a: 'r' } ] },
+    { id: 'A2.2', group: 'Architectural', title: 'Lower level plan', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'Lower level plan', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 23.2, h: 20.2 }, { t: 'Key plan', s: 'Not to scale', x: 26.0, y: 1.2, w: 5.3, h: 4.2 }, { t: 'Plan notes', s: 'General', x: 26.0, y: 7.4, w: 5.3, h: 14.0 } ],
+      notes: [ { v: 0, text: 'flex room, slightly buried', t: [.44, .8], p: [.64, .6], a: 'r' }, { v: 0, text: 'one step down with the land', t: [.58, .2], p: [.72, .38], a: 'r' } ] },
+    { id: 'A2.3', group: 'Architectural', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'Roof plan', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 23.2, h: 20.2 }, { t: 'Roof heights', s: 'Schedule', x: 26.0, y: 1.2, w: 5.3, h: 20.2 } ],
+      notes: [ { v: 0, text: 'every roof under 30 ft', t: [.58, .2], p: [.45, .4], a: 'l' }, { v: 0, text: 'ribbon roof at 2:12', t: [.4, .84], p: [.58, .62], a: 'r' } ] },
+    { id: 'A3.1', group: 'Architectural', title: 'Elevations west and north', short: 'Elevations west, north', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'West elevation', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 29.9, h: 9.2 }, { t: 'North elevation', s: '3/16 in = 1 ft', x: 1.4, y: 12.2, w: 29.9, h: 9.2 } ],
+      notes: [ { v: 0, text: 'approach from the west', t: [.62, .26], p: [.5, .56], a: 'l' }, { v: 1, text: 'every roof under 30 ft', t: [.7, .24], p: [.58, .52], a: 'l' } ] },
+    { id: 'A3.2', group: 'Architectural', title: 'Elevations east and south', short: 'Elevations east, south', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'East elevation', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 29.9, h: 9.2 }, { t: 'South elevation', s: '3/16 in = 1 ft', x: 1.4, y: 12.2, w: 29.9, h: 9.2 } ],
+      notes: [ { v: 0, text: 'late light on the terrace', t: [.34, .28], p: [.46, .56], a: 'r' } ] },
+    { id: 'A4.1', group: 'Architectural', title: 'Building sections', scale: '3/16 in = 1 ft', issued: [2],
+      views: [ { t: 'Section through living', s: '3/16 in = 1 ft', x: 1.4, y: 1.2, w: 29.9, h: 5.8 }, { t: 'Section through bridge', s: '3/16 in = 1 ft', x: 1.4, y: 8.6, w: 29.9, h: 5.8 }, { t: 'Section through suites', s: '3/16 in = 1 ft', x: 1.4, y: 16.0, w: 29.9, h: 5.8 } ],
+      notes: [ { v: 0, text: 'clerestory at the fold', t: [.6, .3], p: [.5, .62], a: 'l' }, { v: 2, text: 'L2 floor 12 ft over L1', t: [.3, .3], p: [.42, .62], a: 'r' } ] },
+    { id: 'A5.1', group: 'Architectural', title: 'Exterior materials and colors', short: 'Materials and colors', scale: 'None', issued: [2],
+      views: [ { t: 'Materials board', s: 'Samples', x: 1.4, y: 1.2, w: 18.4, h: 20.2 }, { t: 'Colors', s: 'Samples', x: 21.2, y: 1.2, w: 10.1, h: 9.2 }, { t: 'Glazing and metals', s: 'Samples', x: 21.2, y: 12.2, w: 10.1, h: 9.2 } ],
+      notes: [ { v: 0, text: 'cedar, dark steel, board form concrete', t: [.3, .5], p: [.18, .3], a: 'l' } ] },
+    { id: 'A6.1', group: 'Architectural', title: 'Wildfire hardening · Chapter 7A', short: 'Wildfire hardening', scale: 'As noted', issued: [2],
+      views: [ { t: 'Vents and eaves', s: 'Details', x: 1.4, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Glazing and doors', s: 'Details', x: 16.9, y: 1.2, w: 14.4, h: 9.2 }, { t: 'Decks and terraces', s: 'Details', x: 1.4, y: 12.2, w: 14.4, h: 9.2 }, { t: 'Defensible space', s: 'Diagram', x: 16.9, y: 12.2, w: 14.4, h: 9.2 } ],
+      notes: [ { v: 0, text: 'Very High FHSZ, full 7A', t: [.34, .3], p: [.2, .58], a: 'l' }, { v: 3, text: 'keep the signature tree', t: [.62, .3], p: [.5, .6], a: 'l' } ] },
+    { id: 'A9.1', group: 'Architectural', title: 'Perspectives', scale: 'None', issued: [2],
+      views: [ { t: 'Arrival from the west', s: 'Perspective', x: 1.4, y: 1.2, w: 19.6, h: 20.2 }, { t: 'Rear court', s: 'Perspective', x: 22.4, y: 1.2, w: 8.9, h: 9.2 }, { t: 'Living room tip', s: 'Perspective', x: 22.4, y: 12.2, w: 8.9, h: 9.2 } ],
+      notes: [ { v: 0, text: 'approach from the west', t: [.42, .24], p: [.28, .46], a: 'l' } ] },
+    { id: 'L1.0', group: 'Landscape', title: 'Landscape concept', scale: '1/8 in = 1 ft', issued: [2],
+      views: [ { t: 'Landscape concept', s: '1/8 in = 1 ft', x: 1.4, y: 1.2, w: 21.6, h: 20.2 }, { t: 'Plant palette', s: 'Schedule', x: 24.2, y: 1.2, w: 7.1, h: 20.2 } ],
+      notes: [ { v: 0, text: 'keep the signature tree', t: [.6, .26], p: [.47, .46], a: 'l' }, { v: 0, text: 'terraces step with the land', t: [.56, .84], p: [.74, .66], a: 'r' } ] }
+  ]
+};
+
+/* ================================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const U = n => `calc(var(--u) * ${+n.toFixed(4)})`;
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+const MQ = matchMedia('screen and (max-width:760px), screen and (max-aspect-ratio:1/1) and (max-width:1100px)');
+const SHEETS = SET.sheets;
+const N = SHEETS.length;
+const ZL = 'ABCDEFGHJKLMNPQRSTUVWX'; // zone letters, I and O skipped
+
+/* border geometry: the upper right corner is cut on the roof stroke angle */
+const K = 0.738;                     // dx/dy of the roof stroke (53.6 degrees from horizontal)
+const LOCK = { x: 32.86, y: 0.84, w: 2.14 };          // lockup in sheet inches
+const LK = LOCK.w / 357;                               // inches per lockup px
+const GAP = 0.34;                                      // horizontal gap from stroke envelope to cut
+const aCut = LOCK.x + 23 * LK - K * LOCK.y + GAP;      // cut line X = aCut + K * Y
+const V1 = [aCut + K * 0.5, 0.5], V2 = [35.5, (35.5 - aCut) / K];
+
+function borderPath() {
+  const R = 0.3, r = 0.38, dx = K / Math.hypot(K, 1), dy = 1 / Math.hypot(K, 1);
+  const f = n => +n.toFixed(4);
+  return `M${f(0.75 + R)} 0.5 H${f(V1[0] - r)} Q${f(V1[0])} 0.5 ${f(V1[0] + r * dx)} ${f(0.5 + r * dy)} ` +
+    `L${f(V2[0] - r * dx)} ${f(V2[1] - r * dy)} Q35.5 ${f(V2[1])} 35.5 ${f(V2[1] + r)} ` +
+    `V${23.5 - R} Q35.5 23.5 ${35.5 - R} 23.5 H${0.75 + R} Q0.75 23.5 0.75 ${23.5 - R} V${0.5 + R} Q0.75 0.5 ${0.75 + R} 0.5 Z`;
+}
+
+function frameSVG() {
+  let t = '';
+  for (let x = 1; x <= 35; x++) {
+    const L = x % 6 === 0 ? 0.3 : 0.13;
+    if (x < V1[0] - 0.4) t += `<line class="tk" data-ax="x" data-v="${x}" x1="${x}" y1="${0.5 - L}" x2="${x}" y2="0.5"/>`;
+    t += `<line class="tk" data-ax="x" data-v="${x}" x1="${x}" y1="23.5" x2="${x}" y2="${23.5 + L}"/>`;
+  }
+  for (let y = 1; y <= 23; y++) {
+    const L = y % 6 === 0 ? 0.3 : 0.13;
+    t += `<line class="tk" data-ax="y" data-v="${y}" x1="${0.75 - L}" y1="${y}" x2="0.75" y2="${y}"/>`;
+    if (y > V2[1] + 0.4) t += `<line class="tk" data-ax="y" data-v="${y}" x1="35.5" y1="${y}" x2="${35.5 + L}" y2="${y}"/>`;
+  }
+  const posts = [4, 12, 20].map(y => `<circle class="post" cx="0.22" cy="${y}" r="0.11"/><circle class="posti" cx="0.22" cy="${y}" r="0.035"/>`).join('');
+  return `<svg class="frame" viewBox="0 0 36 24" preserveAspectRatio="none" aria-hidden="true">
+    <rect class="bind" x="0" y="0" width="0.44" height="24"/><line class="bindl" x1="0.44" y1="0" x2="0.44" y2="24"/>${posts}
+    <path class="bd" d="${borderPath()}"/>
+    <line class="vr" x1="32" y1="0.5" x2="32" y2="23.5"/>
+    ${t}</svg>`;
+}
+
+function zoneLabels() {
+  let h = '';
+  for (let n = 1; n <= 34; n++) {
+    if (n + 1 < V1[0] - 0.4) h += `<span class="zl" data-ax="x" data-v="${n}" style="left:${U(n + 0.5)};top:${U(0.27)}">${n}</span>`;
+    h += `<span class="zl" data-ax="x" data-v="${n}" style="left:${U(n + 0.5)};top:${U(23.75)}">${n}</span>`;
+  }
+  for (let k = 1; k <= 22; k++) {
+    h += `<span class="zl" data-ax="y" data-v="${k}" style="left:${U(0.6)};top:${U(k + 0.5)}">${ZL[k - 1]}</span>`;
+    if (k > V2[1] + 0.4) h += `<span class="zl" data-ax="y" data-v="${k}" style="left:${U(35.76)};top:${U(k + 0.5)}">${ZL[k - 1]}</span>`;
+  }
+  return h;
+}
+
+/* a note with a leader, inside a box of size w x h inches, positions as fractions */
+function noteHTML(n, w, h, d) {
+  const gx = 0.14 / w;                                   // leader gap from the text, as a fraction
+  const sx = n.a === 'r' ? n.t[0] + gx : n.t[0] - gx, sy = n.t[1];
+  const [px, py] = n.p;
+  const cx = sx + (px - sx) * 0.18, cy = sy + (py - sy) * 0.85;
+  const P = v => +(v * 100).toFixed(3), X = v => +(v * w).toFixed(4), Y = v => +(v * h).toFixed(4);
+  return `<svg class="ld" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true" style="--d:${d}"><path pathLength="1" d="M${X(sx)} ${Y(sy)} Q${X(cx)} ${Y(cy)} ${X(px)} ${Y(py)}"/></svg>
+    <span class="note${n.a === 'r' ? ' r' : ''}" style="left:${P(n.t[0])}%;top:${P(n.t[1])}%;--d:${d};--nx:${P(n.t[0])}">${esc(n.text)}</span>
+    <span class="dot" style="left:${P(px)}%;top:${P(py)}%;--d:${d}"></span>`;
+}
+
+function viewTitle(num, t, s) {
+  return `<div class="vt"><span class="vn">${num}</span><span class="vtt"><b>${esc(t)}</b><i>${esc(s)}</i></span></div>`;
+}
+
+function fieldCartoon(sh) {
+  const views = sh.views || [];
+  let d = 0, h = '';
+  views.forEach((v, i) => {
+    const notes = (sh.notes || []).filter(n => n.v === i);
+    let nh = '';
+    notes.forEach(n => { nh += noteHTML(n, v.w, v.h, d); d += 520; });
+    h += `<div class="view" style="left:${U(v.x - 0.75)};top:${U(v.y - 0.5)};width:${U(v.w)};height:${U(v.h)};--ar:${(v.w / v.h).toFixed(3)}">
+      <div class="box"></div>${nh}${viewTitle(i + 1, v.t, v.s)}</div>`;
+  });
+  return h;
+}
+
+function sheetNotesFree(sh) {
+  const notes = (sh.notes || []).filter(n => n.v === undefined);
+  if (!notes.length) return '';
+  const W = 31.25, H = 23;
+  let d = 0;
+  return `<div class="vfree">${notes.map(n => {
+    const m = { ...n, t: [(n.t[0] - 0.75) / W, (n.t[1] - 0.5) / H], p: [(n.p[0] - 0.75) / W, (n.p[1] - 0.5) / H] };
+    const s = noteHTML(m, W, H, d); d += 520; return s;
+  }).join('')}</div>`;
+}
+
+function fieldModel() {
+  return `<div class="model">
+    <iframe data-src="${esc(SET.model.src)}" title="Walsh Residence live model" allow="fullscreen; xr-spatial-tracking; gyroscope; accelerometer" loading="eager"></iframe>
+    <img class="still" src="${esc(SET.model.still)}" alt="Walsh Residence sketch model" loading="lazy">
+    <div class="cov">${viewTitle(1, 'The site', 'Live model · drag to orbit')}</div>
+  </div>`;
+}
+
+function fieldIndex(sh) {
+  const P = SET.project, iss = SET.issuances, last = iss[iss.length - 1].no;
+  const B = (x, y, w, inner, cls = '') => `<div class="blk ${cls}" style="left:${U(x - 0.75)};top:${U(y - 0.5)};width:${U(w)}">${inner}</div>`;
+  let rows = `<div class="trow si-t hd"><span>No.</span><span>Sheet</span><span>Scale</span>${iss.map(i => `<span class="c">${i.no}</span>`).join('')}</div>`;
+  SET.groups.forEach(g => {
+    const gs = SHEETS.filter(s => s.group === g);
+    if (!gs.length) return;
+    rows += `<div class="trow si-t gp"><span style="grid-column:1 / -1">${esc(g)}</span></div>`;
+    gs.forEach(s => {
+      rows += `<div class="trow si-t link" data-go="${s.id}" role="link" tabindex="0"><span class="n">${s.id}</span><span class="t">${esc(s.title)}</span><span class="dt it" style="font-size:inherit">${esc(s.scale)}</span>${iss.map(i => `<span class="c">${(s.issued || []).includes(i.no) ? `<i class="idot${i.no === last ? ' new' : ''}"></i>` : ''}</span>`).join('')}</div>`;
+    });
+  });
+  const pd = [
+    ['Project', P.name], ['Site', P.site], ['Address', P.address], ['APN', P.apn], ['Zoning', P.zoning], ['Jurisdiction', P.county],
+    ['Owner', `${P.owner}, ${P.ownerCo}`], ['Designer', 'André Mandel'], ['Architect of record', SET.aor.name],
+    ['Design review', `Lahontan (LCC) · no. pending`], ['Building permit', `Placer County · no. pending`], ['Fire zone', SET.fire], ['Status', SET.status]
+  ].map(([k, v]) => `<div class="trow pd-t"><span class="k">${esc(k)}</span><span>${esc(v)}</span></div>`).join('');
+  const isr = `<div class="trow is-t hd"><span>No.</span><span>Date</span><span>Issued for</span><span>Sheets</span></div>` +
+    iss.slice().reverse().map(i => `<div class="trow is-t"><span class="n" style="font-family:var(--ft)">${i.no}</span><span>${esc(i.date)}</span><span>${esc(i.for)}</span><span>${SHEETS.filter(s => (s.issued || []).includes(i.no)).length || ''}</span></div>`).join('');
+  const legendNote = { text: 'a note in hand', t: [.62, .3], p: [.46, .62], a: 'l' };
+  const legend = `<div class="legend-demo view" style="position:relative;width:${U(6.2)};height:${U(4)};--ar:1.55;margin-bottom:${U(1.3)}"><div class="box"></div>${noteHTML(legendNote, 6.2, 4, 400)}${viewTitle(1, 'View title', 'Scale')}</div>
+    <p class="legend-p">A cartoon set. Each dashed box holds a view to come; handwritten notes carry design intent. The title block keeps the set, the issuances and the index in one place.</p>`;
+  return B(1.6, 1.4, 14.4, `<h2 class="h2">Sheet index</h2>${rows}`) +
+    B(1.6, 16.4, 14.4, `<h2 class="h2">Issuances</h2>${isr}`) +
+    B(18.2, 1.4, 13.0, `<h2 class="h2">Project data</h2>${pd}`) +
+    B(18.2, 11.6, 13.0, `<h2 class="h2">Drawing conventions</h2>${legend}`) +
+    sheetNotesFree(sh);
+}
+
+function titleBlock(sh, i) {
+  const F = SET.firm, P = SET.project, iss = SET.issuances;
+  const issRows = iss.slice().reverse().map((r, k, arr) => {
+    const d = (arr.length - 1 - k) * 170 + 260;     // oldest (bottom) first, newest (top) last
+    return `<div class="ir${k === 0 ? ' new' : ''}" style="--d:${d}"><span class="no">${k === 0 ? '<svg class="tick" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5.5 L4 8.5 L9 1.5"/></svg>' : ''}${r.no}</span><span class="dt">${esc(r.date)}</span><span class="dt">${esc(r.for)}</span></div>`;
+  }).join('');
+  let lastG = null;
+  const idx = SHEETS.map((s, k) => {
+    const g0 = s.group !== lastG && k > 0; lastG = s.group;
+    return `<button class="ix${g0 ? ' g0' : ''}${k === i ? ' cur' : ''}" data-go="${s.id}" aria-current="${k === i ? 'page' : 'false'}"><span class="n">${s.id}</span><span class="t">${esc(s.short || s.title)}</span></button>`;
+  }).join('');
+  const snCells = s => [...s].map(c => `<span class="fc${c === '.' ? ' pt' : ''}">${c}</span>`).join('');
+  return `<aside class="tb" aria-label="Title block">
+    <img class="lock" src="${esc(SET.marks.lockup)}" alt="André Mandel" width="357" height="520" style="left:${U(LOCK.x - 32)};top:${U(LOCK.y - 0.5)};width:${U(LOCK.w)}">
+    <div class="tbin">
+      <div class="sec firm"><div class="nm">${esc(F.name)}</div><div class="dt it">${esc(F.line)}</div><div class="dt">${F.addr.map(esc).join('<br>')}<br>${esc(F.phone)}<br>${esc(F.email)}</div></div>
+      <div class="sec pj"><div class="nm">${esc(P.name)}</div><div class="dt">${esc(P.site)}<br>${P.address.split(', ').map(esc).join('<br>')}<br>APN ${esc(P.apn)}<br>${esc(P.zoning)} · ${esc(P.county)}</div><div class="dt it">Owner · ${esc(P.owner)}<br>${esc(P.ownerCo)}</div></div>
+      <div class="sec ag"><div class="lbl">Agency and permits</div>${SET.permits.map(p => `<div class="dt kv"><span>${esc(p.tb || p.k)}</span><span class="v">${esc(p.v)}</span></div>`).join('')}<div class="dt">${esc(SET.fire)}</div></div>
+      <div class="sec"><div class="lbl">Issuances</div><div class="iss"><span class="hd">No</span><span class="hd">Date</span><span class="hd">Issued for</span>${issRows}</div></div>
+      <div class="sec"><div class="lbl">Sheets</div><div class="idx">${idx}</div></div>
+      <div class="grow"></div>
+      <div class="sec stamp stampw"><div><div class="lbl">${esc(SET.aor.label)}</div><div class="dt">${esc(SET.aor.name.replace(', AIA', ','))}<br>AIA</div></div><div class="seal"><span>${esc(SET.aor.note)}</span></div></div>
+      <div class="sec si"><div class="lbl">Sheet title</div><div class="stt">${esc(sh.title)}</div>
+        <div class="meta"><div><div class="lbl">Scale</div><div class="dt">${esc(sh.scale)}</div></div><div><div class="lbl">Date</div><div class="dt">${esc(SET.date)}</div></div><div><div class="lbl">Drawn</div><div class="dt">${esc(SET.drawnBy)}</div></div></div>
+        <div class="status">${esc(SET.status)}</div></div>
+      <div class="snw"><div><div class="sn" data-sn="${sh.id}" aria-label="Sheet ${sh.id}">${snCells(sh.id)}</div></div><div class="of"><span class="lbl">Sheet</span><br>${i + 1} of ${N}</div></div>
+      <div class="copy">${esc(SET.copy)}</div>
+    </div></aside>`;
+}
+
+function buildSheet(sh, i) {
+  const kind = sh.kind || 'cartoon';
+  const field = kind === 'model' ? fieldModel() : kind === 'index' ? fieldIndex(sh) : fieldCartoon(sh) + sheetNotesFree(sh);
+  const el = document.createElement('section');
+  el.className = 'sheet';
+  el.dataset.id = sh.id; el.dataset.kind = kind;
+  el.setAttribute('aria-label', `${sh.id} ${sh.title}`);
+  el.innerHTML = `<div class="paper">${frameSVG()}${zoneLabels()}<div class="field">${field}</div>${titleBlock(sh, i)}<div class="shade"></div></div>`;
+  return el;
+}
+
+/* ================================================================ build */
+const stage = $('#stage');
+SHEETS.forEach((s, i) => stage.appendChild(buildSheet(s, i)));
+const els = [...stage.children];
+stage.insertAdjacentHTML('beforeend', '<div class="caret" id="cx"></div><div class="caret" id="cy"></div><div class="thumb" id="thumb" aria-hidden="true"></div>');
+$('#smark').src = SET.marks.mark;
+
+// mobile drawer
+(function buildDrawer() {
+  const P = SET.project;
+  let h = `<div class="lbl">Sheets · ${N}</div>`;
+  SET.groups.forEach(g => {
+    h += `<div class="lbl dg">${esc(g)}</div>`;
+    SHEETS.filter(s => s.group === g).forEach(s => { h += `<button class="dr" data-go="${s.id}"><span class="n">${s.id}</span><span class="t">${esc(s.title)}</span></button>`; });
+  });
+  h += `<div class="dp"><div class="lbl">Project</div>${esc(P.name)} · ${esc(P.site)}<br>${esc(P.address)}<br>APN ${esc(P.apn)} · ${esc(P.zoning)}<div class="lbl">Issuances</div>${SET.issuances.slice().reverse().map(r => `${r.no} · ${esc(r.date)} · ${esc(r.for)}`).join('<br>')}<div class="lbl">Status</div>${esc(SET.status)}<div class="lbl">Architect of record</div>${esc(SET.aor.name)}</div>`;
+  $('#drawer').innerHTML = h;
+})();
+
+/* ================================================================ layout */
+let mob = MQ.matches, u = 46;
+const root = document.documentElement;
+var layout = function () {
+  mob = MQ.matches;
+  const W = innerWidth, H = innerHeight;
+  if (mob) {
+    u = 14; root.style.setProperty('--u', u + 'px');
+    stage.style.left = stage.style.top = '0px';
+    return;
+  }
+  const ctrlH = 50;
+  u = Math.max(8, Math.min((W - 28) / 36, (H - ctrlH - 14) / 24));
+  u = Math.floor(u * 100) / 100;
+  root.style.setProperty('--u', u + 'px');
+  const sw = 36 * u, shh = 24 * u;
+  const sx = Math.round((W - sw) / 2), sy = Math.round(Math.max(8, (H - ctrlH - shh) / 2));
+  stage.style.left = sx + 'px'; stage.style.top = sy + 'px';
+  const below = H - (sy + shh);
+  $('#ctrl').style.bottom = Math.max(6, Math.round((below - 34) / 2)) + 'px';
+}
+const _layout = layout;
+layout = function () { _layout(); hairlines(); };
+// leaders are drawn in view inches; keep them one screen pixel wide at any scale
+function hairlines(scope) {
+  (scope || stage).querySelectorAll('.ld').forEach(sv => {
+    const vb = sv.viewBox.baseVal, r = sv.getBoundingClientRect();
+    if (!vb || !vb.width || !r.width) return;
+    sv.querySelector('path').style.strokeWidth = (1.05 * vb.width / r.width).toFixed(4) + 'px';
+  });
+}
+addEventListener('resize', layout);
+MQ.addEventListener ? MQ.addEventListener('change', layout) : MQ.addListener(layout);
+layout();
+
+/* ================================================================ split flap */
+const FLAP = ' .0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+const flapTimers = new Map();
+function setCells(el, str) {
+  el.innerHTML = [...str].map(c => `<span class="fc${c === '.' ? ' pt' : ''}">${c}</span>`).join('');
+}
+function flap(el, from, to) {
+  if (!el) return;
+  (flapTimers.get(el) || []).forEach(clearTimeout);
+  flapTimers.set(el, []);
+  if (RM.matches || !from) { setCells(el, to); return; }
+  setCells(el, to);
+  const cells = [...el.children];
+  cells.forEach((c, k) => {
+    const a = FLAP.indexOf((from[k] || ' ').toUpperCase()), b = FLAP.indexOf(to[k]);
+    if (a === b || to[k] === '.') return;
+    let seq = [];
+    for (let j = (a + 1) % FLAP.length; ; j = (j + 1) % FLAP.length) { seq.push(FLAP[j]); if (j === b || seq.length > 40) break; }
+    seq = seq.slice(-7);
+    c.textContent = from[k] || ' ';
+    seq.forEach((ch, s) => {
+      const t = setTimeout(() => { c.textContent = ch; c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip'); }, 90 * k + 62 * (s + 1));
+      flapTimers.get(el).push(t);
+    });
+  });
+}
+function finishFlaps() {
+  flapTimers.forEach((ts, el) => { ts.forEach(clearTimeout); });
+  flapTimers.clear();
+  els.forEach((e, i) => setCells(e.querySelector('.sn'), SHEETS[i].id));
+  setCells($('#ssn'), SHEETS[cur].id);
+}
+
+/* ================================================================ turning */
+let cur = -1, anim = null;
+function loadModel(sheet) {
+  const f = sheet.querySelector('iframe[data-src]');
+  if (f && !f.src) {
+    f.addEventListener('load', () => { f.classList.add('ready'); const s = sheet.querySelector('.still'); if (s) s.classList.add('gone'); }, { once: true });
+    f.src = f.dataset.src;
+  }
+}
+function arrive(el, prevIdx) {
+  el.classList.remove('play');
+  const rows = el.querySelectorAll('.ix');
+  const c = rows[SHEETS.indexOf(SHEETS.find(s => s.id === el.dataset.id))];
+  if (c && prevIdx >= 0 && rows[prevIdx]) c.style.setProperty('--from', (rows[prevIdx].offsetTop - c.offsetTop) + 'px');
+  else if (c) c.style.setProperty('--from', '0px');
+  if (RM.matches) return;
+  void el.offsetWidth;
+  el.classList.add('play');
+}
+function updateChrome(i, prev) {
+  const s = SHEETS[i];
+  $('#cn').textContent = s.id;
+  $('#stl').textContent = s.title;
+  flap($('#ssn'), prev >= 0 ? SHEETS[prev].id : '    ', s.id);
+  $('#drawer').querySelectorAll('.dr').forEach(b => b.classList.toggle('cur', b.dataset.go === s.id));
+  document.title = `${s.id} ${s.title} · Walsh Living Set`;
+  const h = '#' + s.id;
+  if (location.hash !== h) history.replaceState(null, '', h);
+}
+function go(i, dir) {
+  i = Math.max(0, Math.min(N - 1, i));
+  if (i === cur) return;
+  if (anim) { anim.forEach(a => a.finish()); anim = null; }
+  hideThumb();
+  const prev = cur, next = els[i], old = prev >= 0 ? els[prev] : null;
+  dir = dir || (i > prev ? 1 : -1);
+  cur = i;
+  loadModel(next);
+  updateChrome(i, prev);
+  const sn = next.querySelector('.sn');
+  if (!old || RM.matches) {
+    els.forEach(e => e.classList.remove('on', 'top'));
+    next.classList.add('on');
+    flap(sn, old ? SHEETS[prev].id : '    ', SHEETS[i].id);
+    arrive(next, prev);
+    return;
+  }
+  const opts = { duration: 980, easing: 'cubic-bezier(.55,.05,.25,1)' };
+  const shadeK = [{ opacity: 0 }, { opacity: 1, offset: .55 }, { opacity: 0 }];
+  if (dir > 0) {
+    // lift the current leaf off its left binding, the next sheet is revealed beneath, title block first
+    next.classList.add('on'); old.classList.add('on', 'top');
+    const a1 = old.animate([{ transform: 'rotateY(0deg)', opacity: 1 }, { transform: 'rotateY(-84deg)', opacity: 1, offset: .78 }, { transform: 'rotateY(-104deg)', opacity: 0 }], opts);
+    const a2 = old.querySelector('.shade').animate(shadeK, opts);
+    anim = [a1, a2];
+    setTimeout(() => { flap(sn, SHEETS[prev].id, SHEETS[i].id); arrive(next, prev); }, 230);
+    a1.onfinish = () => { old.classList.remove('on', 'top'); anim = null; };
+  } else {
+    // the previous leaf swings back down onto the set
+    old.classList.add('on'); next.classList.add('on', 'top');
+    const a1 = next.animate([{ transform: 'rotateY(-104deg)', opacity: 0 }, { transform: 'rotateY(-84deg)', opacity: 1, offset: .22 }, { transform: 'rotateY(0deg)', opacity: 1 }], opts);
+    const a2 = next.querySelector('.shade').animate(shadeK.slice().reverse(), opts);
+    anim = [a1, a2];
+    setTimeout(() => { flap(sn, SHEETS[prev].id, SHEETS[i].id); arrive(next, prev); }, 520);
+    a1.onfinish = () => { old.classList.remove('on'); next.classList.remove('top'); anim = null; };
+  }
+}
+const idxOf = id => SHEETS.findIndex(s => s.id.toLowerCase() === String(id).toLowerCase());
+function fromHash() { const k = idxOf(decodeURIComponent(location.hash.slice(1))); return k >= 0 ? k : 0; }
+addEventListener('hashchange', () => go(fromHash()));
+
+/* ================================================================ input */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go]');
+  if (t) { go(idxOf(t.dataset.go)); closeDrawer(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea')) return;
+  const k = e.key;
+  if (k === 'Enter' && e.target.matches && e.target.matches('.si-t.link')) { go(idxOf(e.target.dataset.go)); return; }
+  if (k === 'ArrowRight' || k === 'PageDown') { go(cur + 1, 1); e.preventDefault(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { go(cur - 1, -1); e.preventDefault(); }
+  else if (k === 'Home') go(0); else if (k === 'End') go(N - 1);
+  else if (k === 'Escape') closeDrawer();
+});
+$('#prev').onclick = () => go(cur - 1, -1);
+$('#next').onclick = () => go(cur + 1, 1);
+$('#print').onclick = () => window.print();
+// swipe
+let sw = null;
+addEventListener('touchstart', e => { if (e.touches.length === 1) sw = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
+addEventListener('touchend', e => {
+  if (!sw) return;
+  const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > 1.6 * Math.abs(dy) && Date.now() - sw.t < 700 && !$('#drawer').classList.contains('show')) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  sw = null;
+}, { passive: true });
+// drawer
+function openDrawer() { $('#drawer').classList.add('show'); $('#scrim').classList.add('show'); $('#ib').setAttribute('aria-expanded', 'true'); }
+function closeDrawer() { $('#drawer').classList.remove('show'); $('#scrim').classList.remove('show'); $('#ib').setAttribute('aria-expanded', 'false'); }
+$('#ib').onclick = () => $('#drawer').classList.contains('show') ? closeDrawer() : openDrawer();
+$('#scrim').onclick = closeDrawer;
+
+/* ================================================================ live thumbnail */
+const thumb = $('#thumb');
+let thumbFor = null;
+function showThumb(row) {
+  if (mob || !matchMedia('(hover:hover)').matches) return;
+  const id = row.dataset.go, k = idxOf(id);
+  if (k < 0 || k === cur) { hideThumb(); return; }
+  const tu = Math.max(5.4, u * 0.16);
+  const tw = 36 * tu, th = 24 * tu;
+  if (thumbFor !== id) {
+    thumbFor = id;
+    const clone = els[k].querySelector('.paper').cloneNode(true);
+    clone.querySelectorAll('iframe').forEach(f => f.remove());
+    clone.querySelectorAll('.still').forEach(s => { s.classList.remove('gone'); s.loading = 'eager'; });
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    const wrap = document.createElement('div');
+    wrap.className = 'tpaper';
+    wrap.style.cssText = `--u:${tu}px;--fl:0;width:${tw}px;height:${th}px`;
+    wrap.appendChild(clone);
+    thumb.innerHTML = '';
+    thumb.appendChild(wrap);
+    thumb.style.cssText = `left:-9999px;top:0;width:${tw}px;height:${th}px`;
+    hairlines(wrap);
+    thumb.insertAdjacentHTML('beforeend', `<span class="cap">${esc(id)} · ${esc(SHEETS[k].short || SHEETS[k].title)}</span>`);
+    if (!RM.matches) requestAnimationFrame(() => wrap.classList.add('play'));
+  }
+  const sr = stage.getBoundingClientRect(), rr = row.getBoundingClientRect();
+  const x = 31.75 * u - tw;
+  let y = rr.top + rr.height / 2 - sr.top - th / 2;
+  y = Math.max(0.6 * u, Math.min(23.4 * u - th, y));
+  thumb.style.cssText = `left:${x}px;top:${y}px;width:${tw}px;height:${th}px`;
+  thumb.classList.add('show');
+}
+function hideThumb() { thumb.classList.remove('show'); }
+stage.addEventListener('mouseover', e => {
+  const r = e.target.closest('.tb .ix');
+  if (r) showThumb(r);
+});
+stage.addEventListener('mouseout', e => {
+  const r = e.target.closest('.tb .ix');
+  if (r && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.tb .ix'))) hideThumb();
+});
+
+/* ================================================================ drafting readout: ticks warm near the cursor */
+let mx = null, raf = 0, hotSheet = null;
+function clearHot(sheet) {
+  if (!sheet) return;
+  sheet.querySelectorAll('.tk').forEach(t => { t.style.strokeOpacity = ''; t.classList.remove('hot'); });
+  sheet.querySelectorAll('.zl').forEach(z => z.classList.remove('hot', 'warm'));
+}
+function readout() {
+  raf = 0;
+  const sheet = els[cur];
+  if (hotSheet && hotSheet !== sheet) clearHot(hotSheet);
+  hotSheet = sheet;
+  const cx = $('#cx'), cy = $('#cy'), rd = $('#rd');
+  if (!mx || mob) { clearHot(sheet); cx.classList.remove('show'); cy.classList.remove('show'); rd.innerHTML = 'Zone <b>&#183;</b>'; return; }
+  const sr = stage.getBoundingClientRect();
+  const ix = (mx.x - sr.left) / u, iy = (mx.y - sr.top) / u;
+  const inside = ix >= 0.75 && ix <= 35.5 && iy >= 0.5 && iy <= 23.5;
+  if (!inside) { clearHot(sheet); cx.classList.remove('show'); cy.classList.remove('show'); rd.innerHTML = 'Zone <b>&#183;</b>'; return; }
+  const zx = Math.min(34, Math.max(1, Math.floor(ix))), zy = Math.min(22, Math.max(1, Math.floor(iy)));
+  sheet.querySelectorAll('.tk').forEach(t => {
+    const v = +t.dataset.v, d = Math.abs(v - (t.dataset.ax === 'x' ? ix : iy));
+    const k = Math.max(0, 1 - d / 3.2);
+    t.style.strokeOpacity = (0.42 + 0.58 * k).toFixed(2);
+    t.classList.toggle('hot', d < 0.5);
+  });
+  sheet.querySelectorAll('.zl').forEach(z => {
+    const v = +z.dataset.v, c = z.dataset.ax === 'x' ? zx : zy;
+    z.classList.toggle('hot', v === c);
+    z.classList.toggle('warm', Math.abs(v - c) === 1);
+  });
+  cx.style.left = (ix * u) + 'px'; cx.style.top = (0.5 * u - 7) + 'px';
+  cy.style.left = (0.75 * u - 7) + 'px'; cy.style.top = (iy * u) + 'px';
+  cx.classList.add('show'); cy.classList.add('show');
+  rd.innerHTML = `Zone <b>${ZL[zy - 1]}${zx}</b>`;
+}
+addEventListener('mousemove', e => { mx = { x: e.clientX, y: e.clientY }; if (!raf) raf = requestAnimationFrame(readout); }, { passive: true });
+document.addEventListener('mouseleave', () => { mx = null; if (!raf) raf = requestAnimationFrame(readout); });
+
+/* ================================================================ print: everything in its final still state */
+function toStill() {
+  if (anim) { anim.forEach(a => a.finish()); anim = null; }
+  finishFlaps();
+  els.forEach(e => e.classList.remove('play'));
+  hideThumb();
+}
+addEventListener('beforeprint', toStill);
+matchMedia('print').addEventListener && matchMedia('print').addEventListener('change', e => { if (e.matches) toStill(); });
+
+/* ================================================================ start */
+const start = () => go(fromHash());
+(document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]) : Promise.resolve()).then(start);
+</script>
+</body>
+</html>

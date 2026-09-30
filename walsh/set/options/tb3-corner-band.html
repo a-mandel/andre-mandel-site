@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Walsh Living Set</title>
+<meta name="description" content="Walsh Residence living plan set, title block option 3, corner and band. ANDRÉ MANDEL.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#e6e3db">
+<link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Tenor+Sans&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f5f1; --paper2: #ebe9e3; --desk: #e6e3db;
+    --ink: #1b1a18; --muted: #6c6963; --rule: rgba(27,26,24,.2); --faint: rgba(27,26,24,.09);
+    --accent: #c07a2c;
+    --f-title: 'Tenor Sans', 'Helvetica Neue', Arial, sans-serif;
+    --f-serif: 'EB Garamond', Garamond, Georgia, serif;
+    --f-hand: 'Nothing You Could Do', 'Bradley Hand', cursive;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--desk); color: var(--ink); font-family: var(--f-serif); overflow: hidden;
+         -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; color: inherit; }
+
+  /* ---------- desk and stack ---------- */
+  #desk { position: fixed; inset: 0; overflow: hidden; touch-action: pan-y; }
+  #stack { position: absolute; }
+  .sheet { position: absolute; inset: 0; background: var(--paper); overflow: hidden;
+           backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  body.desk .sheet { box-shadow: 0 1px 2px rgba(27,26,24,.08), 0 14px 40px rgba(27,26,24,.14); border-radius: 2px; }
+  .sheet.leaf { z-index: 2; }
+  .sheet .turnshade { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: linear-gradient(90deg, rgba(27,26,24,.0), rgba(27,26,24,.22)); }
+  #live { position: absolute; z-index: 3; overflow: hidden; background: transparent; visibility: hidden;
+          backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  #live iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+
+  /* type scale: inch sizes with a px floor that eases down on small windows */
+  .sheet { --fl: min(1px, calc(var(--in) / 46)); }   /* below 46 px per inch the sheet scales as one drawing */
+  .sheet.m { --in: 60px; }
+  .m table.dat { font-size: 13px; }
+  .sheet .t-data  { font-size: max(calc(10 * var(--fl)), calc(var(--in) * .13)); line-height: 1.28; }
+  .sheet .t-lab   { font: 400 max(calc(9 * var(--fl)), calc(var(--in) * .095))/1.25 var(--f-title);
+                    letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .sheet .t-caps  { font-family: var(--f-title); letter-spacing: .12em; text-transform: uppercase; }
+  .sheet .t-it    { font-style: italic; }
+  .sheet .t-mut   { color: var(--muted); }
+
+  /* ---------- SVG linework ---------- */
+  .lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .lines .hair { fill: none; stroke: var(--ink); }
+  .lines .soft { fill: none; stroke: var(--rule); }
+  .lines .tick { stroke: var(--ink); }
+  .lines .view { fill: none; stroke: rgba(27,26,24,.55); }
+  .lines .leader { fill: none; stroke: var(--ink); }
+  .lines .dot { fill: var(--accent); }
+  .lines text { font-family: var(--f-title); fill: var(--muted); }
+  .lines .post { fill: var(--paper); stroke: rgba(27,26,24,.45); }
+
+  /* ---------- title block, right column ---------- */
+  .logo { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
+  .col { position: absolute; display: flex; flex-direction: column; }
+  .col .blk + .blk { margin-top: calc(var(--in) * .32); }
+  .col .t-lab { margin-bottom: calc(var(--in) * .06); }
+  .col .firmname { font-family: var(--f-title); letter-spacing: .16em; text-transform: uppercase; }
+  .col .pname { font: 400 max(calc(17 * var(--fl)), calc(var(--in) * .34))/1.05 var(--f-serif); margin: 0 0 calc(var(--in) * .04); }
+  .col .kv { display: grid; grid-template-columns: auto 1fr; column-gap: .8em; margin-top: calc(var(--in) * .08); }
+  .col .kv dt { color: var(--muted); font-style: italic; }
+  .col .kv dd { margin: 0; }
+  .col .grow { flex: 1; }
+  .col .copy { color: var(--muted); font-style: italic; }
+  table.iss { border-collapse: collapse; width: 100%; }
+  table.iss th { text-align: left; font-weight: 400; padding: 0 .6em .25em 0; }
+  table.iss td { padding: .08em .6em .08em 0; vertical-align: top; }
+  table.iss td:first-child, table.iss th:first-child { width: 1.7em; }
+  table.iss tr.new td { color: var(--ink); }
+  table.iss tr.new td:first-child { color: var(--accent); }
+
+  /* ---------- bottom band ---------- */
+  .band { position: absolute; }
+  .idx { position: absolute; display: flex; align-items: stretch; }
+  .grp { display: flex; flex-direction: column; min-width: 0; }
+  .grp + .grp { margin-left: var(--ggap); }
+  .grp .t-lab { white-space: nowrap; margin-bottom: calc(var(--in) * .05); }
+  .grp .cells { display: flex; flex: 1; }
+  .cell { width: var(--cw); flex: none; padding: 0 calc(var(--in) * .1) 0 0; border: 0; background: none; text-align: left;
+          cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .cell .fr { display: flex; align-items: center; gap: calc(var(--in) * .07); }
+  .cell svg { display: block; flex: none; }
+  .cell .fr rect.pg { fill: var(--paper); stroke: rgba(27,26,24,.5); }
+  .cell .fr rect.vw { fill: none; stroke: rgba(27,26,24,.35); }
+  .cell .fr rect.md { fill: var(--paper2); stroke: none; }
+  .cell .no { font-family: var(--f-title); letter-spacing: .06em; white-space: nowrap; }
+  .cell .ti { color: var(--muted); font-style: italic; margin-top: calc(var(--in) * .045); line-height: 1.08;
+              display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  @media (hover: hover) {
+    .cell:hover .ti, .cell:hover .no { color: var(--ink); }
+    .cell:hover .fr rect.pg { stroke: var(--ink); }
+    table.dat tr.row:hover td { color: var(--accent); }
+  }
+  .cell.on .no { color: var(--accent); }
+  .cell.on .ti { color: var(--ink); }
+  .cell.on .fr rect.pg { stroke: var(--accent); stroke-width: 1.6; }
+  .cell:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  .stamp { position: absolute; display: flex; align-items: center; }
+  .stamp .seal { flex: none; border-radius: 50%; border: 1px dashed rgba(27,26,24,.5); display: grid; place-items: center;
+                 text-align: center; color: var(--muted); }
+  .stamp .txt { padding-left: calc(var(--in) * .16); min-width: 0; }
+  .stitle { position: absolute; display: flex; flex-direction: column; justify-content: space-between; }
+  .stitle .nm { font: 400 max(calc(13 * var(--fl)), calc(var(--in) * .2))/1.12 var(--f-title); letter-spacing: .12em; text-transform: uppercase; }
+  .stitle .meta { display: flex; flex-wrap: wrap; column-gap: 1.1em; }
+  .stitle .meta b { font-weight: 400; font-family: var(--f-title); font-size: .82em; letter-spacing: .14em; color: var(--muted); margin-right: .35em; }
+  .stitle .status { color: var(--accent); font-style: italic; }
+  .snum { position: absolute; background: var(--ink); color: var(--paper); display: flex; flex-direction: column;
+          justify-content: space-between; }
+  .snum .t-lab { color: rgba(246,245,241,.62); }
+  .snum .big { font: 400 max(calc(30 * var(--fl)), calc(var(--in) * .66))/1 var(--f-title); letter-spacing: .04em; }
+  .snum .of { font-style: italic; color: rgba(246,245,241,.7); }
+
+  /* ---------- drawing field ---------- */
+  .field { position: absolute; }
+  .poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bub { position: absolute; display: flex; align-items: center; gap: calc(var(--in) * .12); white-space: nowrap; }
+  .bub .c { flex: none; width: max(calc(19 * var(--fl)), calc(var(--in) * .36)); height: max(calc(19 * var(--fl)), calc(var(--in) * .36));
+            border: 1px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font-family: var(--f-title); }
+  .bub .tt { font-family: var(--f-title); letter-spacing: .12em; text-transform: uppercase; }
+  .bub .sc { font-style: italic; color: var(--muted); }
+  .note { position: absolute; font: 400 max(calc(15 * var(--fl)), calc(var(--in) * .3))/1.15 var(--f-hand); color: var(--ink); white-space: nowrap; }
+
+  /* A0.1 real content */
+  .blockx { position: absolute; }
+  .blockx .hero { font: 400 max(calc(30 * var(--fl)), calc(var(--in) * .78))/1 var(--f-serif); margin: 0; }
+  .blockx .sub { font: italic 400 max(calc(14 * var(--fl)), calc(var(--in) * .28))/1.2 var(--f-serif); color: var(--muted); margin: calc(var(--in) * .08) 0 calc(var(--in) * .4); }
+  table.dat { border-collapse: collapse; width: 100%; }
+  table.dat th { text-align: left; font-weight: 400; padding: 0 1em calc(var(--in) * .08) 0; vertical-align: bottom; }
+  table.dat td { padding: calc(var(--in) * .035) 1em calc(var(--in) * .035) 0; vertical-align: top; }
+  table.dat td.k { color: var(--muted); font-style: italic; white-space: nowrap; }
+  table.dat tr.g td { padding-top: calc(var(--in) * .2); }
+  table.dat tr.row { cursor: pointer; }
+  table.dat td.no { font-family: var(--f-title); letter-spacing: .06em; white-space: nowrap; }
+  table.dat td.mk { text-align: center; color: var(--accent); }
+  table.dat th.mk { text-align: center; }
+
+  /* ---------- floating control ---------- */
+  #ctl { position: fixed; z-index: 20; display: flex; gap: 2px; align-items: center; padding: 4px;
+         background: rgba(246,245,241,.92); border: 1px solid var(--rule); border-radius: 22px;
+         box-shadow: 0 6px 20px rgba(27,26,24,.1); backdrop-filter: blur(6px); }
+  #ctl.v { flex-direction: column; }
+  #ctl button { border: 0; background: none; cursor: pointer; min-width: 36px; height: 36px; border-radius: 18px;
+                display: grid; place-items: center; padding: 0 8px; }
+  #ctl button:hover { background: var(--paper2); }
+  #ctl .cur { font: 400 11px/1 var(--f-title); letter-spacing: .1em; min-width: 50px; }
+  #ctl svg { width: 16px; height: 16px; stroke: var(--ink); fill: none; stroke-width: 1.3; }
+  #ctl button:focus-visible { outline: 1px solid var(--accent); }
+
+  /* ---------- mobile ---------- */
+  body.mob { background: var(--paper); }
+  .m { display: flex; flex-direction: column; }
+  .m .mfield { position: relative; flex: 1; margin: 10px 10px 0; min-height: 0; }
+  .m .mclip { position: absolute; inset: 0; overflow: hidden; }
+  .m .mscroll { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 16px 28px; }
+  .m .mframe { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .m .mframe path { fill: none; stroke: var(--ink); stroke-width: 1; }
+  .m .mhead { padding-right: 34px; margin-bottom: 14px; }
+  .m .mhead .k { font: 400 9px/1.3 var(--f-title); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .m .mnote { display: flex; gap: 8px; align-items: baseline; font: 400 18px/1.2 var(--f-hand); margin: 8px 0 4px; }
+  .m .mnote i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; transform: translateY(-2px); }
+  .m .mview { margin: 0 0 18px; }
+  .m .mview .bx { border: 1px dashed rgba(27,26,24,.5); border-radius: 8px; width: 100%; }
+  .m .mview .bub { position: static; margin-top: 8px; white-space: normal; flex-wrap: wrap; row-gap: 2px; font-size: 11px; }
+  .m .mview .bub { gap: 8px; }
+  .m .mview .bub .c { width: 20px; height: 20px; font-size: 10px; }
+  .m .mstrip { flex: none; display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 10px;
+               padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 10px); }
+  .m .mstrip img { height: 34px; width: auto; display: block; }
+  .m .mstrip .num { font: 400 22px/1 var(--f-title); letter-spacing: .04em; }
+  .m .mstrip .ttl { min-width: 0; }
+  .m .mstrip .ttl div:first-child { font: 400 10px/1.25 var(--f-title); letter-spacing: .12em; text-transform: uppercase;
+               overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .m .mstrip .ttl div:last-child { font: italic 400 11px/1.3 var(--f-serif); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m .mstrip .btns { display: flex; gap: 2px; }
+  .m .mstrip button { border: 1px solid var(--rule); background: var(--paper); height: 36px; min-width: 36px; border-radius: 18px;
+               font: 400 10px/1 var(--f-title); letter-spacing: .12em; text-transform: uppercase; padding: 0 10px; cursor: pointer; }
+  .m .mstrip button.ar { border-color: transparent; padding: 0; }
+  .m .mstrip svg { width: 15px; height: 15px; stroke: var(--ink); fill: none; stroke-width: 1.4; display: block; }
+  .m .mdata table.dat { font-size: 12px; }
+  .m .mdata .blk { margin-bottom: 22px; }
+
+  #mIndex { position: fixed; inset: 0; z-index: 40; display: none; background: rgba(27,26,24,.18); }
+  #mIndex.open { display: block; }
+  #mIndex .pan { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; background: var(--paper);
+                 border-radius: 16px 16px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom, 0px) + 22px);
+                 box-shadow: 0 -10px 30px rgba(27,26,24,.14); font-size: 14px; }
+  #mIndex .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  #mIndex .hd img { height: 42px; }
+  #mIndex .x { border: 1px solid var(--rule); background: none; border-radius: 18px; height: 36px; padding: 0 14px;
+               font: 400 10px/1 var(--f-title); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+  #mIndex h3 { font: 400 9px/1.3 var(--f-title); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  #mIndex .it { display: grid; grid-template-columns: 52px 1fr; gap: 10px; width: 100%; text-align: left; border: 0; background: none;
+                padding: 9px 0; cursor: pointer; align-items: baseline; }
+  #mIndex .it .n { font: 400 12px/1 var(--f-title); letter-spacing: .06em; }
+  #mIndex .it .t { font: 400 15px/1.25 var(--f-serif); }
+  #mIndex .it.on .n, #mIndex .it.on .t { color: var(--accent); }
+  #mIndex p { margin: 0 0 3px; line-height: 1.35; }
+  #mIndex .mut { color: var(--muted); font-style: italic; }
+
+  /* ---------- print: 36 x 24 in, one sheet per page ---------- */
+  #print { display: none; }
+  @page { size: 36in 24in; margin: 0; }
+  @media print {
+    html, body { background: #fff; overflow: visible; height: auto; }
+    #desk, #ctl, #mIndex { display: none !important; }
+    #print { display: block; }
+    #print .sheet { position: relative; inset: auto; width: 36in; height: 24in; box-shadow: none; border-radius: 0;
+                    break-after: page; page-break-after: always; break-inside: avoid; }
+    #print .sheet:last-child { break-after: auto; page-break-after: auto; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (prefers-reduced-motion: reduce) { .sheet { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="desk" aria-live="polite">
+  <div id="stack">
+    <div id="live" aria-hidden="false"></div>
+  </div>
+</div>
+<nav id="ctl" aria-label="Sheet controls">
+  <button type="button" id="cPrev" aria-label="Previous sheet"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button>
+  <button type="button" id="cCur" class="cur" aria-label="Current sheet">A0.0</button>
+  <button type="button" id="cNext" aria-label="Next sheet"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button>
+  <button type="button" id="cPrint" aria-label="Print the set at 36 by 24 inches"><svg viewBox="0 0 16 16"><path d="M4.5 6V2.5h7V6M4.5 11.5h-2v-5h11v5h-2M4.5 9.5h7v4h-7z"/></svg></button>
+</nav>
+<div id="mIndex" role="dialog" aria-modal="true" aria-label="Sheet index and title block"><div class="pan" id="mPan"></div></div>
+<div id="print" aria-hidden="true"></div>
+
+<script>
+/* =====================================================================
+   SET DATA. One object holds the whole set. Extend sheets, views,
+   notes and issuances here; the title block and index build from it.
+   Geometry is in inches. View and note coordinates are relative to the
+   drawing field's top left corner (field is 31.75 wide by 21.25 tall).
+   ===================================================================== */
+const SET = {
+  firm: {
+    name: 'ANDRÉ MANDEL', line: 'Residential design',
+    address: ['40 Edith St #4', 'San Francisco CA 94133'],
+    phone: '510.459.7686', email: 'andre.mandel@gmail.com'
+  },
+  project: {
+    name: 'Walsh Residence', sub: 'Lahontan Lot 235',
+    address: ['8154 Lahontan Drive', 'Truckee CA'],
+    data: [['APN', '108 160 012 000'], ['Zoning', 'RS PD 1.7'], ['County', 'Placer County'], ['Owner', 'Dustin Walsh, Elevated Developers']]
+  },
+  agency: [
+    ['Lahontan design review (LCC)', 'no. pending'],
+    ['Placer County building permit', 'no. pending'],
+    ['Very High FHSZ', 'Chapter 7A']
+  ],
+  issuances: [                       /* append new issuances; newest shows first */
+    { no: 1, date: '9/28/26', for: 'Feasibility FA2' },
+    { no: 2, date: '9/30/26', for: 'Living set, cartoon' }
+  ],
+  stamp: { role: 'Architect of record', name: 'Joseph Benveniste, AIA', when: 'Stamp at design review submittal' },
+  status: 'Feasibility · not for construction',
+  drawn: 'AM',
+  copyright: '© 2026 André Mandel. Drawings are instruments of service.',
+  model: { src: '../../?sheet', still: '../../preview-house.jpg' },
+  marks: { lockup: '../../marks/am10_lockup.webp', mark: '../../marks/am10_mark.webp' },
+  groups: [
+    { name: 'General', sheets: [
+      { no: 'A0.0', title: 'Cover · the site', scale: 'As shown', kind: 'model', issued: [2] },
+      { no: 'A0.1', title: 'Sheet index and project data', scale: 'No scale', kind: 'index', issued: [2],
+        note: { t: 'LCC meets the 2nd Wednesday', x: 3.2, y: 17.9, to: [1.2, 15.9] } }
+    ]},
+    { name: 'Feasibility', sheets: [
+      { no: 'F1.0', title: 'Regulatory report', scale: 'As noted', issued: [2],
+        views: [
+          { n: 1, t: 'Zoning and setbacks', s: '1/16 in = 1 ft', x: .9, y: .9, w: 14.4, h: 9.4 },
+          { n: 2, t: 'Height envelope', s: '3/32 in = 1 ft', x: 16.4, y: .9, w: 14.4, h: 9.4 },
+          { n: 3, t: 'Design review path', s: 'No scale', x: .9, y: 11.6, w: 9.4, h: 8.0 },
+          { n: 4, t: 'Code summary', s: 'No scale', x: 11.2, y: 11.6, w: 9.4, h: 8.0 },
+          { n: 5, t: 'Wildfire summary', s: 'No scale', x: 21.4, y: 11.6, w: 9.4, h: 8.0 } ],
+        note: { t: 'every roof under 30 ft', x: 24.8, y: 3.0, to: [22.4, 4.9] } },
+      { no: 'F2.0', title: 'Budget framework', scale: 'No scale', issued: [2],
+        views: [
+          { n: 1, t: 'Cost framework', s: 'No scale', x: .9, y: .9, w: 18.6, h: 18.7 },
+          { n: 2, t: 'Cost drivers', s: 'No scale', x: 20.6, y: .9, w: 10.2, h: 8.8 },
+          { n: 3, t: 'Allowances', s: 'No scale', x: 20.6, y: 10.8, w: 10.2, h: 8.8 } ],
+        note: { t: 'the roof is the budget', x: 23.2, y: 5.0, to: [22.0, 3.3] } },
+      { no: 'F3.0', title: 'Preliminary timeline', scale: 'No scale', issued: [2],
+        views: [
+          { n: 1, t: 'Preliminary timeline', s: 'No scale', x: .9, y: .9, w: 29.9, h: 10.4 },
+          { n: 2, t: 'Design review calendar', s: 'No scale', x: .9, y: 12.6, w: 14.4, h: 7.0 },
+          { n: 3, t: 'Earthwork window', s: 'No scale', x: 16.4, y: 12.6, w: 14.4, h: 7.0 } ],
+        note: { t: 'LCC meets the 2nd Wednesday', x: 5.2, y: 15.2, to: [3.4, 16.8] } },
+      { no: 'F4.0', title: 'Outline specifications', scale: 'No scale', issued: [2],
+        views: [
+          { n: 1, t: 'Site and structure', s: 'No scale', x: .9, y: .9, w: 7.0, h: 18.7 },
+          { n: 2, t: 'Envelope', s: 'No scale', x: 8.55, y: .9, w: 7.0, h: 18.7 },
+          { n: 3, t: 'Interiors', s: 'No scale', x: 16.2, y: .9, w: 7.0, h: 18.7 },
+          { n: 4, t: 'Systems', s: 'No scale', x: 23.85, y: .9, w: 7.0, h: 18.7 } ],
+        note: { t: 'cedar, dark steel, board form concrete', x: 10.4, y: 6.2, to: [9.6, 4.4] } }
+    ]},
+    { name: 'Architectural', sheets: [
+      { no: 'A1.0', title: 'Site plan', scale: '1/8 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Site plan', s: '1/8 in = 1 ft', x: .9, y: .9, w: 21.8, h: 18.7 },
+          { n: 2, t: 'Vicinity map', s: 'No scale', x: 23.8, y: .9, w: 7.0, h: 7.0 },
+          { n: 3, t: 'Site data', s: 'No scale', x: 23.8, y: 9.2, w: 7.0, h: 10.4 } ],
+        note: { t: 'approach from the west', x: 3.4, y: 3.2, to: [2.2, 8.4] } },
+      { no: 'A2.1', title: 'Main level plan', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Main level plan', s: '3/16 in = 1 ft', x: .9, y: .9, w: 22.6, h: 18.7 },
+          { n: 2, t: 'Key plan', s: 'No scale', x: 24.6, y: .9, w: 6.2, h: 5.2 },
+          { n: 3, t: 'Plan notes', s: 'No scale', x: 24.6, y: 7.5, w: 6.2, h: 12.1 } ],
+        note: { t: 'keep the signature tree', x: 12.6, y: 7.4, to: [11.4, 9.8] } },
+      { no: 'A2.2', title: 'Lower level plan', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Lower level plan', s: '3/16 in = 1 ft', x: .9, y: .9, w: 22.6, h: 18.7 },
+          { n: 2, t: 'Key plan', s: 'No scale', x: 24.6, y: .9, w: 6.2, h: 5.2 },
+          { n: 3, t: 'Plan notes', s: 'No scale', x: 24.6, y: 7.5, w: 6.2, h: 12.1 } ],
+        note: { t: 'flex room steps down with the grade', x: 12.2, y: 13.8, to: [17.4, 12.2] } },
+      { no: 'A2.3', title: 'Roof plan', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Roof plan', s: '3/16 in = 1 ft', x: .9, y: .9, w: 22.6, h: 18.7 },
+          { n: 2, t: 'Height diagram', s: 'No scale', x: 24.6, y: .9, w: 6.2, h: 8.6 },
+          { n: 3, t: 'Roof notes', s: 'No scale', x: 24.6, y: 11.0, w: 6.2, h: 8.6 } ],
+        note: { t: 'every roof under 30 ft', x: 16.2, y: 3.2, to: [15.0, 5.6] } },
+      { no: 'A3.1', title: 'Elevations west and north', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'West elevation', s: '3/16 in = 1 ft', x: .9, y: .9, w: 29.9, h: 8.4 },
+          { n: 2, t: 'North elevation', s: '3/16 in = 1 ft', x: .9, y: 11.2, w: 29.9, h: 8.4 } ],
+        note: { t: 'approach from the west', x: 21.6, y: 2.2, to: [20.4, 4.3] } },
+      { no: 'A3.2', title: 'Elevations east and south', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'East elevation', s: '3/16 in = 1 ft', x: .9, y: .9, w: 29.9, h: 8.4 },
+          { n: 2, t: 'South elevation', s: '3/16 in = 1 ft', x: .9, y: 11.2, w: 29.9, h: 8.4 } ],
+        note: { t: 'glass at the living room tip', x: 22.0, y: 2.2, to: [26.6, 4.6] } },
+      { no: 'A4.1', title: 'Building sections', scale: '3/16 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Section through living', s: '3/16 in = 1 ft', x: .9, y: .9, w: 14.4, h: 8.4 },
+          { n: 2, t: 'Section through bridge', s: '3/16 in = 1 ft', x: 16.4, y: .9, w: 14.4, h: 8.4 },
+          { n: 3, t: 'Section through suites', s: '3/16 in = 1 ft', x: .9, y: 11.2, w: 29.9, h: 8.4 } ],
+        note: { t: 'clerestory at the fold', x: 5.4, y: 3.2, to: [4.2, 5.4] } },
+      { no: 'A5.1', title: 'Exterior materials and colors', scale: 'No scale', issued: [2],
+        views: [
+          { n: 1, t: 'Material board', s: 'No scale', x: .9, y: .9, w: 14.4, h: 18.7 },
+          { n: 2, t: 'Color study', s: '1/8 in = 1 ft', x: 16.4, y: .9, w: 14.4, h: 8.4 },
+          { n: 3, t: 'Material schedule', s: 'No scale', x: 16.4, y: 11.2, w: 14.4, h: 8.4 } ],
+        note: { t: 'cedar, dark steel, board form concrete', x: 4.2, y: 8.6, to: [3.0, 11.2] } },
+      { no: 'A6.1', title: 'Wildfire hardening · Chapter 7A', scale: 'As noted', issued: [2],
+        views: [
+          { n: 1, t: 'Eave and soffit', s: '1 1/2 in = 1 ft', x: .9, y: .9, w: 9.4, h: 8.4 },
+          { n: 2, t: 'Vents', s: '3 in = 1 ft', x: 11.2, y: .9, w: 9.4, h: 8.4 },
+          { n: 3, t: 'Glazing', s: '3 in = 1 ft', x: 21.4, y: .9, w: 9.4, h: 8.4 },
+          { n: 4, t: 'Deck edge', s: '1 1/2 in = 1 ft', x: .9, y: 11.2, w: 9.4, h: 8.4 },
+          { n: 5, t: 'Defensible space', s: 'No scale', x: 11.2, y: 11.2, w: 19.6, h: 8.4 } ],
+        note: { t: 'Very High FHSZ, full 7A', x: 14.2, y: 14.4, to: [12.6, 16.6] } },
+      { no: 'A9.1', title: 'Perspectives', scale: 'No scale', issued: [2],
+        views: [
+          { n: 1, t: 'Arrival from the west', s: 'No scale', x: .9, y: .9, w: 19.6, h: 11.8 },
+          { n: 2, t: 'Rear court at dusk', s: 'No scale', x: 21.6, y: .9, w: 9.2, h: 11.8 },
+          { n: 3, t: 'Living room tip', s: 'No scale', x: .9, y: 14.0, w: 14.4, h: 5.6 },
+          { n: 4, t: 'The bridge', s: 'No scale', x: 16.4, y: 14.0, w: 14.4, h: 5.6 } ],
+        note: { t: 'dusk, glowing interiors', x: 23.4, y: 9.4, to: [26.6, 7.2] } }
+    ]},
+    { name: 'Landscape', sheets: [
+      { no: 'L1.0', title: 'Landscape concept', scale: '1/8 in = 1 ft', issued: [2],
+        views: [
+          { n: 1, t: 'Landscape concept', s: '1/8 in = 1 ft', x: .9, y: .9, w: 21.8, h: 18.7 },
+          { n: 2, t: 'Plant palette', s: 'No scale', x: 23.8, y: .9, w: 7.0, h: 18.7 } ],
+        note: { t: 'keep the signature tree', x: 10.6, y: 7.0, to: [9.4, 9.4] } }
+    ]}
+  ]
+};
+
+/* =====================================================================
+   GEOMETRY (inches). Corner and band layout.
+   ===================================================================== */
+const G = {
+  W: 36, H: 24, L: .75, T: .5, R: 35.5, B: 23.5,
+  colX: 32.5,            /* right column: 3 in wide, narrower than the default strip */
+  bandY: 21.75,          /* bottom band: 1 3/4 in tall */
+  r: .3,                 /* corner radius */
+  logoW: 1.9, logoPadR: .28, logoTop: .72, gap: .2
+};
+(function () {
+  const s = G.logoW / 357, k = 0.738;            /* dx/dy of the roof stroke, 53.6 degrees */
+  G.logoS = s; G.logoH = 520 * s; G.logoX = G.R - G.logoPadR - G.logoW;
+  const gh = G.gap / Math.sin(53.6 * Math.PI / 180);   /* perpendicular gap to horizontal offset */
+  G.cutX = gh + G.logoX + 23 * s - k * (G.logoTop - G.T);
+  G.cutY = G.T + (G.R - G.cutX) / k;
+  G.field = { x: G.L, y: G.T, w: G.colX - G.L, h: G.bandY - G.T };
+})();
+
+const SHEETS = []; SET.groups.forEach(g => g.sheets.forEach(s => { s.group = g.name; SHEETS.push(s); }));
+const IDX = no => SHEETS.findIndex(s => s.no === no);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ISS_NEW = SET.issuances.slice().sort((a, b) => b.no - a.no);
+const LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+/* ---------- linework (SVG in px) ---------- */
+function borderPath(u) {
+  const { L, T, R, B, r, cutX, cutY } = G, f = .34, k = 0.738;
+  const P = (x, y) => (x * u).toFixed(2) + ' ' + (y * u).toFixed(2);
+  const len = Math.hypot(k, 1);
+  const cx1 = cutX + k * f / len, cy1 = T + f / len;        /* along the cut from its top */
+  const cx2 = R - k * f / len, cy2 = cutY - f / len;         /* along the cut from its bottom */
+  return 'M' + P(L + r, T) + ' L' + P(cutX - f, T) + ' Q' + P(cutX, T) + ' ' + P(cx1, cy1) +
+    ' L' + P(cx2, cy2) + ' Q' + P(R, cutY) + ' ' + P(R, cutY + f) +
+    ' L' + P(R, B - r) + ' Q' + P(R, B) + ' ' + P(R - r, B) +
+    ' L' + P(L + r, B) + ' Q' + P(L, B) + ' ' + P(L, B - r) +
+    ' L' + P(L, T + r) + ' Q' + P(L, T) + ' ' + P(L + r, T) + ' Z';
+}
+function ticks(u) {
+  const { L, T, R, B } = G; let o = '';
+  const sw = Math.max(.7, u * .012);
+  const fs = Math.max(7.5 * Math.min(1, u / 46), u * .085);
+  const line = (x1, y1, x2, y2) => `<line class="tick" x1="${(x1 * u).toFixed(1)}" y1="${(y1 * u).toFixed(1)}" x2="${(x2 * u).toFixed(1)}" y2="${(y2 * u).toFixed(1)}" stroke-width="${sw}"/>`;
+  const txt = (x, y, t) => `<text x="${(x * u).toFixed(1)}" y="${(y * u).toFixed(1)}" font-size="${fs.toFixed(1)}" text-anchor="middle" dominant-baseline="central" letter-spacing=".08em">${t}</text>`;
+  for (let i = 1; i < 36; i++) {
+    const long = i % 6 === 0, lt = long ? .26 : .12;
+    if (i > L && i < R) { o += line(i, T, i, T - lt) + line(i, B, i, B + lt); }
+  }
+  for (let i = 1; i <= 36; i++) {                   /* number every inch column across */
+    const cx = i - .5; if (cx < L || cx > R) continue;
+    o += txt(cx, T * .5, i) + txt(cx, B + (24 - B) * .5, i);
+  }
+  for (let j = 1; j < 24; j++) {
+    const long = j % 6 === 0, lt = long ? .26 : .12;
+    o += line(L, j, L - lt, j) + line(R, j, R + lt, j);
+  }
+  for (let j = 1; j <= 24; j++) {                   /* letters down, I and O skipped */
+    const cy = j - .5; if (cy < T || cy > B) continue;
+    o += txt(L - .2, cy, LETTERS[j - 1]) + txt(R + .25, cy, LETTERS[j - 1]);
+  }
+  return o;
+}
+function binding(u) {
+  /* pale binding strip in the left margin with three screw posts */
+  const sw = Math.max(.7, u * .01); let o = `<rect x="0" y="0" width="${(.42 * u).toFixed(1)}" height="${(24 * u).toFixed(1)}" fill="var(--paper2)"/>`;
+  o += `<line x1="${(.42 * u).toFixed(1)}" y1="0" x2="${(.42 * u).toFixed(1)}" y2="${(24 * u).toFixed(1)}" stroke="var(--rule)" stroke-width="${sw}"/>`;
+  [3, 12, 21].forEach(y => {
+    const cx = .21 * u, cy = y * u, r = .085 * u;
+    o += `<circle class="post" cx="${cx}" cy="${cy}" r="${r}" stroke-width="${sw}"/>` +
+         `<line x1="${cx - r * .55}" y1="${cy}" x2="${cx + r * .55}" y2="${cy}" stroke="rgba(27,26,24,.45)" stroke-width="${sw}"/>`;
+  });
+  return o;
+}
+function sheetLines(u, sh) {
+  const sw = Math.max(1, u * .013), hw = Math.max(1, u * .011);
+  const F = G.field;
+  let o = `<svg class="lines" viewBox="0 0 ${36 * u} ${24 * u}" aria-hidden="true">`;
+  o += binding(u) + ticks(u);
+  o += `<path class="hair" d="${borderPath(u)}" stroke-width="${sw * 1.15}"/>`;
+  /* the only two title block rules: one vertical, one horizontal */
+  o += `<line class="hair" x1="${G.colX * u}" y1="${G.T * u}" x2="${G.colX * u}" y2="${G.bandY * u}" stroke-width="${hw}"/>`;
+  o += `<line class="hair" x1="${G.L * u}" y1="${G.bandY * u}" x2="${G.R * u}" y2="${G.bandY * u}" stroke-width="${hw}"/>`;
+  (sh.views || []).forEach(v => {
+    const x = (F.x + v.x) * u, y = (F.y + v.y) * u;
+    o += `<rect class="view" x="${x}" y="${y}" width="${v.w * u}" height="${v.h * u}" rx="${.16 * u}" stroke-width="${hw}" stroke-dasharray="${(.1 * u).toFixed(1)} ${(.07 * u).toFixed(1)}"/>`;
+    o += `<line class="soft" x1="${x + .5 * u}" y1="${y + (v.h + .72) * u}" x2="${x + Math.min(v.w, 9) * u}" y2="${y + (v.h + .72) * u}" stroke-width="${hw}"/>`;
+  });
+  if (sh.note) o += leader(u, sh.note);
+  return o + '</svg>';
+}
+function leader(u, n) {
+  const F = G.field, sx = (F.x + n.x - .12) * u, sy = (F.y + n.y + .24) * u;
+  const tx = (F.x + n.to[0]) * u, ty = (F.y + n.to[1]) * u;
+  const mx = (sx + tx) / 2 + (ty - sy) * .18, my = (sy + ty) / 2 - (tx - sx) * .18;
+  return `<path class="leader" d="M${sx} ${sy} Q${mx} ${my} ${tx} ${ty}" stroke-width="${Math.max(.8, u * .01)}"/>` +
+         `<circle class="dot" cx="${tx}" cy="${ty}" r="${Math.max(3, u * .06)}"/>`;
+}
+
+/* ---------- filmstrip thumbnail of a sheet ---------- */
+function thumb(sh, w) {
+  const h = w * 2 / 3, sc = w / 36, F = G.field;
+  let o = `<svg width="${w.toFixed(1)}" height="${h.toFixed(1)}" viewBox="0 0 36 24" aria-hidden="true">` +
+    `<rect class="pg" x=".6" y=".6" width="34.8" height="22.8" rx="1.6" vector-effect="non-scaling-stroke"/>`;
+  const box = (x, y, ww, hh, cls) => `<rect class="${cls}" x="${F.x + x}" y="${F.y + y}" width="${ww}" height="${hh}" rx=".5" vector-effect="non-scaling-stroke"/>`;
+  if (sh.kind === 'model') o += box(.6, .6, 30.5, 20, 'md');
+  else if (sh.kind === 'index') o += box(1, 1.4, 8.6, 17, 'vw') + box(10.8, 1.4, 11, 17, 'vw') + box(23, 1.4, 7.8, 7, 'vw');
+  else (sh.views || []).forEach(v => o += box(v.x, v.y, v.w, v.h, 'vw'));
+  o += `<line x1="${G.colX}" y1="1" x2="${G.colX}" y2="${G.bandY}" stroke="rgba(27,26,24,.35)" vector-effect="non-scaling-stroke"/>` +
+       `<line x1="1" y1="${G.bandY}" x2="35" y2="${G.bandY}" stroke="rgba(27,26,24,.35)" vector-effect="non-scaling-stroke"/>`;
+  return o + '</svg>';
+}
+
+/* ---------- desktop sheet ---------- */
+const at = (u, x, y, w, h) => `left:${(x * u).toFixed(1)}px;top:${(y * u).toFixed(1)}px;` + (w != null ? `width:${(w * u).toFixed(1)}px;` : '') + (h != null ? `height:${(h * u).toFixed(1)}px;` : '');
+
+function renderSheet(i, u, forPrint) {
+  const sh = SHEETS[i];
+  const el = document.createElement('section');
+  el.className = 'sheet'; el.dataset.no = sh.no;
+  el.style.setProperty('--in', u + 'px');
+  el.setAttribute('aria-label', 'Sheet ' + sh.no + ', ' + sh.title);
+  let h = sheetLines(u, sh);
+  h += fieldHTML(sh, u, forPrint);
+  h += `<img class="logo" src="${SET.marks.lockup}" alt="ANDRÉ MANDEL" style="${at(u, G.logoX, G.logoTop, G.logoW, G.logoH)}">`;
+  h += columnHTML(u);
+  h += bandHTML(i, u);
+  h += '<div class="turnshade"></div>';
+  el.innerHTML = h;
+  return el;
+}
+
+function fieldHTML(sh, u, forPrint) {
+  const F = G.field; let h = '';
+  if (sh.kind === 'model') {
+    const e = .03;   /* inset so the border and title block hairlines stay visible over the live model */
+    h += `<div class="field" data-field style="${at(u, F.x + e, F.y + e, F.w - 2 * e, F.h - 2 * e)}overflow:hidden;border-top-left-radius:${G.r * u}px;border-bottom-left-radius:0">` +
+         `<img class="poster" src="${SET.model.still}" alt="The Walsh Residence model on Lahontan Lot 235"></div>`;
+    return h;
+  }
+  h += `<div class="field" data-field style="${at(u, F.x, F.y, F.w, F.h)}"></div>`;
+  if (sh.kind === 'index') h += indexSheetHTML(u);
+  (sh.views || []).forEach(v => {
+    h += `<div class="bub t-data" style="${at(u, F.x + v.x, F.y + v.y + v.h + .2)}"><span class="c">${v.n}</span><span class="tt">${esc(v.t)}</span><span class="sc">${esc(v.s)}</span></div>`;
+  });
+  if (sh.note) h += `<div class="note" style="${at(u, F.x + sh.note.x, F.y + sh.note.y)}">${esc(sh.note.t)}</div>`;
+  return h;
+}
+
+function indexTable(showScale) {
+  let h = '<table class="dat t-data"><thead><tr><th class="t-lab">No.</th><th class="t-lab">Sheet</th>' + (showScale ? '<th class="t-lab">Scale</th>' : '') +
+    SET.issuances.map(s => `<th class="t-lab mk">${s.no}</th>`).join('') + '</tr></thead><tbody>';
+  SET.groups.forEach(g => {
+    h += `<tr class="g"><td colspan="${3 + SET.issuances.length}" class="t-lab">${esc(g.name)}</td></tr>`;
+    g.sheets.forEach(s => {
+      h += `<tr class="row" data-go="${s.no}"><td class="no">${s.no}</td><td>${esc(s.title)}</td>` + (showScale ? `<td class="t-it t-mut">${esc(s.scale)}</td>` : '') +
+        SET.issuances.map(x => `<td class="mk">${(s.issued || []).includes(x.no) ? '●' : ''}</td>`).join('') + '</tr>';
+    });
+  });
+  return h + '</tbody></table>';
+}
+function projectTable() {
+  const P = SET.project, rows = [
+    ['Address', P.address.join(', ')], ...P.data,
+    ...SET.agency.map(a => [a[0], a[1]]),
+    ['Designer', 'André Mandel'], ['Architect of record', SET.stamp.name]
+  ];
+  return '<table class="dat t-data"><tbody>' + rows.map(r => `<tr><td class="k">${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('') + '</tbody></table>';
+}
+function indexSheetHTML(u) {
+  const F = G.field; let h = '';
+  const blocks = [
+    { x: 1.0, y: .9, w: 9.2, n: 2, t: 'Project data', s: 'No scale',
+      html: `<p class="hero">${esc(SET.project.name)}</p><p class="sub">${esc(SET.project.sub)} · Truckee</p>` + projectTable() },
+    { x: 11.3, y: .9, w: 11.0, n: 1, t: 'Sheet index', s: 'No scale', html: indexTable(true) },
+    { x: 23.4, y: 9.2, w: 7.4, n: 4, t: 'Issuances', s: 'Newest first',
+      html: '<table class="dat t-data"><thead><tr><th class="t-lab">No.</th><th class="t-lab">Date</th><th class="t-lab">Issued for</th></tr></thead><tbody>' +
+        ISS_NEW.map(s => `<tr><td class="no">${s.no}</td><td>${s.date}</td><td>${esc(s.for)}</td></tr>`).join('') + '</tbody></table>' }
+  ];
+  blocks.forEach(b => { h += `<div class="blockx" style="${at(u, F.x + b.x, F.y + b.y, b.w)}">${b.html}</div>`; });
+  return h + `<div class="blockx" data-vic style="${at(u, F.x + 23.4, F.y + .9, 7.4, 6.4)}border:1px dashed rgba(27,26,24,.5);border-radius:${.16 * u}px"></div>` +
+    `<div class="bub t-data" style="${at(u, F.x + 23.4, F.y + 7.5)}"><span class="c">3</span><span class="tt">Vicinity map</span><span class="sc">No scale</span></div>` +
+    `<div class="bub t-data" style="${at(u, F.x + 1.0, F.y + 19.9)}"><span class="c">2</span><span class="tt">Project data</span><span class="sc">No scale</span></div>` +
+    `<div class="bub t-data" style="${at(u, F.x + 11.3, F.y + 19.9)}"><span class="c">1</span><span class="tt">Sheet index</span><span class="sc">No scale</span></div>`;
+}
+
+function columnHTML(u) {
+  const f = SET.firm, p = SET.project, pad = .22, top = G.logoTop + G.logoH + .3;
+  let h = `<div class="col t-data" style="${at(u, G.colX + pad, top, G.R - G.colX - pad * 2, G.bandY - top - .2)}">`;
+  h += `<div class="blk"><div class="firmname">${esc(f.name)}</div><div class="t-it t-mut">${esc(f.line)}</div>` +
+       f.address.map(a => `<div>${esc(a)}</div>`).join('') + `<div>${f.phone}</div><div>${f.email}</div></div>`;
+  h += `<div class="blk"><div class="t-lab">Project</div><div class="pname">${esc(p.name)}</div><div class="t-it">${esc(p.sub)}</div>` +
+       p.address.map(a => `<div>${esc(a)}</div>`).join('') +
+       `<dl class="kv">${p.data.map(d => `<dt>${esc(d[0])}</dt><dd>${esc(d[1])}</dd>`).join('')}</dl></div>`;
+  h += `<div class="blk"><div class="t-lab">Issuances</div><table class="iss"><thead><tr><th class="t-lab">No.</th><th class="t-lab">Date</th><th class="t-lab">Issued for</th></tr></thead><tbody>` +
+       ISS_NEW.map((s, k) => `<tr class="${k === 0 ? 'new' : ''}"><td>${s.no}</td><td>${s.date}</td><td>${esc(s.for)}</td></tr>`).join('') + `</tbody></table></div>`;
+  h += `<div class="grow"></div>`;
+  h += `<div class="blk"><div class="t-lab">Agency and permits</div>` +
+       SET.agency.map(a => `<div>${esc(a[0])} · <span class="t-it t-mut">${esc(a[1])}</span></div>`).join('') + `</div>`;
+  h += `<div class="blk copy">${esc(SET.copyright)}</div>`;
+  return h + '</div>';
+}
+
+function bandHTML(i, u) {
+  const sh = SHEETS[i], y0 = G.bandY + .14, y1 = G.B - .15, bh = y1 - y0;
+  const ix0 = 1.0, ix1 = 24.95, ggap = .3;
+  const cw = (ix1 - ix0 - ggap * (SET.groups.length - 1)) / SHEETS.length;
+  let h = `<nav class="idx" aria-label="Sheet index" style="${at(u, ix0, y0, ix1 - ix0, bh)}--cw:${(cw * u).toFixed(2)}px;--ggap:${(ggap * u).toFixed(2)}px">`;
+  const tw = Math.max(24 * Math.min(1, u / 46), .54 * u);
+  SET.groups.forEach(g => {
+    h += `<div class="grp"><div class="t-lab">${esc(g.name)}</div><div class="cells">`;
+    g.sheets.forEach(s => {
+      const on = s.no === sh.no;
+      h += `<button type="button" class="cell t-data${on ? ' on' : ''}" data-go="${s.no}" ${on ? 'aria-current="page"' : ''} aria-label="${esc(s.no + ', ' + s.title)}">` +
+           `<span class="fr">${thumb(s, tw)}<span class="no">${s.no}</span></span><span class="ti">${esc(s.title)}</span></button>`;
+    });
+    h += '</div></div>';
+  });
+  h += '</nav>';
+  /* stamp */
+  const sx = 25.25, sw = 3.2, d = Math.min(1.3, bh);
+  h += `<div class="stamp t-data" style="${at(u, sx, y0, sw, bh)}"><div class="seal t-lab" style="width:${d * u}px;height:${d * u}px">Stamp</div>` +
+       `<div class="txt"><div class="t-lab">${esc(SET.stamp.role)}</div><div>${esc(SET.stamp.name)}</div><div class="t-it t-mut">${esc(SET.stamp.when)}</div></div></div>`;
+  /* sheet title */
+  const tx = 28.7, tw2 = G.colX - .2 - tx;
+  const date = ISS_NEW[0].date;
+  h += `<div class="stitle t-data" style="${at(u, tx, y0, tw2, bh)}"><div class="nm">${esc(sh.title)}</div>` +
+       `<div><div class="meta"><span><b>Scale</b>${esc(sh.scale)}</span><span><b>Date</b>${date}</span><span><b>Drawn</b>${SET.drawn}</span></div>` +
+       `<div class="status">${esc(SET.status)}</div></div></div>`;
+  /* sheet number cell */
+  const nx = G.colX + .14, ny = G.bandY + .14, nw = G.R - G.colX - .28, nh = G.B - G.bandY - .28;
+  h += `<div class="snum t-data" style="${at(u, nx, ny, nw, nh)}border-radius:${.14 * u}px ${.14 * u}px ${Math.max(.14, G.r - .1) * u}px ${.14 * u}px;padding:${.12 * u}px ${.18 * u}px">` +
+       `<div class="t-lab">Sheet</div><div class="big">${sh.no}</div><div class="of">${i + 1} of ${SHEETS.length}</div></div>`;
+  return h;
+}
+
+/* ---------- mobile sheet ---------- */
+function renderMobile(i) {
+  const sh = SHEETS[i];
+  const el = document.createElement('section');
+  el.className = 'sheet m'; el.dataset.no = sh.no;
+  el.setAttribute('aria-label', 'Sheet ' + sh.no + ', ' + sh.title);
+  let body = '';
+  if (sh.kind === 'model') body = `<img class="poster" src="${SET.model.still}" alt="The Walsh Residence model on Lahontan Lot 235">`;
+  else {
+    body = `<div class="mscroll"><div class="mhead"><div class="k">${esc(sh.group)} · ${esc(sh.scale)}</div>` +
+      (sh.note ? `<div class="mnote"><i></i>${esc(sh.note.t)}</div>` : '') + `</div>`;
+    if (sh.kind === 'index') {
+      body += `<div class="mdata"><div class="blk">${indexTable(false)}</div><div class="blk">${projectTable()}</div></div>`;
+    } else {
+      (sh.views || []).forEach(v => {
+        body += `<div class="mview"><div class="bx" style="aspect-ratio:${v.w} / ${v.h}"></div>` +
+                `<div class="bub"><span class="c">${v.n}</span><span class="tt">${esc(v.t)}</span><span class="sc">${esc(v.s)}</span></div></div>`;
+      });
+    }
+    body += '</div>';
+  }
+  el.innerHTML = `<div class="mfield"><div class="mclip" data-field>${body}</div><svg class="mframe" aria-hidden="true"></svg></div>` +
+    `<div class="mstrip"><img src="${SET.marks.mark}" alt="ANDRÉ MANDEL"><div class="num">${sh.no}</div>` +
+    `<div class="ttl"><div>${esc(sh.title)}</div><div>${esc(SET.project.name)} · ${i + 1} of ${SHEETS.length}</div></div>` +
+    `<div class="btns"><button type="button" class="ar" data-step="-1" aria-label="Previous sheet"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button>` +
+    `<button type="button" class="ar" data-step="1" aria-label="Next sheet"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button>` +
+    `<button type="button" data-open-index>Index</button></div></div><div class="turnshade"></div>`;
+  return el;
+}
+function mobileFrame(el) {
+  /* hairline frame with the upper right corner cut on the 53.6 degree roof angle */
+  const f = el.querySelector('.mfield'), svg = el.querySelector('.mframe'), clip = el.querySelector('.mclip');
+  const w = f.clientWidth, h = f.clientHeight, a = 26, r = 10, e = a / 0.738;
+  const d = `M${r} .5 L${w - a - 6} .5 Q${w - a} .5 ${w - a + 4} 5 L${w - 3.5} ${e - 5} Q${w - .5} ${e} ${w - .5} ${e + 6} L${w - .5} ${h - r} Q${w - .5} ${h - .5} ${w - r} ${h - .5} L${r} ${h - .5} Q.5 ${h - .5} .5 ${h - r} L.5 ${r} Q.5 .5 ${r} .5Z`;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`); svg.innerHTML = `<path d="${d}"/>`;
+  clip.style.clipPath = `path('${d}')`;
+}
+
+/* =====================================================================
+   RUNTIME: fit, paging, turning, live model
+   ===================================================================== */
+const desk = document.getElementById('desk'), stack = document.getElementById('stack'), live = document.getElementById('live');
+const ctl = document.getElementById('ctl'), mIndex = document.getElementById('mIndex');
+let cur = 0, base = null, u = 46, mobile = false, busy = false, iframe = null;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function layout() {
+  const W = innerWidth, H = innerHeight;
+  mobile = W < 820 || H > W * 1.05;
+  document.body.classList.toggle('mob', mobile); document.body.classList.toggle('desk', !mobile);
+  if (mobile) {
+    u = 0; stack.style.cssText = `left:0;top:0;width:${W}px;height:${H}px;perspective:${W * 3}px`;
+    ctl.style.display = 'none';
+  } else {
+    const pad = Math.max(20, Math.min(40, W / 48));
+    u = Math.min((W - pad * 2) / 36, (H - pad * 2) / 24);
+    const sw = 36 * u, shh = 24 * u, left = (W - sw) / 2, top = (H - shh) / 2;
+    stack.style.cssText = `left:${left}px;top:${top}px;width:${sw}px;height:${shh}px;perspective:${sw * 2.4}px`;
+    ctl.style.display = 'flex';
+    const side = left;
+    if (side >= 72) { ctl.classList.add('v'); ctl.style.cssText = `display:flex;left:${left + sw + (side - 48) / 2}px;top:50%;transform:translateY(-50%)`; }
+    else { ctl.classList.remove('v'); ctl.style.cssText = `display:flex;left:50%;bottom:${Math.max(4, top / 2 - 22)}px;transform:translateX(-50%)`; }
+  }
+  const el = build(cur);
+  if (base) base.remove();
+  base = el; stack.insertBefore(el, live);
+  afterMount(el);
+  placeLive();
+}
+function build(i) { return mobile ? renderMobile(i) : renderSheet(i, u, false); }
+function afterMount(el) { if (mobile) mobileFrame(el); }
+
+function ensureIframe() {
+  if (iframe) return;
+  iframe = document.createElement('iframe');
+  iframe.src = SET.model.src; iframe.title = 'Live 3D model of the Walsh Residence';
+  iframe.setAttribute('allow', 'fullscreen; accelerometer; gyroscope');
+  live.appendChild(iframe);
+}
+function fieldRect(el) {
+  const f = el.querySelector('[data-field]'); if (!f) return null;
+  const a = f.getBoundingClientRect(), b = stack.getBoundingClientRect();
+  return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height };
+}
+function placeLive() {
+  const on = SHEETS[cur].kind === 'model';
+  if (on) {
+    ensureIframe();
+    const r = fieldRect(base);
+    live.style.left = r.x + 'px'; live.style.top = r.y + 'px'; live.style.width = r.w + 'px'; live.style.height = r.h + 'px';
+    live.style.transformOrigin = `${-r.x}px ${stack.clientHeight / 2 - r.y}px`;
+    live.style.borderRadius = mobile ? '0' : `${G.r * u}px 0 0 0`;
+    live.style.clipPath = mobile ? base.querySelector('.mclip').style.clipPath : 'none';
+    live.style.visibility = 'visible';
+  } else live.style.visibility = 'hidden';
+  syncChrome();
+}
+function syncChrome() {
+  const sh = SHEETS[cur];
+  document.getElementById('cCur').textContent = sh.no;
+  document.title = sh.no + ' · Walsh Living Set';
+  if (location.hash.slice(1) !== sh.no) history.replaceState(null, '', '#' + sh.no);
+  if (mIndex.classList.contains('open')) fillMobileIndex();
+}
+
+const turnSpec = { duration: 760, easing: 'cubic-bezier(.45,.05,.25,1)' };
+const OUT = [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-96deg)' }];
+const IN = [{ transform: 'rotateY(-96deg)' }, { transform: 'rotateY(0deg)' }];
+function go(i) {
+  i = Math.max(0, Math.min(SHEETS.length - 1, i));
+  if (i === cur || busy) return;
+  const dir = i > cur ? 1 : -1, old = base, fromModel = SHEETS[cur].kind === 'model';
+  cur = i;
+  const nu = build(i);
+  if (reduce) { old.remove(); base = nu; stack.insertBefore(nu, live); afterMount(nu); placeLive(); return; }
+  busy = true;
+  if (dir > 0) {
+    /* the current sheet lifts off the stack and turns over the left binding */
+    stack.insertBefore(nu, old); afterMount(nu); base = nu;
+    old.classList.add('leaf'); old.style.transformOrigin = 'left center';
+    const a = old.animate(OUT, turnSpec);
+    old.querySelector('.turnshade').animate([{ opacity: 0 }, { opacity: 1 }], turnSpec);
+    if (fromModel) live.animate(OUT, turnSpec);
+    a.onfinish = () => { old.remove(); busy = false; placeLive(); live.style.transform = ''; };
+  } else {
+    /* the previous sheet swings back from the binding onto the stack */
+    nu.classList.add('leaf'); nu.style.transformOrigin = 'left center';
+    stack.insertBefore(nu, live); afterMount(nu); base = nu;
+    const toModel = SHEETS[i].kind === 'model';
+    if (toModel) placeLive(); else live.style.visibility = 'hidden';
+    const a = nu.animate(IN, turnSpec);
+    nu.querySelector('.turnshade').animate([{ opacity: 1 }, { opacity: 0 }], turnSpec);
+    if (toModel) live.animate(IN, turnSpec);
+    a.onfinish = () => { old.remove(); nu.classList.remove('leaf'); nu.style.transformOrigin = ''; busy = false; placeLive(); };
+  }
+  syncChrome();
+}
+
+/* ---------- mobile index panel: the whole title block, collapsed ---------- */
+function fillMobileIndex() {
+  const f = SET.firm, p = SET.project;
+  let h = `<div class="hd"><img src="${SET.marks.lockup}" alt="ANDRÉ MANDEL"><button type="button" class="x" data-close>Close</button></div>`;
+  SET.groups.forEach(g => {
+    h += `<h3>${esc(g.name)}</h3>`;
+    g.sheets.forEach(s => h += `<button type="button" class="it${s.no === SHEETS[cur].no ? ' on' : ''}" data-go="${s.no}"><span class="n">${s.no}</span><span class="t">${esc(s.title)}</span></button>`);
+  });
+  h += `<h3>Project</h3><p style="font-size:20px">${esc(p.name)}</p><p class="mut">${esc(p.sub)}</p>${p.address.map(a => `<p>${esc(a)}</p>`).join('')}` +
+       p.data.map(d => `<p><span class="mut">${esc(d[0])}</span> ${esc(d[1])}</p>`).join('');
+  h += `<h3>Issuances</h3>` + ISS_NEW.map(s => `<p>${s.no} · ${s.date} · ${esc(s.for)}</p>`).join('');
+  h += `<h3>Agency and permits</h3>` + SET.agency.map(a => `<p>${esc(a[0])} · <span class="mut">${esc(a[1])}</span></p>`).join('');
+  h += `<h3>${esc(SET.stamp.role)}</h3><p>${esc(SET.stamp.name)}</p><p class="mut">${esc(SET.stamp.when)}</p>`;
+  h += `<h3>Status</h3><p style="color:var(--accent)" class="mut">${esc(SET.status)}</p>`;
+  h += `<h3>${esc(f.name)}</h3><p class="mut">${esc(f.line)}</p><p>${f.address.join(', ')}</p><p>${f.phone} · ${f.email}</p>`;
+  h += `<p class="mut" style="margin-top:14px;font-size:12px">${esc(SET.copyright)}</p>`;
+  document.getElementById('mPan').innerHTML = h;
+}
+
+/* ---------- input ---------- */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { mIndex.classList.remove('open'); go(IDX(g.dataset.go)); return; }
+  const st = e.target.closest('[data-step]'); if (st) { go(cur + (+st.dataset.step)); return; }
+  if (e.target.closest('[data-open-index]')) { fillMobileIndex(); mIndex.classList.add('open'); return; }
+  if (e.target.closest('[data-close]') || e.target === mIndex) mIndex.classList.remove('open');
+});
+document.getElementById('cPrev').onclick = () => go(cur - 1);
+document.getElementById('cNext').onclick = () => go(cur + 1);
+document.getElementById('cPrint').onclick = () => window.print();
+document.getElementById('cCur').onclick = () => go(IDX('A0.1'));
+addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea')) return;
+  if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+  else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0); else if (e.key === 'End') go(SHEETS.length - 1);
+  else if (e.key === 'Escape') mIndex.classList.remove('open');
+});
+let sx = null, sy = 0;
+desk.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+desk.addEventListener('pointerup', e => {
+  if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(cur + (dx < 0 ? 1 : -1));
+});
+desk.addEventListener('pointercancel', () => sx = null);
+addEventListener('hashchange', () => { const i = IDX(decodeURIComponent(location.hash.slice(1))); if (i >= 0) go(i); });
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!busy) layout(); }, 120); });
+
+/* ---------- print set: every sheet at true size, still image in place of the model ---------- */
+function buildPrint() {
+  const pr = document.getElementById('print'); pr.innerHTML = '';
+  SHEETS.forEach((s, i) => pr.appendChild(renderSheet(i, 96, true)));
+}
+
+/* ---------- start ---------- */
+(function start() {
+  const i = IDX(decodeURIComponent(location.hash.slice(1)));
+  if (i >= 0) cur = i;
+  layout(); buildPrint();
+  if (document.fonts) document.fonts.ready.then(() => { if (!busy) layout(); });
+})();
+</script>
+</body>
+</html>
